@@ -7,18 +7,41 @@ import { ParoquiasDestaque } from "@/components/home/ParoquiasDestaque"
 import { ArcebispoSection } from "@/components/home/ArcebispoSection"
 import { SetoresSection } from "@/components/home/SetoresSection"
 import { DocumentosSection } from "@/components/home/DocumentosSection"
+import { ScrollReveal } from "@/components/providers/ScrollReveal"
 
 export default function Home() {
   return (
     <SiteLayout>
+      {/* Hero sem reveal — é acima da dobra */}
       <Hero />
-      <QuickLinks />
-      <NewsSection />
-      <AgendaMissaSection />
-      <ParoquiasDestaque />
-      <ArcebispoSection />
-      <SetoresSection />
-      <DocumentosSection />
+
+      <ScrollReveal>
+        <QuickLinks />
+      </ScrollReveal>
+
+      <ScrollReveal delay={0.05}>
+        <NewsSection />
+      </ScrollReveal>
+
+      <ScrollReveal delay={0.05}>
+        <AgendaMissaSection />
+      </ScrollReveal>
+
+      <ScrollReveal delay={0.05}>
+        <ParoquiasDestaque />
+      </ScrollReveal>
+
+      <ScrollReveal delay={0.05}>
+        <ArcebispoSection />
+      </ScrollReveal>
+
+      <ScrollReveal delay={0.05}>
+        <SetoresSection />
+      </ScrollReveal>
+
+      <ScrollReveal delay={0.05}>
+        <DocumentosSection />
+      </ScrollReveal>
     </SiteLayout>
   )
 }

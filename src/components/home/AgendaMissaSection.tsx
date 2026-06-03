@@ -77,75 +77,77 @@ export function AgendaMissaSection() {
               </div>
             </div>
 
-            <div className="bg-primary rounded-lg overflow-hidden">
+            <div className="bg-white border border-border rounded-lg overflow-hidden shadow-sm">
               {/* Header */}
-              <div className="px-6 pt-5 pb-4 border-b border-white/15">
-                <p className="text-[10px] font-semibold text-accent uppercase tracking-widest mb-1 flex items-center gap-2">
+              <div className="px-6 pt-5 pb-4 border-b border-border">
+                <p className="text-[10px] font-semibold text-primary uppercase tracking-widest mb-1 flex items-center gap-2">
                   <span className="block w-3 h-0.5 bg-accent" aria-hidden="true" />
                   Busca de horários
                 </p>
-                <h3 className="font-serif text-[20px] font-bold text-white">
+                <h3 className="font-serif text-[20px] font-bold text-foreground">
                   Horários de missa na sua cidade
                 </h3>
               </div>
 
               {/* Form */}
-              <div className="px-6 py-5 space-y-4">
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] font-semibold text-white/70 uppercase tracking-[.06em]">
-                    Cidade
-                  </Label>
-                  <Select value={cidade} onValueChange={(v) => setCidade(v ?? "")}>
-                    <SelectTrigger className="bg-white border-white/30 text-foreground focus:border-accent">
-                      <SelectValue placeholder="Selecione a cidade…" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="botucatu">Botucatu</SelectItem>
-                      <SelectItem value="avare">Avaré</SelectItem>
-                      <SelectItem value="piraju">Piraju</SelectItem>
-                      <SelectItem value="lencois">Lençóis Paulista</SelectItem>
-                      <SelectItem value="ourinhos">Ourinhos</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="px-6 py-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
+                      Cidade
+                    </Label>
+                    <Select value={cidade} onValueChange={(v) => setCidade(v ?? "")}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="botucatu">Botucatu</SelectItem>
+                        <SelectItem value="avare">Avaré</SelectItem>
+                        <SelectItem value="piraju">Piraju</SelectItem>
+                        <SelectItem value="lencois">Lençóis Paulista</SelectItem>
+                        <SelectItem value="ourinhos">Ourinhos</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] font-semibold text-white/70 uppercase tracking-[.06em]">
-                    Paróquia (opcional)
-                  </Label>
-                  <Select disabled={!cidade}>
-                    <SelectTrigger className="bg-white border-white/30 text-foreground disabled:opacity-60">
-                      <SelectValue placeholder="Todas as paróquias" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="todas">Todas as paróquias</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
+                      Paróquia (opcional)
+                    </Label>
+                    <Select disabled={!cidade}>
+                      <SelectTrigger className="disabled:opacity-60">
+                        <SelectValue placeholder="Todas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todas">Todas as paróquias</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] font-semibold text-white/70 uppercase tracking-[.06em]">
-                    Dia da semana
-                  </Label>
-                  <Select value={dia} onValueChange={(v) => setDia(v ?? "")}>
-                    <SelectTrigger className="bg-white border-white/30 text-foreground">
-                      <SelectValue placeholder="Qualquer dia" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="dom">Domingo</SelectItem>
-                      <SelectItem value="seg">Segunda-feira</SelectItem>
-                      <SelectItem value="ter">Terça-feira</SelectItem>
-                      <SelectItem value="qua">Quarta-feira</SelectItem>
-                      <SelectItem value="qui">Quinta-feira</SelectItem>
-                      <SelectItem value="sex">Sexta-feira</SelectItem>
-                      <SelectItem value="sab">Sábado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
+                      Dia da semana
+                    </Label>
+                    <Select value={dia} onValueChange={(v) => setDia(v ?? "")}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Qualquer dia" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="dom">Domingo</SelectItem>
+                        <SelectItem value="seg">Segunda-feira</SelectItem>
+                        <SelectItem value="ter">Terça-feira</SelectItem>
+                        <SelectItem value="qua">Quarta-feira</SelectItem>
+                        <SelectItem value="qui">Quinta-feira</SelectItem>
+                        <SelectItem value="sex">Sexta-feira</SelectItem>
+                        <SelectItem value="sab">Sábado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <Link
                   href="/horarios-de-missa"
-                  className="flex items-center justify-center gap-2 w-full bg-accent text-foreground text-[14px] font-semibold py-3 rounded-md hover:bg-accent/90 transition-colors mt-2"
+                  className="flex items-center justify-center gap-2 w-full bg-accent text-foreground text-[14px] font-semibold py-3 rounded-md hover:bg-accent/90 transition-colors"
                 >
                   <IconSearch size={16} />
                   Buscar horários
@@ -153,7 +155,7 @@ export function AgendaMissaSection() {
               </div>
 
               {/* Footer */}
-              <p className="text-center text-[12px] text-white/55 px-6 pb-5">
+              <p className="text-center text-[12px] text-muted-foreground px-6 pb-5">
                 50 paróquias · 20 municípios da Arquidiocese
               </p>
             </div>

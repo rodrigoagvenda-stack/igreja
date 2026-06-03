@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Source_Sans_3 } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { LenisProvider } from "@/components/providers/LenisProvider";
 import "./globals.css";
 
 const playfairDisplay = Playfair_Display({
@@ -55,7 +56,9 @@ export default function RootLayout({
       className={`${playfairDisplay.variable} ${sourceSans3.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-          <TooltipProvider>{children}</TooltipProvider>
+          <LenisProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </LenisProvider>
         </body>
     </html>
   );

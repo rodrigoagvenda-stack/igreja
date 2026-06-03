@@ -60,20 +60,20 @@ export default function HorariosMissaPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-8">
 
           {/* Formulário */}
-          <div className="bg-primary rounded-xl overflow-hidden h-fit">
-            <div className="px-6 pt-6 pb-4 border-b border-white/15">
-              <p className="text-[10px] font-semibold text-accent uppercase tracking-widest mb-1 flex items-center gap-2">
+          <div className="bg-white border border-border rounded-xl overflow-hidden shadow-sm h-fit">
+            <div className="px-6 pt-6 pb-4 border-b border-border">
+              <p className="text-[10px] font-semibold text-primary uppercase tracking-widest mb-1 flex items-center gap-2">
                 <span className="block w-3 h-0.5 bg-accent" aria-hidden="true" />
                 Busca de horários
               </p>
-              <h2 className="font-serif text-[22px] font-bold text-white">Encontre uma missa</h2>
+              <h2 className="font-serif text-[22px] font-bold text-foreground">Encontre uma missa</h2>
             </div>
 
-            <div className="px-6 py-5 space-y-4">
+            <div className="px-6 py-5 space-y-3">
               <div className="space-y-1.5">
-                <Label className="text-[11px] font-semibold text-white/70 uppercase tracking-[.06em]">Cidade</Label>
+                <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">Cidade</Label>
                 <Select value={cidade} onValueChange={(v) => { setCidade(v ?? ""); setParoquia(""); setBuscou(false) }}>
-                  <SelectTrigger className="bg-white border-white/30 text-foreground">
+                  <SelectTrigger>
                     <SelectValue placeholder="Selecione a cidade…" />
                   </SelectTrigger>
                   <SelectContent>
@@ -84,44 +84,46 @@ export default function HorariosMissaPage() {
                 </Select>
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-[11px] font-semibold text-white/70 uppercase tracking-[.06em]">Paróquia (opcional)</Label>
-                <Select value={paroquia} onValueChange={(v) => setParoquia(v ?? "")} disabled={!cidade}>
-                  <SelectTrigger className="bg-white border-white/30 text-foreground disabled:opacity-60">
-                    <SelectValue placeholder="Todas as paróquias" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todas">Todas as paróquias</SelectItem>
-                    {paroquiasDisponiveis.map(p => (
-                      <SelectItem key={p} value={p}>{p}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">Paróquia (opcional)</Label>
+                  <Select value={paroquia} onValueChange={(v) => setParoquia(v ?? "")} disabled={!cidade}>
+                    <SelectTrigger className="disabled:opacity-60">
+                      <SelectValue placeholder="Todas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todas">Todas as paróquias</SelectItem>
+                      {paroquiasDisponiveis.map(p => (
+                        <SelectItem key={p} value={p}>{p}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-[11px] font-semibold text-white/70 uppercase tracking-[.06em]">Dia da semana</Label>
-                <Select value={dia} onValueChange={(v) => setDia(v ?? "")}>
-                  <SelectTrigger className="bg-white border-white/30 text-foreground">
-                    <SelectValue placeholder="Qualquer dia" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {dias.map(d => <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">Dia da semana</Label>
+                  <Select value={dia} onValueChange={(v) => setDia(v ?? "")}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Qualquer dia" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {dias.map(d => <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <button
                 onClick={handleBuscar}
                 disabled={!cidade}
-                className="flex items-center justify-center gap-2 w-full bg-accent text-foreground text-[14px] font-semibold py-3 rounded-md hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+                className="flex items-center justify-center gap-2 w-full bg-accent text-foreground text-[14px] font-semibold py-3 rounded-md hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <IconSearch size={16} />
                 Buscar horários
               </button>
             </div>
 
-            <p className="text-center text-[12px] text-white/50 px-6 pb-5">
+            <p className="text-center text-[12px] text-muted-foreground px-6 pb-5">
               50 paróquias · 20 municípios da Arquidiocese
             </p>
           </div>
