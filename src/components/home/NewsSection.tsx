@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { IconCalendar, IconArrowRight, IconPhoto } from "@tabler/icons-react"
+import Image from "next/image"
+import { IconCalendar, IconArrowRight } from "@tabler/icons-react"
 import { Badge } from "@/components/ui/badge"
 
 const featured = {
@@ -44,13 +45,12 @@ export function NewsSection() {
             className="group bg-card rounded-lg border border-border overflow-hidden hover:border-primary hover:shadow-[0_4px_20px_rgba(139,26,46,.1)] transition-all"
             aria-label={featured.title}
           >
-            {/* Image placeholder */}
-            <div className="h-[200px] md:h-[220px] bg-gradient-to-br from-muted to-border flex items-center justify-center relative">
-              <IconPhoto size={40} className="text-muted-foreground/40" aria-hidden="true" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/40 to-transparent px-4 pb-3 pt-8">
-                <span className="text-[11px] font-semibold text-white/90 uppercase tracking-[.06em]">
-                  {featured.category}
-                </span>
+            {/* Image */}
+            <div className="h-[200px] md:h-[220px] relative overflow-hidden">
+              <Image src="https://picsum.photos/seed/noticia-destaque/700/300" alt={featured.title} fill className="object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 px-4 pb-3">
+                <span className="text-[11px] font-semibold text-white/90 uppercase tracking-[.06em]">{featured.category}</span>
               </div>
             </div>
 
@@ -80,9 +80,9 @@ export function NewsSection() {
                 href={href}
                 className="group flex gap-4 items-start bg-card border border-border rounded-lg p-4 hover:border-primary hover:bg-primary/5 transition-all"
               >
-                {/* Thumb placeholder */}
-                <div className="w-16 h-16 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
-                  <IconPhoto size={22} className="text-muted-foreground/40" aria-hidden="true" />
+                {/* Thumb */}
+                <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 relative">
+                  <Image src={`https://picsum.photos/seed/noticia-${href}/80/80`} alt={title} fill className="object-cover" />
                 </div>
 
                 <div className="flex-1 min-w-0">

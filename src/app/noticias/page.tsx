@@ -2,10 +2,11 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { SiteLayout } from "@/components/layout/SiteLayout"
 import { PageHeader } from "@/components/layout/PageHeader"
 import { Badge } from "@/components/ui/badge"
-import { IconCalendar, IconPhoto, IconArrowRight } from "@tabler/icons-react"
+import { IconCalendar, IconArrowRight } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
 export const dynamic = "force-static"
@@ -74,11 +75,10 @@ export default function NoticiasPage() {
               className="group bg-card border border-border rounded-lg overflow-hidden hover:border-primary hover:shadow-[0_4px_20px_rgba(39,79,160,.10)] transition-all flex flex-col"
             >
               {/* Thumb */}
-              <div className="h-[180px] bg-gradient-to-br from-muted to-border flex items-center justify-center flex-shrink-0 relative">
-                <IconPhoto size={36} className="text-muted-foreground/30" aria-hidden="true" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent px-3 pb-2 pt-6">
-                  <span className="text-[10px] font-semibold text-white/90 uppercase tracking-[.06em]">{categoria}</span>
-                </div>
+              <div className="h-[180px] relative overflow-hidden flex-shrink-0">
+                <Image src={`https://picsum.photos/seed/${slug}/600/240`} alt={titulo} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <span className="absolute bottom-2 left-3 text-[10px] font-semibold text-white/90 uppercase tracking-[.06em]">{categoria}</span>
               </div>
 
               {/* Body */}

@@ -1,9 +1,10 @@
 import { SiteLayout } from "@/components/layout/SiteLayout"
 import { PageHeader } from "@/components/layout/PageHeader"
 import Link from "next/link"
+import Image from "next/image"
 import {
   IconMapPin, IconPhone, IconMail, IconClock,
-  IconUser, IconBuildingChurch, IconArrowLeft, IconPhoto,
+  IconUser, IconArrowLeft,
 } from "@tabler/icons-react"
 
 export const metadata = { title: "Paróquia" }
@@ -47,8 +48,9 @@ export default function ParoquiaSlugPage() {
           {/* Main */}
           <div className="space-y-8">
             {/* Hero image */}
-            <div className="w-full h-[260px] bg-gradient-to-br from-muted to-border rounded-lg flex items-center justify-center">
-              <IconBuildingChurch size={64} className="text-muted-foreground/20" aria-hidden="true" />
+            <div className="w-full h-[260px] relative rounded-lg overflow-hidden">
+              <Image src="https://picsum.photos/seed/catedral-nossa-senhora/900/400" alt={paroquia.nome} fill className="object-cover" priority />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
 
             {/* Descrição */}
@@ -83,8 +85,8 @@ export default function ParoquiaSlugPage() {
               <h2 className="font-serif text-[20px] font-bold mb-4 pb-3 border-b border-border">Galeria</h2>
               <div className="grid grid-cols-3 gap-3">
                 {[1,2,3,4,5,6].map(i => (
-                  <div key={i} className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-                    <IconPhoto size={24} className="text-muted-foreground/30" aria-hidden="true" />
+                  <div key={i} className="aspect-square relative rounded-lg overflow-hidden">
+                    <Image src={`https://picsum.photos/seed/galeria-paroquia-${i}/200/200`} alt={`Foto ${i}`} fill className="object-cover hover:scale-105 transition-transform duration-300" />
                   </div>
                 ))}
               </div>

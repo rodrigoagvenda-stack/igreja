@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { IconArrowRight, IconUser } from "@tabler/icons-react"
+import Image from "next/image"
+import { IconArrowRight } from "@tabler/icons-react"
 
 export function ArcebispoSection() {
   return (
@@ -7,9 +8,9 @@ export function ArcebispoSection() {
       <div className="max-w-[1100px] mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-10">
 
-          {/* Photo placeholder */}
-          <div className="w-[110px] h-[110px] rounded-lg bg-white/15 border-2 border-white/25 flex items-center justify-center flex-shrink-0">
-            <IconUser size={48} className="text-white/40" aria-hidden="true" />
+          {/* Photo */}
+          <div className="w-[110px] h-[110px] rounded-lg overflow-hidden border-2 border-white/25 flex-shrink-0 relative">
+            <Image src="https://picsum.photos/seed/arcebispo-botucatu/110/110" alt="Arcebispo" fill className="object-cover" />
           </div>
 
           {/* Content */}

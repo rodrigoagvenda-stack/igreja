@@ -1,6 +1,6 @@
 import { SiteLayout } from "@/components/layout/SiteLayout"
 import { PageHeader } from "@/components/layout/PageHeader"
-import { IconUser, IconArrowRight } from "@tabler/icons-react"
+import Image from "next/image"
 import Link from "next/link"
 
 export const metadata = { title: "O Arcebispo" }
@@ -31,8 +31,8 @@ export default function ArcebispoPage() {
 
           {/* Foto + info */}
           <div className="space-y-4">
-            <div className="w-full aspect-[3/4] max-w-[260px] mx-auto lg:mx-0 bg-muted rounded-xl flex items-center justify-center border border-border">
-              <IconUser size={72} className="text-muted-foreground/20" aria-hidden="true" />
+            <div className="w-full aspect-[3/4] max-w-[260px] mx-auto lg:mx-0 rounded-xl overflow-hidden relative border border-border">
+              <Image src="https://picsum.photos/seed/arcebispo-retrato/280/380" alt="Dom [Arcebispo]" fill className="object-cover" priority />
             </div>
             <div className="bg-card border border-border rounded-lg p-4 space-y-2 text-[13px]">
               <p className="font-serif font-bold text-[16px]">Dom [Nome do Arcebispo]</p>

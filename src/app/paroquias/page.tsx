@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/layout/SiteLayout"
 import { PageHeader } from "@/components/layout/PageHeader"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Image from "next/image"
 import { IconSearch, IconMapPin, IconBuildingChurch, IconUser } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
@@ -82,8 +83,9 @@ export default function ParoquiasPage() {
               className="group bg-card border border-border rounded-lg overflow-hidden hover:border-primary hover:shadow-[0_4px_16px_rgba(39,79,160,.10)] transition-all"
             >
               {/* Image */}
-              <div className="h-[130px] bg-gradient-to-br from-muted to-border flex items-center justify-center">
-                <IconBuildingChurch size={44} className="text-muted-foreground/25 group-hover:text-primary/30 transition-colors" aria-hidden="true" />
+              <div className="h-[130px] relative overflow-hidden">
+                <Image src={`https://picsum.photos/seed/${slug}/400/160`} alt={nome} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors" />
               </div>
               {/* Body */}
               <div className="p-4">

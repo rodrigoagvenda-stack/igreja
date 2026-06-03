@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { IconMapPin, IconArrowRight, IconBuildingChurch } from "@tabler/icons-react"
+import Image from "next/image"
+import { IconMapPin, IconArrowRight } from "@tabler/icons-react"
 
 const paroquias = [
   { nome: "Catedral Nossa Senhora das Dores", cidade: "Botucatu", href: "/paroquias/catedral-nossa-senhora-das-dores" },
@@ -34,9 +35,10 @@ export function ParoquiasDestaque() {
               href={href}
               className="group bg-card border border-border rounded-lg overflow-hidden hover:border-primary hover:shadow-[0_4px_16px_rgba(139,26,46,.12)] transition-all"
             >
-              {/* Image placeholder */}
-              <div className="h-[120px] bg-gradient-to-br from-muted to-border flex items-center justify-center">
-                <IconBuildingChurch size={40} className="text-muted-foreground/30 group-hover:text-primary/40 transition-colors" aria-hidden="true" />
+              {/* Image */}
+              <div className="h-[120px] relative overflow-hidden">
+                <Image src={`https://picsum.photos/seed/${href}/400/160`} alt={nome} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors" />
               </div>
 
               {/* Body */}

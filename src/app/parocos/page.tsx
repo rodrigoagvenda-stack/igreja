@@ -2,10 +2,11 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { SiteLayout } from "@/components/layout/SiteLayout"
 import { PageHeader } from "@/components/layout/PageHeader"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { IconUser, IconMapPin, IconBuildingChurch } from "@tabler/icons-react"
+import { IconMapPin, IconBuildingChurch } from "@tabler/icons-react"
 
 export const dynamic = "force-static"
 
@@ -57,8 +58,8 @@ export default function ParocosPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           {filtrados.map(({ nome, paroquia, cidade: c }) => (
             <div key={nome} className="bg-card border border-border rounded-lg p-5 flex flex-col items-center text-center gap-3 hover:border-primary hover:shadow-[0_4px_16px_rgba(39,79,160,.08)] transition-all">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <IconUser size={28} className="text-primary" aria-hidden="true" />
+              <div className="w-16 h-16 rounded-full overflow-hidden relative flex-shrink-0">
+                <Image src={`https://picsum.photos/seed/paroco-${nome}/80/80`} alt={nome} fill className="object-cover" />
               </div>
               <div>
                 <p className="font-serif font-bold text-[14px] leading-snug">{nome}</p>

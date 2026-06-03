@@ -1,8 +1,9 @@
 import { SiteLayout } from "@/components/layout/SiteLayout"
 import { PageHeader } from "@/components/layout/PageHeader"
 import Link from "next/link"
+import Image from "next/image"
 import {
-  IconCalendar, IconUser, IconTag, IconBrandWhatsapp,
+  IconCalendar, IconUser, IconBrandWhatsapp,
   IconBrandFacebook, IconLink, IconArrowLeft, IconPhoto,
 } from "@tabler/icons-react"
 import { Badge } from "@/components/ui/badge"
@@ -54,8 +55,9 @@ export default function NoticiaSlugPage() {
           {/* Main article */}
           <article>
             {/* Hero image */}
-            <div className="w-full h-[280px] md:h-[360px] bg-gradient-to-br from-muted to-border rounded-lg flex items-center justify-center mb-6">
-              <IconPhoto size={52} className="text-muted-foreground/25" aria-hidden="true" />
+            <div className="w-full h-[280px] md:h-[360px] relative rounded-lg overflow-hidden mb-6">
+              <Image src="https://picsum.photos/seed/noticia-destaque-slug/900/400" alt={artigo.titulo} fill className="object-cover" priority />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
 
             {/* Meta */}
@@ -110,8 +112,8 @@ export default function NoticiaSlugPage() {
                     href={`/noticias/${slug}`}
                     className="group flex gap-3 items-start"
                   >
-                    <div className="w-14 h-14 rounded-md bg-muted flex-shrink-0 flex items-center justify-center">
-                      <IconPhoto size={18} className="text-muted-foreground/40" aria-hidden="true" />
+                    <div className="w-14 h-14 rounded-md overflow-hidden flex-shrink-0 relative">
+                      <Image src={`https://picsum.photos/seed/${slug}/80/80`} alt={titulo} fill className="object-cover" />
                     </div>
                     <div>
                       <span className={`inline-flex text-[9px] font-semibold uppercase tracking-[.06em] px-1.5 py-0.5 rounded-sm mb-1 ${categoryColor[categoria] ?? "bg-muted text-muted-foreground"}`}>
