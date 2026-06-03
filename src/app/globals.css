@@ -1,0 +1,215 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Class-based dark mode — add class="dark" to any ancestor */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* === COLOR TOKENS === */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  /* === SEMANTIC CUSTOM === */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  /* === RADIUS === */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  /* === FONTS === */
+  --font-sans: var(--font-source-sans-3), system-ui, sans-serif;
+  --font-serif: var(--font-playfair-display), Georgia, serif;
+  --font-mono: ui-monospace, monospace;
+  --font-heading: var(--font-playfair-display), Georgia, serif;
+}
+
+/* ══════════════════════════════════════════════════
+   LIGHT MODE — Arquidiocese de Botucatu
+   Primary: azul institucional #274FA0  Accent: ouro #C9A84C
+   ══════════════════════════════════════════════════ */
+:root {
+  /* === BASE === */
+  --background: oklch(0.97 0.007 78);        /* #f5f3ef creme quente */
+  --foreground: oklch(0.145 0 0);            /* #1a1a1a quase preto */
+
+  /* === CARD === */
+  --card: oklch(1 0 0);                      /* #ffffff branco */
+  --card-foreground: oklch(0.145 0 0);
+
+  /* === POPOVER / DROPDOWN === */
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+
+  /* === PRIMARY — azul institucional #274FA0 === */
+  --primary: oklch(0.39 0.16 257);
+  --primary-foreground: oklch(1 0 0);
+
+  /* === SECONDARY === */
+  --secondary: oklch(0.95 0.007 78);         /* #f0eeea cinza quente */
+  --secondary-foreground: oklch(0.145 0 0);
+
+  /* === MUTED === */
+  --muted: oklch(0.95 0.007 78);
+  --muted-foreground: oklch(0.42 0.006 50);  /* #5a5753 */
+
+  /* === ACCENT — ouro #C9A84C === */
+  --accent: oklch(0.73 0.116 79);
+  --accent-foreground: oklch(0.145 0 0);
+
+  /* === DESTRUCTIVE === */
+  --destructive: oklch(0.48 0.18 22);        /* #b91c1c vermelho erro */
+  --destructive-foreground: oklch(1 0 0);
+
+  /* === BORDERS & INPUTS === */
+  --border: oklch(0.9 0.008 77);             /* #e2dfd9 */
+  --input: oklch(0.85 0.009 77);
+  --ring: oklch(0.39 0.16 257);              /* foco = primary */
+
+  /* === BORDER RADIUS === */
+  --radius: 0.5rem;
+
+  /* === CHART COLORS (visualmente distintos) === */
+  --chart-1: oklch(0.39 0.16 257);          /* azul */
+  --chart-2: oklch(0.73 0.116 79);          /* ouro */
+  --chart-3: oklch(0.44 0.12 147);          /* verde */
+  --chart-4: oklch(0.52 0.12 58);           /* âmbar */
+  --chart-5: oklch(0.42 0.006 50);          /* cinza */
+
+  /* === SIDEBAR / TOPBAR === */
+  --sidebar: oklch(0.26 0.13 257);          /* #1B3472 marinho escuro */
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.39 0.16 257);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.32 0.12 257);
+  --sidebar-accent-foreground: oklch(0.97 0.005 50);
+  --sidebar-border: oklch(0.35 0.10 257);
+  --sidebar-ring: oklch(0.73 0.116 79);     /* ouro */
+
+  /* === SEMANTIC COLORS === */
+  --success: oklch(0.44 0.12 147);
+  --success-foreground: oklch(1 0 0);
+  --warning: oklch(0.52 0.12 58);
+  --warning-foreground: oklch(0.145 0 0);
+  --info: oklch(0.41 0.14 264);
+  --info-foreground: oklch(1 0 0);
+}
+
+/* ══════════════════════════════════════════════════
+   DARK MODE
+   ══════════════════════════════════════════════════ */
+.dark {
+  /* === BASE DARK === */
+  --background: oklch(0.13 0.02 257);       /* #0d1a30 fundo azul muito escuro */
+  --foreground: oklch(0.97 0.007 78);
+
+  /* === CARD DARK === */
+  --card: oklch(0.18 0.025 257);
+  --card-foreground: oklch(0.97 0.007 78);
+
+  /* === POPOVER DARK === */
+  --popover: oklch(0.18 0.025 257);
+  --popover-foreground: oklch(0.97 0.007 78);
+
+  /* === PRIMARY DARK — azul mais claro === */
+  --primary: oklch(0.55 0.17 257);
+  --primary-foreground: oklch(1 0 0);
+
+  /* === SECONDARY DARK === */
+  --secondary: oklch(0.22 0.03 257);
+  --secondary-foreground: oklch(0.97 0.007 78);
+
+  /* === MUTED DARK === */
+  --muted: oklch(0.22 0.03 257);
+  --muted-foreground: oklch(0.62 0.005 50);
+
+  /* === ACCENT DARK — ouro permanece === */
+  --accent: oklch(0.73 0.116 79);
+  --accent-foreground: oklch(0.145 0 0);
+
+  /* === DESTRUCTIVE DARK === */
+  --destructive: oklch(0.62 0.21 22);
+  --destructive-foreground: oklch(1 0 0);
+
+  /* === BORDERS DARK === */
+  --border: oklch(0.24 0.04 257);
+  --input: oklch(0.24 0.04 257);
+  --ring: oklch(0.55 0.17 257);
+
+  /* === CHART DARK === */
+  --chart-1: oklch(0.55 0.17 257);
+  --chart-2: oklch(0.73 0.116 79);
+  --chart-3: oklch(0.55 0.14 147);
+  --chart-4: oklch(0.72 0.14 65);
+  --chart-5: oklch(0.55 0.005 50);
+
+  /* === SIDEBAR DARK === */
+  --sidebar: oklch(0.09 0.015 257);
+  --sidebar-foreground: oklch(0.75 0.008 50);
+  --sidebar-primary: oklch(0.55 0.17 257);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.18 0.025 257);
+  --sidebar-accent-foreground: oklch(0.85 0.005 50);
+  --sidebar-border: oklch(0.22 0.03 257);
+  --sidebar-ring: oklch(0.73 0.116 79);
+
+  /* === SEMANTIC DARK === */
+  --success: oklch(0.6 0.16 147);
+  --success-foreground: oklch(0.145 0 0);
+  --warning: oklch(0.72 0.14 65);
+  --warning-foreground: oklch(0.145 0 0);
+  --info: oklch(0.6 0.17 264);
+  --info-foreground: oklch(1 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+  html {
+    @apply font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
