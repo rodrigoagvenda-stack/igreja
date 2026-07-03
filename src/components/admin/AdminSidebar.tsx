@@ -11,12 +11,21 @@ import {
 } from "@tabler/icons-react"
 import { useState } from "react"
 
-const nav = [
-  { label: "Dashboard",       href: "/admin",           icon: IconLayoutDashboard },
-  { label: "Notícias",        href: "/admin/noticias",  icon: IconNews },
-  { label: "Agenda",          href: "/admin/agenda",    icon: IconCalendar },
-  { label: "Paróquias",       href: "/admin/paroquias", icon: IconBuildingChurch },
-  { label: "Horários de Missa", href: "/admin/horarios", icon: IconClock },
+type Icon = React.ComponentType<{ size?: number; className?: string }>
+type NavLink  = { label: string; href: string; icon: Icon; children?: never }
+type NavGroup = { label: string; icon: Icon; children: { label: string; href: string }[]; href?: never }
+type NavItem  = NavLink | NavGroup
+
+function isGroup(item: NavItem): item is NavGroup {
+  return Array.isArray((item as NavGroup).children)
+}
+
+const nav: NavItem[] = [
+  { label: "Dashboard",         href: "/admin",            icon: IconLayoutDashboard },
+  { label: "Notícias",          href: "/admin/noticias",   icon: IconNews },
+  { label: "Agenda",            href: "/admin/agenda",     icon: IconCalendar },
+  { label: "Paróquias",         href: "/admin/paroquias",  icon: IconBuildingChurch },
+  { label: "Horários de Missa", href: "/admin/horarios",   icon: IconClock },
   {
     label: "Clero", icon: IconUsers,
     children: [
@@ -25,8 +34,8 @@ const nav = [
       { label: "Seminaristas", href: "/admin/clero/seminaristas" },
     ],
   },
-  { label: "Documentos",      href: "/admin/documentos",     icon: IconFileText },
-  { label: "Configurações",   href: "/admin/configuracoes",  icon: IconSettings },
+  { label: "Documentos",    href: "/admin/documentos",    icon: IconFileText },
+  { label: "Configurações", href: "/admin/configuracoes", icon: IconSettings },
 ]
 
 export function AdminSidebar() {
@@ -54,7 +63,7 @@ export function AdminSidebar() {
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5 overflow-y-auto">
         {nav.map((item) => {
-          if ("children" in item) {
+          if (isGroup(item)) {
             const isActive = item.children.some(c => pathname.startsWith(c.href))
             return (
               <div key={item.label}>
