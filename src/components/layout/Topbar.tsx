@@ -14,7 +14,7 @@ export function Topbar() {
       <div className="max-w-[1100px] mx-auto px-6 flex justify-between items-center">
         <div className="flex items-center gap-1.5 text-white/60">
           <IconMapPin size={13} aria-hidden="true" />
-          <span>Rua da Cúria, 123 — Botucatu, SP</span>
+          <span>Rua Dr. Costa Leite, 668 — Botucatu, SP</span>
         </div>
         <nav aria-label="Links rápidos">
           <ul className="flex items-center">

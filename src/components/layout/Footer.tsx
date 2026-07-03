@@ -42,8 +42,8 @@ const footerCols = [
 ]
 
 const socials = [
-  { icon: <IconBrandInstagram size={15} />, label: "Instagram", href: "#" },
-  { icon: <IconBrandFacebook size={15} />,  label: "Facebook",  href: "#" },
+  { icon: <IconBrandInstagram size={15} />, label: "Instagram", href: "https://www.instagram.com/arquidiocesebotucatu" },
+  { icon: <IconBrandFacebook size={15} />,  label: "Facebook",  href: "https://www.facebook.com/arquidiocesedebotucatu" },
   { icon: <IconBrandYoutube size={15} />,   label: "YouTube",   href: "#" },
 ]
 
@@ -59,21 +59,21 @@ export function Footer() {
             <FooterLogo />
 
             <p className="text-white/50 text-xs leading-relaxed">
-              Portal Oficial da Arquidiocese de Botucatu — Cúria Metropolitana. Servindo às 50 paróquias e cerca de 20 municípios da região.
+              Portal Oficial da Arquidiocese de Botucatu — Cúria Metropolitana. Servindo às 47 paróquias em 4 regiões pastorais.
             </p>
 
             <address className="not-italic space-y-1.5 text-xs text-white/45">
               <p className="flex items-center gap-2">
                 <IconMapPin size={12} className="text-accent flex-shrink-0" />
-                Rua da Cúria, 123 — Botucatu, SP
+                Rua Dr. Costa Leite, 668 — Centro, Botucatu, SP
               </p>
               <p className="flex items-center gap-2">
                 <IconPhone size={12} className="text-accent flex-shrink-0" />
-                (14) 3111-0000
+                (14) 3811-5900
               </p>
               <p className="flex items-center gap-2">
                 <IconMail size={12} className="text-accent flex-shrink-0" />
-                contato@arquidiocesebotucatu.org.br
+                secretaria@arquidiocesebotucatu.org.br
               </p>
             </address>
 

@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import {
   IconCalendar, IconUser, IconBrandWhatsapp,
-  IconBrandFacebook, IconLink, IconArrowLeft, IconPhoto,
+  IconBrandFacebook, IconLink, IconArrowLeft,
 } from "@tabler/icons-react"
 import { Badge } from "@/components/ui/badge"
 
