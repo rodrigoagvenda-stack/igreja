@@ -42,7 +42,7 @@ const footerCols = [
 ]
 
 const socials = [
-  { icon: <IconBrandInstagram size={15} />, label: "Instagram", href: "https://www.instagram.com/arquidiocesebotucatu" },
+  { icon: <IconBrandInstagram size={15} />, label: "Instagram", href: "https://www.instagram.com/arquidiocesedebotucatu" },
   { icon: <IconBrandFacebook size={15} />,  label: "Facebook",  href: "https://www.facebook.com/arquidiocesedebotucatu" },
   { icon: <IconBrandYoutube size={15} />,   label: "YouTube",   href: "#" },
 ]

@@ -115,23 +115,23 @@ export default function ContatoPage() {
               <h3 className="font-serif text-[16px] font-bold pb-3 border-b border-border">Cúria Metropolitana</h3>
               <div className="flex gap-3 text-[13px]">
                 <IconMapPin size={16} className="text-primary flex-shrink-0 mt-0.5" />
-                <p className="leading-[1.5]">Rua da Cúria, 123 — Centro<br />Botucatu/SP — CEP 18600-000</p>
+                <p className="leading-[1.5]">Rua Dr. Costa Leite, 668 — Centro<br />Botucatu/SP — CEP 18600-010</p>
               </div>
               <div className="flex gap-3 text-[13px]">
                 <IconPhone size={16} className="text-primary flex-shrink-0 mt-0.5" />
-                <p>(14) 3111-0000</p>
+                <p>(14) 3811-5900</p>
               </div>
               <div className="flex gap-3 text-[13px]">
                 <IconMail size={16} className="text-primary flex-shrink-0 mt-0.5" />
-                <a href="mailto:contato@arquidiocesebotucatu.org.br" className="text-primary hover:underline break-all">
-                  contato@arquidiocesebotucatu.org.br
+                <a href="mailto:secretaria@arquidiocesebotucatu.org.br" className="text-primary hover:underline break-all">
+                  secretaria@arquidiocesebotucatu.org.br
                 </a>
               </div>
               <div className="flex gap-3 text-[13px]">
                 <IconClock size={16} className="text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p>Segunda a sexta</p>
-                  <p className="text-muted-foreground">8h00 – 12h00 | 13h30 – 17h30</p>
+                  <p className="text-muted-foreground">8h00 – 18h00</p>
                 </div>
               </div>
             </div>
