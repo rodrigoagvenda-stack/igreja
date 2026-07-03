@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Só processa rotas /admin
@@ -44,7 +44,6 @@ export async function middleware(request: NextRequest) {
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
 
   if (!aal || aal.currentLevel !== "aal2") {
-    // Usuário logado mas MFA não concluído → redireciona para login com flag
     const loginUrl = new URL("/admin/login", request.url)
     loginUrl.searchParams.set("mfa", "required")
     return NextResponse.redirect(loginUrl)
