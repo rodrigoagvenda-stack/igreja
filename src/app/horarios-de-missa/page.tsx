@@ -19,10 +19,38 @@ const cidadesData: Record<string, string[]> = {
   ourinhos:  ["Paróquia Nossa Senhora das Graças", "Paróquia São Luís"],
 }
 
-const resultadosMock = [
-  { paroquia: "Catedral Nossa Senhora das Dores", cidade: "Botucatu", horarios: ["8h00", "10h00", "18h00"], href: "/paroquias/catedral-nossa-senhora-das-dores" },
-  { paroquia: "Paróquia São José",                cidade: "Botucatu", horarios: ["7h30", "10h00", "19h30"], href: "/paroquias/sao-jose-botucatu" },
-  { paroquia: "Paróquia Sagrado Coração de Jesus",cidade: "Botucatu", horarios: ["8h00", "18h00"],          href: "/paroquias/sagrado-coracao-botucatu" },
+type Local = { nome: string; tipo: "Matriz" | "Capela"; horarios: string[] }
+type ResultadoParoquia = { paroquia: string; cidade: string; locais: Local[]; href: string }
+
+const resultadosMock: ResultadoParoquia[] = [
+  {
+    paroquia: "Catedral Nossa Senhora das Dores",
+    cidade: "Botucatu",
+    href: "/paroquias/catedral-nossa-senhora-das-dores",
+    locais: [
+      { nome: "Igreja Matriz — Catedral",       tipo: "Matriz",  horarios: ["8h00", "10h00", "18h00"] },
+      { nome: "Capela São João Batista",         tipo: "Capela",  horarios: ["7h00", "19h00"] },
+      { nome: "Capela Nossa Senhora de Fátima",  tipo: "Capela",  horarios: ["9h00"] },
+    ],
+  },
+  {
+    paroquia: "Paróquia São José",
+    cidade: "Botucatu",
+    href: "/paroquias/sao-jose-botucatu",
+    locais: [
+      { nome: "Igreja Matriz — São José",  tipo: "Matriz",  horarios: ["7h30", "10h00", "19h30"] },
+      { nome: "Capela Santo Expedito",     tipo: "Capela",  horarios: ["8h00"] },
+    ],
+  },
+  {
+    paroquia: "Paróquia Sagrado Coração de Jesus",
+    cidade: "Botucatu",
+    href: "/paroquias/sagrado-coracao-botucatu",
+    locais: [
+      { nome: "Igreja Matriz — Sagrado Coração",  tipo: "Matriz",  horarios: ["8h00", "18h00"] },
+      { nome: "Capela São Francisco de Assis",    tipo: "Capela",  horarios: ["7h00", "17h00"] },
+    ],
+  },
 ]
 
 const dias = [
@@ -139,9 +167,10 @@ export default function HorariosMissaPage() {
             ) : (
               <div className="space-y-4">
                 <p className="text-[13px] text-muted-foreground">{resultadosMock.length} paróquias encontradas</p>
-                {resultadosMock.map(({ paroquia: p, cidade: c, horarios, href }) => (
-                  <div key={p} className="bg-card border border-border rounded-lg p-5 hover:border-primary hover:shadow-[0_2px_12px_rgba(39,79,160,.08)] transition-all">
-                    <div className="flex items-start justify-between gap-3 mb-3">
+                {resultadosMock.map(({ paroquia: p, cidade: c, locais, href }) => (
+                  <div key={p} className="bg-card border border-border rounded-lg overflow-hidden hover:border-primary hover:shadow-[0_2px_12px_rgba(39,79,160,.08)] transition-all">
+                    {/* Cabeçalho da paróquia */}
+                    <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-3 border-b border-border">
                       <div>
                         <h3 className="font-serif font-bold text-[16px] leading-snug">{p}</h3>
                         <p className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5">
@@ -152,11 +181,25 @@ export default function HorariosMissaPage() {
                         Ver paróquia <IconArrowRight size={12} />
                       </Link>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {horarios.map(h => (
-                        <span key={h} className="flex items-center gap-1 text-[12px] bg-primary/10 text-primary px-2.5 py-1 rounded-md font-medium">
-                          <IconClock size={11} /> {h}
-                        </span>
+
+                    {/* Locais com horários */}
+                    <div className="divide-y divide-border">
+                      {locais.map(({ nome, tipo, horarios }) => (
+                        <div key={nome} className="px-5 py-3 flex flex-col sm:flex-row sm:items-center gap-2">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <span className={`text-[10px] font-semibold uppercase tracking-[.05em] px-1.5 py-0.5 rounded flex-shrink-0 ${tipo === "Matriz" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                              {tipo}
+                            </span>
+                            <span className="text-[13px] font-medium truncate">{nome}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {horarios.map(h => (
+                              <span key={h} className="flex items-center gap-1 text-[12px] bg-primary/10 text-primary px-2 py-0.5 rounded font-medium">
+                                <IconClock size={10} /> {h}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>

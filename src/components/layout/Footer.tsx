@@ -21,7 +21,9 @@ const footerCols = [
     title: "Pastoral",
     links: [
       { label: "Paróquias",            href: "/paroquias" },
-      { label: "Párocos",              href: "/parocos" },
+      { label: "Padres",               href: "/padres" },
+      { label: "Diáconos",             href: "/diaconos" },
+      { label: "Seminaristas",         href: "/seminaristas" },
       { label: "Setores pastorais",    href: "/setores" },
       { label: "Agenda pastoral",      href: "/agenda" },
       { label: "Horários de missa",    href: "/horarios-de-missa" },

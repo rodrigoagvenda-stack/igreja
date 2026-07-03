@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import {
-  IconSearch, IconClock, IconMenu2, IconArrowRight,
+  IconSearch, IconClock, IconMenu2, IconArrowRight, IconChevronDown,
   IconBrandInstagram, IconBrandFacebook, IconBrandYoutube,
 } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
@@ -18,15 +18,22 @@ const navLinks = [
   { label: "Sobre",       href: "/sobre" },
   { label: "Notícias",    href: "/noticias" },
   { label: "Paróquias",   href: "/paroquias" },
-  { label: "Párocos",     href: "/parocos" },
   { label: "Agenda",      href: "/agenda" },
   { label: "Setores",     href: "/setores" },
   { label: "Documentos",  href: "/documentos" },
 ]
 
+const cleroLinks = [
+  { label: "Padres",        href: "/padres" },
+  { label: "Diáconos",      href: "/diaconos" },
+  { label: "Seminaristas",  href: "/seminaristas" },
+]
+
 export function Navbar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [cleroOpen, setCleroOpen] = useState(false)
+  const isCleroActive = cleroLinks.some(l => pathname === l.href)
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b-2 border-primary shadow-[0_2px_12px_rgba(0,0,0,.06)]">
@@ -51,6 +58,42 @@ export function Navbar() {
               {label}
             </Link>
           ))}
+
+          {/* Clero dropdown */}
+          <div
+            className="relative"
+            onMouseEnter={() => setCleroOpen(true)}
+            onMouseLeave={() => setCleroOpen(false)}
+          >
+            <button
+              className={cn(
+                "flex items-center gap-1 text-[13px] font-medium px-3 py-2 rounded-md transition-all",
+                isCleroActive
+                  ? "text-primary font-semibold"
+                  : "text-foreground hover:text-primary hover:bg-primary/5"
+              )}
+            >
+              Clero <IconChevronDown size={12} className={cn("transition-transform", cleroOpen && "rotate-180")} />
+            </button>
+            {cleroOpen && (
+              <div className="absolute top-full left-0 mt-1 bg-white border border-border rounded-lg shadow-lg py-1 min-w-[160px] z-50">
+                {cleroLinks.map(({ label, href }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      "block px-4 py-2 text-[13px] transition-colors",
+                      pathname === href
+                        ? "text-primary font-semibold bg-primary/5"
+                        : "text-foreground hover:text-primary hover:bg-primary/5"
+                    )}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Desktop actions */}
@@ -108,6 +151,24 @@ export function Navbar() {
                     )}
                   >
                     <IconArrowRight size={14} className="opacity-40 flex-shrink-0" />
+                    {label}
+                  </Link>
+                ))}
+
+                <p className="px-3 pt-3 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Clero</p>
+                {cleroLinks.map(({ label, href }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-3 h-10 text-sm rounded-md transition-colors pl-6",
+                      pathname === href
+                        ? "bg-primary text-primary-foreground font-semibold"
+                        : "text-foreground hover:bg-muted"
+                    )}
+                  >
+                    <IconArrowRight size={12} className="opacity-30 flex-shrink-0" />
                     {label}
                   </Link>
                 ))}
