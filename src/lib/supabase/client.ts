@@ -2,8 +2,16 @@ import { createBrowserClient } from "@supabase/ssr"
 import type { Database } from "@/types/database"
 
 export function createClient() {
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !key) {
+    const missing = [
+      !url && "NEXT_PUBLIC_SUPABASE_URL",
+      !key && "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    ].filter(Boolean).join(", ")
+    throw new Error(`Variável de ambiente faltando no Easypanel: ${missing}`)
+  }
+
+  return createBrowserClient<Database>(url, key)
 }

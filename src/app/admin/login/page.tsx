@@ -30,7 +30,15 @@ export default function AdminLoginPage() {
     setError("")
     setLoading(true)
 
-    const supabase = createClient()
+    let supabase
+    try {
+      supabase = createClient()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro de configuração. Contate o administrador.")
+      setLoading(false)
+      return
+    }
+
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
 
     if (signInError) {
@@ -78,7 +86,15 @@ export default function AdminLoginPage() {
     setError("")
     setLoading(true)
 
-    const supabase = createClient()
+    let supabase
+    try {
+      supabase = createClient()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro de configuração. Contate o administrador.")
+      setLoading(false)
+      return
+    }
+
     const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({ factorId })
 
     if (challengeError || !challenge) {
