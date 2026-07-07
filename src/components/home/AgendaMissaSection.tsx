@@ -23,7 +23,7 @@ export function AgendaMissaSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
 
           {/* ── AGENDA ── */}
-          <div>
+          <div className="flex flex-col">
             <div className="flex items-end justify-between mb-5 pb-4 border-b border-border">
               <div>
                 <p className="flex items-center gap-2 text-[11px] font-semibold text-primary uppercase tracking-widest mb-1">
@@ -37,7 +37,7 @@ export function AgendaMissaSection() {
               </Link>
             </div>
 
-            <div className="bg-card border border-border rounded-lg overflow-hidden divide-y divide-border">
+            <div className="bg-card border border-border rounded-lg overflow-hidden divide-y divide-border flex-1">
               {agendaItems.map(({ day, month, title, location, dotColor, href }) => (
                 <Link
                   key={title}
@@ -66,7 +66,7 @@ export function AgendaMissaSection() {
           </div>
 
           {/* ── BUSCA DE MISSA ── */}
-          <div>
+          <div className="flex flex-col">
             <div className="flex items-end justify-between mb-5 pb-4 border-b border-border">
               <div>
                 <p className="flex items-center gap-2 text-[11px] font-semibold text-primary uppercase tracking-widest mb-1">
@@ -77,7 +77,7 @@ export function AgendaMissaSection() {
               </div>
             </div>
 
-            <div className="bg-white border border-border rounded-lg overflow-hidden shadow-sm">
+            <div className="bg-white border border-border rounded-lg overflow-hidden shadow-sm flex-1 flex flex-col">
               {/* Header */}
               <div className="px-6 pt-5 pb-4 border-b border-border">
                 <p className="text-[10px] font-semibold text-primary uppercase tracking-widest mb-1 flex items-center gap-2">
