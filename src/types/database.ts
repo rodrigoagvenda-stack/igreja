@@ -3,7 +3,7 @@ export type Json = string | number | boolean | null | { [key: string]: Json } | 
 export type Database = {
   public: {
     Tables: {
-      noticias: {
+      arq_noticias: {
         Row: {
           id:           string
           slug:         string
@@ -19,10 +19,10 @@ export type Database = {
           created_at:   string
           updated_at:   string
         }
-        Insert: Omit<Database["public"]["Tables"]["noticias"]["Row"], "id" | "created_at" | "updated_at">
-        Update: Partial<Database["public"]["Tables"]["noticias"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_noticias"]["Row"], "id" | "created_at" | "updated_at">
+        Update: Partial<Database["public"]["Tables"]["arq_noticias"]["Insert"]>
       }
-      eventos: {
+      arq_eventos: {
         Row: {
           id:         string
           titulo:     string
@@ -35,10 +35,10 @@ export type Database = {
           created_at: string
           updated_at: string
         }
-        Insert: Omit<Database["public"]["Tables"]["eventos"]["Row"], "id" | "created_at" | "updated_at">
-        Update: Partial<Database["public"]["Tables"]["eventos"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_eventos"]["Row"], "id" | "created_at" | "updated_at">
+        Update: Partial<Database["public"]["Tables"]["arq_eventos"]["Insert"]>
       }
-      paroquias: {
+      arq_paroquias: {
         Row: {
           id:              string
           slug:            string
@@ -56,10 +56,10 @@ export type Database = {
           created_at:      string
           updated_at:      string
         }
-        Insert: Omit<Database["public"]["Tables"]["paroquias"]["Row"], "id" | "created_at" | "updated_at">
-        Update: Partial<Database["public"]["Tables"]["paroquias"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_paroquias"]["Row"], "id" | "created_at" | "updated_at">
+        Update: Partial<Database["public"]["Tables"]["arq_paroquias"]["Insert"]>
       }
-      locais: {
+      arq_locais: {
         Row: {
           id:          string
           paroquia_id: string
@@ -68,20 +68,20 @@ export type Database = {
           endereco:    string | null
           created_at:  string
         }
-        Insert: Omit<Database["public"]["Tables"]["locais"]["Row"], "id" | "created_at">
-        Update: Partial<Database["public"]["Tables"]["locais"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_locais"]["Row"], "id" | "created_at">
+        Update: Partial<Database["public"]["Tables"]["arq_locais"]["Insert"]>
       }
-      horarios_missa: {
+      arq_horarios_missa: {
         Row: {
           id:         string
           local_id:   string
           descricao:  string
           created_at: string
         }
-        Insert: Omit<Database["public"]["Tables"]["horarios_missa"]["Row"], "id" | "created_at">
-        Update: Partial<Database["public"]["Tables"]["horarios_missa"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_horarios_missa"]["Row"], "id" | "created_at">
+        Update: Partial<Database["public"]["Tables"]["arq_horarios_missa"]["Insert"]>
       }
-      padres: {
+      arq_padres: {
         Row: {
           id:          string
           nome:        string
@@ -93,10 +93,10 @@ export type Database = {
           created_at:  string
           updated_at:  string
         }
-        Insert: Omit<Database["public"]["Tables"]["padres"]["Row"], "id" | "created_at" | "updated_at">
-        Update: Partial<Database["public"]["Tables"]["padres"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_padres"]["Row"], "id" | "created_at" | "updated_at">
+        Update: Partial<Database["public"]["Tables"]["arq_padres"]["Insert"]>
       }
-      diaconos: {
+      arq_diaconos: {
         Row: {
           id:          string
           nome:        string
@@ -108,10 +108,10 @@ export type Database = {
           created_at:  string
           updated_at:  string
         }
-        Insert: Omit<Database["public"]["Tables"]["diaconos"]["Row"], "id" | "created_at" | "updated_at">
-        Update: Partial<Database["public"]["Tables"]["diaconos"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_diaconos"]["Row"], "id" | "created_at" | "updated_at">
+        Update: Partial<Database["public"]["Tables"]["arq_diaconos"]["Insert"]>
       }
-      seminaristas: {
+      arq_seminaristas: {
         Row: {
           id:            string
           nome:          string
@@ -123,10 +123,10 @@ export type Database = {
           created_at:    string
           updated_at:    string
         }
-        Insert: Omit<Database["public"]["Tables"]["seminaristas"]["Row"], "id" | "created_at" | "updated_at">
-        Update: Partial<Database["public"]["Tables"]["seminaristas"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_seminaristas"]["Row"], "id" | "created_at" | "updated_at">
+        Update: Partial<Database["public"]["Tables"]["arq_seminaristas"]["Insert"]>
       }
-      documentos: {
+      arq_documentos: {
         Row: {
           id:           string
           slug:         string
@@ -137,10 +137,10 @@ export type Database = {
           created_at:   string
           updated_at:   string
         }
-        Insert: Omit<Database["public"]["Tables"]["documentos"]["Row"], "id" | "created_at" | "updated_at">
-        Update: Partial<Database["public"]["Tables"]["documentos"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_documentos"]["Row"], "id" | "created_at" | "updated_at">
+        Update: Partial<Database["public"]["Tables"]["arq_documentos"]["Insert"]>
       }
-      setores_pastorais: {
+      arq_setores_pastorais: {
         Row: {
           id:          string
           slug:        string
@@ -153,10 +153,10 @@ export type Database = {
           created_at:  string
           updated_at:  string
         }
-        Insert: Omit<Database["public"]["Tables"]["setores_pastorais"]["Row"], "id" | "created_at" | "updated_at">
-        Update: Partial<Database["public"]["Tables"]["setores_pastorais"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_setores_pastorais"]["Row"], "id" | "created_at" | "updated_at">
+        Update: Partial<Database["public"]["Tables"]["arq_setores_pastorais"]["Insert"]>
       }
-      site_config: {
+      arq_site_config: {
         Row: {
           id:         string
           chave:      string
@@ -164,25 +164,25 @@ export type Database = {
           descricao:  string | null
           updated_at: string
         }
-        Insert: Omit<Database["public"]["Tables"]["site_config"]["Row"], "id" | "updated_at">
-        Update: Partial<Database["public"]["Tables"]["site_config"]["Insert"]>
+        Insert: Omit<Database["public"]["Tables"]["arq_site_config"]["Row"], "id" | "updated_at">
+        Update: Partial<Database["public"]["Tables"]["arq_site_config"]["Insert"]>
       }
     }
     Functions: {
-      is_admin: { Args: Record<never, never>; Returns: boolean }
+      arq_is_admin: { Args: Record<never, never>; Returns: boolean }
     }
   }
 }
 
 // Tipos de conveniência para uso nos componentes
-export type Noticia         = Database["public"]["Tables"]["noticias"]["Row"]
-export type Evento          = Database["public"]["Tables"]["eventos"]["Row"]
-export type Paroquia        = Database["public"]["Tables"]["paroquias"]["Row"]
-export type Local           = Database["public"]["Tables"]["locais"]["Row"]
-export type HorarioMissa    = Database["public"]["Tables"]["horarios_missa"]["Row"]
-export type Padre           = Database["public"]["Tables"]["padres"]["Row"]
-export type Diacono         = Database["public"]["Tables"]["diaconos"]["Row"]
-export type Seminarista     = Database["public"]["Tables"]["seminaristas"]["Row"]
-export type Documento       = Database["public"]["Tables"]["documentos"]["Row"]
-export type SetorPastoral   = Database["public"]["Tables"]["setores_pastorais"]["Row"]
-export type SiteConfig      = Database["public"]["Tables"]["site_config"]["Row"]
+export type Noticia        = Database["public"]["Tables"]["arq_noticias"]["Row"]
+export type Evento         = Database["public"]["Tables"]["arq_eventos"]["Row"]
+export type Paroquia       = Database["public"]["Tables"]["arq_paroquias"]["Row"]
+export type Local          = Database["public"]["Tables"]["arq_locais"]["Row"]
+export type HorarioMissa   = Database["public"]["Tables"]["arq_horarios_missa"]["Row"]
+export type Padre          = Database["public"]["Tables"]["arq_padres"]["Row"]
+export type Diacono        = Database["public"]["Tables"]["arq_diaconos"]["Row"]
+export type Seminarista    = Database["public"]["Tables"]["arq_seminaristas"]["Row"]
+export type Documento      = Database["public"]["Tables"]["arq_documentos"]["Row"]
+export type SetorPastoral  = Database["public"]["Tables"]["arq_setores_pastorais"]["Row"]
+export type SiteConfig     = Database["public"]["Tables"]["arq_site_config"]["Row"]
