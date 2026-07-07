@@ -3,21 +3,28 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { IconLock, IconShieldCheck, IconLoader2, IconShieldLock } from "@tabler/icons-react"
+import {
+  IconLock, IconShieldCheck, IconLoader2,
+  IconShieldLock, IconQrcode,
+} from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/client"
 
-type Step = "credentials" | "mfa"
+type Step = "credentials" | "mfa-enroll" | "mfa-verify"
 
 export default function AdminLoginPage() {
   const router = useRouter()
-  const [step, setStep]         = useState<Step>("credentials")
-  const [email, setEmail]       = useState("")
-  const [password, setPassword] = useState("")
-  const [code, setCode]         = useState("")
-  const [factorId, setFactorId] = useState("")
-  const [error, setError]       = useState("")
-  const [loading, setLoading]   = useState(false)
 
+  const [step, setStep]       = useState<Step>("credentials")
+  const [email, setEmail]     = useState("")
+  const [password, setPassword] = useState("")
+  const [code, setCode]       = useState("")
+  const [factorId, setFactorId] = useState("")
+  const [qrCode, setQrCode]   = useState("")
+  const [secret, setSecret]   = useState("")
+  const [error, setError]     = useState("")
+  const [loading, setLoading] = useState(false)
+
+  // ── Passo 1: e-mail + senha ──────────────────────────────────
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
     setError("")
@@ -32,24 +39,41 @@ export default function AdminLoginPage() {
       return
     }
 
-    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    // Verifica se já tem fator TOTP cadastrado
+    const { data: factors } = await supabase.auth.mfa.listFactors()
+    const totp = factors?.totp?.[0]
 
-    if (aal?.nextLevel === "aal2") {
-      const { data: factors } = await supabase.auth.mfa.listFactors()
-      const totp = factors?.totp?.[0]
-      if (totp) {
-        setFactorId(totp.id)
-        setStep("mfa")
-        setLoading(false)
-        return
-      }
+    if (totp) {
+      // Já tem MFA → ir para verificação
+      setFactorId(totp.id)
+      setCode("")
+      setStep("mfa-verify")
+      setLoading(false)
+      return
     }
 
-    router.push("/admin")
-    router.refresh()
+    // Sem MFA → cadastrar agora
+    const { data: enrolled, error: enrollError } = await supabase.auth.mfa.enroll({
+      factorType: "totp",
+      issuer: "Arquidiocese de Botucatu",
+    })
+
+    if (enrollError || !enrolled) {
+      setError("Erro ao configurar autenticação. Tente novamente.")
+      setLoading(false)
+      return
+    }
+
+    setFactorId(enrolled.id)
+    setQrCode(enrolled.totp.qr_code)
+    setSecret(enrolled.totp.secret)
+    setCode("")
+    setStep("mfa-enroll")
+    setLoading(false)
   }
 
-  async function handleMFA(e: React.FormEvent) {
+  // ── Passo 2 / 3: verificar código TOTP ───────────────────────
+  async function handleVerify(e: React.FormEvent) {
     e.preventDefault()
     setError("")
     setLoading(true)
@@ -79,9 +103,10 @@ export default function AdminLoginPage() {
     router.refresh()
   }
 
+  // ── UI ────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-sidebar flex items-center justify-center px-4">
-      <div className="w-full max-w-[400px]">
+      <div className="w-full max-w-[420px]">
 
         <div className="flex flex-col items-center mb-8">
           <Image
@@ -97,7 +122,8 @@ export default function AdminLoginPage() {
         <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
           <div className="px-8 pt-7 pb-6">
 
-            {step === "credentials" ? (
+            {/* ── CREDENTIALS ── */}
+            {step === "credentials" && (
               <>
                 <h2 className="font-serif text-[20px] font-bold mb-5">Acesso restrito</h2>
                 <form onSubmit={handleLogin} className="space-y-4">
@@ -112,10 +138,9 @@ export default function AdminLoginPage() {
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="usuario@arquidiocesebotucatu.org.br"
-                      className="w-full h-10 px-3 rounded-md border border-border text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                      className="w-full h-10 px-3 rounded-md border border-border text-[14px] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                     />
                   </div>
-
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
                       Senha
@@ -127,37 +152,89 @@ export default function AdminLoginPage() {
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full h-10 px-3 rounded-md border border-border text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                      className="w-full h-10 px-3 rounded-md border border-border text-[14px] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                     />
                   </div>
-
-                  {error && (
-                    <p className="text-[13px] text-destructive">{error}</p>
-                  )}
-
+                  {error && <p className="text-[13px] text-destructive">{error}</p>}
                   <button
                     type="submit"
                     disabled={loading}
                     className="w-full h-10 bg-primary text-white text-[14px] font-semibold rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
                   >
-                    {loading
-                      ? <IconLoader2 size={16} className="animate-spin" />
-                      : <IconLock size={14} />
-                    }
-                    {loading ? "Entrando…" : "Entrar"}
+                    {loading ? <IconLoader2 size={16} className="animate-spin" /> : <IconLock size={14} />}
+                    {loading ? "Verificando…" : "Entrar"}
                   </button>
                 </form>
               </>
-            ) : (
+            )}
+
+            {/* ── MFA ENROLL (primeira vez) ── */}
+            {step === "mfa-enroll" && (
+              <>
+                <div className="flex items-center gap-2 mb-1">
+                  <IconQrcode size={18} className="text-primary" />
+                  <h2 className="font-serif text-[20px] font-bold">Configurar autenticador</h2>
+                </div>
+                <p className="text-[13px] text-muted-foreground mb-4">
+                  Escaneie o QR code com Google Authenticator, Authy ou similar. Depois digite o código gerado.
+                </p>
+
+                {qrCode && (
+                  <div className="flex justify-center mb-4">
+                    {/* qr_code vem como SVG base64 do Supabase */}
+                    <img src={qrCode} alt="QR Code MFA" className="w-44 h-44 border border-border rounded-lg p-2" />
+                  </div>
+                )}
+
+                {secret && (
+                  <div className="mb-4 bg-muted/50 rounded-md px-3 py-2">
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-1">Código manual</p>
+                    <p className="text-[12px] font-mono break-all text-foreground">{secret}</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleVerify} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
+                      Código de verificação (6 dígitos)
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]{6}"
+                      maxLength={6}
+                      required
+                      autoFocus
+                      value={code}
+                      onChange={e => setCode(e.target.value.replace(/\D/g, ""))}
+                      placeholder="000000"
+                      className="w-full h-10 px-3 rounded-md border border-border text-[14px] text-center tracking-[.3em] font-mono focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                    />
+                  </div>
+                  {error && <p className="text-[13px] text-destructive">{error}</p>}
+                  <button
+                    type="submit"
+                    disabled={loading || code.length !== 6}
+                    className="w-full h-10 bg-primary text-white text-[14px] font-semibold rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+                  >
+                    {loading ? <IconLoader2 size={16} className="animate-spin" /> : <IconShieldLock size={14} />}
+                    {loading ? "Configurando…" : "Confirmar e entrar"}
+                  </button>
+                </form>
+              </>
+            )}
+
+            {/* ── MFA VERIFY (logins seguintes) ── */}
+            {step === "mfa-verify" && (
               <>
                 <div className="flex items-center gap-2 mb-1">
                   <IconShieldLock size={18} className="text-primary" />
                   <h2 className="font-serif text-[20px] font-bold">Verificação em duas etapas</h2>
                 </div>
                 <p className="text-[13px] text-muted-foreground mb-5">
-                  Digite o código do seu app autenticador.
+                  Digite o código atual do seu app autenticador.
                 </p>
-                <form onSubmit={handleMFA} className="space-y-4">
+                <form onSubmit={handleVerify} className="space-y-4">
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
                       Código de 6 dígitos
@@ -172,26 +249,18 @@ export default function AdminLoginPage() {
                       value={code}
                       onChange={e => setCode(e.target.value.replace(/\D/g, ""))}
                       placeholder="000000"
-                      className="w-full h-10 px-3 rounded-md border border-border text-[14px] text-center tracking-[.3em] font-mono bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                      className="w-full h-10 px-3 rounded-md border border-border text-[14px] text-center tracking-[.3em] font-mono focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                     />
                   </div>
-
-                  {error && (
-                    <p className="text-[13px] text-destructive">{error}</p>
-                  )}
-
+                  {error && <p className="text-[13px] text-destructive">{error}</p>}
                   <button
                     type="submit"
                     disabled={loading || code.length !== 6}
                     className="w-full h-10 bg-primary text-white text-[14px] font-semibold rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
                   >
-                    {loading
-                      ? <IconLoader2 size={16} className="animate-spin" />
-                      : <IconShieldLock size={14} />
-                    }
-                    {loading ? "Verificando…" : "Verificar"}
+                    {loading ? <IconLoader2 size={16} className="animate-spin" /> : <IconShieldLock size={14} />}
+                    {loading ? "Verificando…" : "Verificar e entrar"}
                   </button>
-
                   <button
                     type="button"
                     onClick={() => { setStep("credentials"); setError(""); setCode("") }}
@@ -202,12 +271,13 @@ export default function AdminLoginPage() {
                 </form>
               </>
             )}
+
           </div>
 
           <div className="bg-muted/50 px-8 py-4 flex items-center gap-2 border-t border-border">
             <IconShieldCheck size={14} className="text-primary flex-shrink-0" />
             <p className="text-[11px] text-muted-foreground leading-snug">
-              Autenticação de dois fatores obrigatória. Configure um app autenticador antes do primeiro acesso.
+              Autenticação em duas etapas obrigatória para acesso ao painel.
             </p>
           </div>
         </div>
