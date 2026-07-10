@@ -4,45 +4,9 @@ import {
   IconFileText, IconPlus, IconArrowRight,
   IconClock, IconCircleCheck, IconAlertCircle, IconPencil,
 } from "@tabler/icons-react"
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata = { title: "Dashboard" }
-
-const stats = [
-  { label: "Notícias publicadas",   value: "42",  sub: "+3 este mês",        icon: IconNews,           variant: "primary" },
-  { label: "Eventos na agenda",     value: "8",   sub: "próximos 30 dias",    icon: IconCalendar,       variant: "accent"  },
-  { label: "Paróquias cadastradas", value: "47",  sub: "4 regiões pastorais", icon: IconBuildingChurch, variant: "primary" },
-  { label: "Padres",                value: "89",  sub: "ativos",              icon: IconUsers,          variant: "primary" },
-  { label: "Diáconos",              value: "13",  sub: "permanentes",         icon: IconUsers,          variant: "accent"  },
-  { label: "Seminaristas",          value: "11",  sub: "em formação",         icon: IconUsers,          variant: "primary" },
-  { label: "Documentos",            value: "27",  sub: "publicados",          icon: IconFileText,       variant: "accent"  },
-  { label: "Horários cadastrados",  value: "143", sub: "por local",           icon: IconClock,          variant: "primary" },
-]
-
-const quickActions = [
-  { label: "Nova notícia",    href: "/admin/noticias/novo",     icon: IconNews },
-  { label: "Novo evento",     href: "/admin/agenda/novo",       icon: IconCalendar },
-  { label: "Novo documento",  href: "/admin/documentos/novo",   icon: IconFileText },
-  { label: "Cadastrar padre", href: "/admin/clero/padres/novo", icon: IconUsers },
-]
-
-const recentNoticias = [
-  { titulo: "Dom Maurício Grotto de Camargo preside encontro de lideranças pastorais", status: "publicado", data: "28 mai 2025" },
-  { titulo: "Semana de catequese reúne mais de 300 catequistas",                        status: "publicado", data: "22 mai 2025" },
-  { titulo: "Escola de Evangelização abre novas turmas para 2025",                      status: "rascunho",  data: "05 mai 2025" },
-  { titulo: "Calendário litúrgico do 2.º semestre é divulgado",                         status: "revisao",   data: "18 mai 2025" },
-]
-
-const proximosEventos = [
-  { titulo: "Ordenação Presbiteral Arquidiocesana", data: "08 Jun", local: "Catedral de Botucatu" },
-  { titulo: "Encontro Regional de Catequistas",     data: "15 Jun", local: "Centro Pastoral" },
-  { titulo: "Assembleia dos Párocos",               data: "22 Jun", local: "Cúria Metropolitana" },
-]
-
-const statusConfig = {
-  publicado: { label: "Publicado", icon: IconCircleCheck, cls: "bg-success/10 text-success" },
-  rascunho:  { label: "Rascunho",  icon: IconPencil,      cls: "bg-muted text-muted-foreground" },
-  revisao:   { label: "Em revisão", icon: IconAlertCircle, cls: "bg-warning/15 text-warning-foreground" },
-}
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -53,7 +17,57 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function AdminDashboardPage() {
+const quickActions = [
+  { label: "Nova notícia",    href: "/admin/noticias/novo",     icon: IconNews },
+  { label: "Novo evento",     href: "/admin/agenda/novo",       icon: IconCalendar },
+  { label: "Novo documento",  href: "/admin/documentos/novo",   icon: IconFileText },
+  { label: "Cadastrar padre", href: "/admin/clero/padres/novo", icon: IconUsers },
+]
+
+const statusConfig = {
+  publicado: { label: "Publicado", icon: IconCircleCheck, cls: "bg-success/10 text-success" },
+  rascunho:  { label: "Rascunho",  icon: IconPencil,      cls: "bg-muted text-muted-foreground" },
+  revisao:   { label: "Em revisão", icon: IconAlertCircle, cls: "bg-warning/15 text-warning-foreground" },
+}
+
+export default async function AdminDashboardPage() {
+  const supabase = await createClient()
+
+  const [
+    { count: totalNoticias },
+    { count: totalEventos },
+    { count: totalParoquias },
+    { count: totalPadres },
+    { count: totalDiaconos },
+    { count: totalSeminaristas },
+    { count: totalDocumentos },
+    { count: totalHorarios },
+    { data: recentNoticias },
+    { data: proximosEventos },
+  ] = await Promise.all([
+    supabase.from('arq_noticias').select('*', { count: 'exact', head: true }).eq('status', 'publicado'),
+    supabase.from('arq_eventos').select('*', { count: 'exact', head: true }).gte('inicio', new Date().toISOString()),
+    supabase.from('arq_paroquias').select('*', { count: 'exact', head: true }).eq('ativa', true),
+    supabase.from('arq_padres').select('*', { count: 'exact', head: true }).eq('ativo', true),
+    supabase.from('arq_diaconos').select('*', { count: 'exact', head: true }).eq('ativo', true),
+    supabase.from('arq_seminaristas').select('*', { count: 'exact', head: true }).eq('ativo', true),
+    supabase.from('arq_documentos').select('*', { count: 'exact', head: true }),
+    supabase.from('arq_horarios_missa').select('*', { count: 'exact', head: true }),
+    supabase.from('arq_noticias').select('titulo, status, created_at').order('created_at', { ascending: false }).limit(4),
+    supabase.from('arq_eventos').select('titulo, local, inicio').gte('inicio', new Date().toISOString()).order('inicio').limit(3),
+  ])
+
+  const stats = [
+    { label: "Notícias publicadas",   value: totalNoticias ?? 0,    sub: "publicadas",          icon: IconNews,           variant: "primary" },
+    { label: "Eventos na agenda",     value: totalEventos ?? 0,     sub: "próximos",             icon: IconCalendar,       variant: "accent"  },
+    { label: "Paróquias ativas",      value: totalParoquias ?? 0,   sub: "4 regiões pastorais",  icon: IconBuildingChurch, variant: "primary" },
+    { label: "Padres",                value: totalPadres ?? 0,      sub: "ativos",               icon: IconUsers,          variant: "primary" },
+    { label: "Diáconos",              value: totalDiaconos ?? 0,    sub: "permanentes",          icon: IconUsers,          variant: "accent"  },
+    { label: "Seminaristas",          value: totalSeminaristas ?? 0, sub: "em formação",         icon: IconUsers,          variant: "primary" },
+    { label: "Documentos",            value: totalDocumentos ?? 0,  sub: "publicados",           icon: IconFileText,       variant: "accent"  },
+    { label: "Horários cadastrados",  value: totalHorarios ?? 0,    sub: "por local",            icon: IconClock,          variant: "primary" },
+  ]
+
   const hora = new Date().getHours()
   const saudacao = hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite"
 
@@ -133,8 +147,9 @@ export default function AdminDashboardPage() {
             </Link>
           </div>
           <div className="divide-y divide-border">
-            {recentNoticias.map(({ titulo, status, data }) => {
-              const cfg = statusConfig[status as keyof typeof statusConfig]
+            {recentNoticias && recentNoticias.length > 0 ? recentNoticias.map(({ titulo, status, created_at }) => {
+              const cfg = statusConfig[status as keyof typeof statusConfig] ?? statusConfig.rascunho
+              const data = new Date(created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
               return (
                 <div key={titulo} className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/40 transition-colors">
                   <div className="flex-1 min-w-0">
@@ -147,7 +162,9 @@ export default function AdminDashboardPage() {
                   </span>
                 </div>
               )
-            })}
+            }) : (
+              <div className="px-5 py-6 text-center text-[13px] text-muted-foreground">Nenhuma notícia cadastrada</div>
+            )}
           </div>
         </div>
 
@@ -166,18 +183,25 @@ export default function AdminDashboardPage() {
             </Link>
           </div>
           <div className="divide-y divide-border">
-            {proximosEventos.map(({ titulo, data, local }) => (
-              <div key={titulo} className="flex items-start gap-3 px-5 py-3.5 hover:bg-muted/40 transition-colors">
-                <div className="w-10 h-10 bg-primary/10 border border-primary/20 rounded-lg flex flex-col items-center justify-center shrink-0">
-                  <span className="font-serif text-[15px] font-bold text-primary leading-none">{data.split(" ")[0]}</span>
-                  <span className="text-[8px] text-primary/60 uppercase font-semibold tracking-wide">{data.split(" ")[1]}</span>
+            {proximosEventos && proximosEventos.length > 0 ? proximosEventos.map(({ titulo, local, inicio }) => {
+              const d = new Date(inicio)
+              const dia = d.toLocaleDateString('pt-BR', { day: '2-digit' })
+              const mes = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')
+              return (
+                <div key={titulo} className="flex items-start gap-3 px-5 py-3.5 hover:bg-muted/40 transition-colors">
+                  <div className="w-10 h-10 bg-primary/10 border border-primary/20 rounded-lg flex flex-col items-center justify-center shrink-0">
+                    <span className="font-serif text-[15px] font-bold text-primary leading-none">{dia}</span>
+                    <span className="text-[8px] text-primary/60 uppercase font-semibold tracking-wide">{mes}</span>
+                  </div>
+                  <div className="min-w-0 pt-0.5">
+                    <p className="text-[13px] font-semibold leading-snug truncate">{titulo}</p>
+                    {local && <p className="text-[11px] text-muted-foreground mt-0.5">{local}</p>}
+                  </div>
                 </div>
-                <div className="min-w-0 pt-0.5">
-                  <p className="text-[13px] font-semibold leading-snug">{titulo}</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{local}</p>
-                </div>
-              </div>
-            ))}
+              )
+            }) : (
+              <div className="px-5 py-6 text-center text-[13px] text-muted-foreground">Nenhum evento próximo</div>
+            )}
           </div>
         </div>
       </div>

@@ -1,15 +1,9 @@
 import Link from "next/link"
 import { IconPlus, IconPencil, IconTrash, IconDownload } from "@tabler/icons-react"
+import { createClient } from "@/lib/supabase/server"
+import { deleteDocumento } from "./actions"
 
 export const metadata = { title: "Documentos" }
-
-const docs = [
-  { id: 1, titulo: "Decreto de Nomeação — Pároco da Catedral",           tipo: "Decreto",    data: "28 mai 2025" },
-  { id: 2, titulo: "Comunicado sobre o Jubileu de 2025",                 tipo: "Comunicado", data: "20 mai 2025" },
-  { id: 3, titulo: "Nomeação de Vigário Episcopal — Setor Avaré",        tipo: "Nomeação",   data: "15 mai 2025" },
-  { id: 4, titulo: "Circular n.º 12/2025 — Semana Nacional de Catequese",tipo: "Circular",   data: "08 mai 2025" },
-  { id: 5, titulo: "Decreto de Criação da Paróquia Santa Cruz em Itatinga", tipo: "Decreto", data: "10 mar 2025" },
-]
 
 const tipoColor: Record<string, string> = {
   Decreto:    "bg-primary/10 text-primary",
@@ -18,7 +12,13 @@ const tipoColor: Record<string, string> = {
   Circular:   "bg-muted text-muted-foreground",
 }
 
-export default function AdminDocumentosPage() {
+export default async function AdminDocumentosPage() {
+  const supabase = await createClient()
+  const { data: docs } = await supabase
+    .from('arq_documentos')
+    .select('id, titulo, tipo, publicado_em, arquivo_url')
+    .order('publicado_em', { ascending: false })
+
   return (
     <div className="p-8 max-w-[1100px] w-full mx-auto">
       <div className="flex items-end justify-between mb-8 pb-6 border-b border-border">
@@ -27,7 +27,9 @@ export default function AdminDocumentosPage() {
             <span className="block w-4 h-0.5 bg-primary shrink-0" />
             Governo eclesiástico
           </p>
-          <h1 className="font-serif text-[28px] font-bold">Documentos</h1>
+          <h1 className="font-serif text-[28px] font-bold">
+            Documentos {docs && docs.length > 0 && <span className="text-muted-foreground text-[18px] font-normal">({docs.length})</span>}
+          </h1>
         </div>
         <Link
           href="/admin/documentos/novo"
@@ -38,34 +40,61 @@ export default function AdminDocumentosPage() {
         </Link>
       </div>
 
-      <div className="bg-card ring-1 ring-foreground/10 rounded-xl overflow-hidden">
-        <div className="divide-y divide-border">
-          {docs.map(({ id, titulo, tipo, data }) => (
-            <div key={id} className="flex items-center gap-4 px-5 py-4 hover:bg-muted/40 transition-colors">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`text-[10px] font-semibold uppercase tracking-[.06em] px-2 py-0.5 rounded-sm ${tipoColor[tipo]}`}>
-                    {tipo}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">{data}</span>
+      {docs && docs.length > 0 ? (
+        <div className="bg-card ring-1 ring-foreground/10 rounded-xl overflow-hidden">
+          <div className="divide-y divide-border">
+            {docs.map(({ id, titulo, tipo, publicado_em, arquivo_url }) => {
+              const data = new Date(publicado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+              return (
+                <div key={id} className="flex items-center gap-4 px-5 py-4 hover:bg-muted/40 transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-[10px] font-semibold uppercase tracking-[.06em] px-2 py-0.5 rounded-sm ${tipoColor[tipo] ?? 'bg-muted text-muted-foreground'}`}>
+                        {tipo}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">{data}</span>
+                    </div>
+                    <p className="text-[13px] font-medium truncate">{titulo}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {arquivo_url && (
+                      <a
+                        href={arquivo_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        title="Baixar arquivo"
+                      >
+                        <IconDownload size={14} />
+                      </a>
+                    )}
+                    <Link
+                      href={`/admin/documentos/${id}/editar`}
+                      className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                    >
+                      <IconPencil size={14} />
+                    </Link>
+                    <form action={deleteDocumento.bind(null, id)}>
+                      <button
+                        type="submit"
+                        className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        title="Excluir"
+                      >
+                        <IconTrash size={14} />
+                      </button>
+                    </form>
+                  </div>
                 </div>
-                <p className="text-[13px] font-medium truncate">{titulo}</p>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <button className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
-                  <IconDownload size={14} />
-                </button>
-                <button className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
-                  <IconPencil size={14} />
-                </button>
-                <button className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
-                  <IconTrash size={14} />
-                </button>
-              </div>
-            </div>
-          ))}
+              )
+            })}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-12 text-center">
+          <p className="text-[14px] font-semibold text-foreground">Nenhum documento cadastrado</p>
+          <p className="text-[13px] text-muted-foreground mt-1">Clique em "Novo documento" para começar.</p>
+        </div>
+      )}
     </div>
   )
 }
