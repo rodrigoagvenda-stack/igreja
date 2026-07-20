@@ -2,8 +2,11 @@ import Link from "next/link"
 import { IconPlus, IconPencil, IconTrash, IconCircleCheck, IconAlertCircle, IconPencil as IconDraft } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
 import { deleteNoticia } from "./actions"
+import { Pagination } from "@/components/admin/Pagination"
 
 export const metadata = { title: "Notícias" }
+
+const PAGE_SIZE = 20
 
 const statusConfig = {
   publicado: { label: "Publicado", icon: IconCircleCheck, cls: "bg-success/10 text-success" },
@@ -11,12 +14,24 @@ const statusConfig = {
   revisao:   { label: "Em revisão", icon: IconAlertCircle, cls: "bg-warning/15 text-warning-foreground" },
 }
 
-export default async function AdminNoticiasPage() {
+export default async function AdminNoticiasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const { page: pageParam } = await searchParams
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10))
+  const from = (page - 1) * PAGE_SIZE
+  const to = from + PAGE_SIZE - 1
+
   const supabase = await createClient()
-  const { data: noticias } = await supabase
-    .from('arq_noticias')
-    .select('id, titulo, categoria, status, created_at')
-    .order('created_at', { ascending: false })
+  const { data: noticias, count } = await supabase
+    .from("arq_noticias")
+    .select("id, titulo, categoria, status, created_at", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(from, to)
+
+  const total = count ?? 0
 
   return (
     <div className="p-8 max-w-[1100px] w-full mx-auto">
@@ -27,7 +42,7 @@ export default async function AdminNoticiasPage() {
             Conteúdo
           </p>
           <h1 className="font-serif text-[28px] font-bold">
-            Notícias {noticias && noticias.length > 0 && <span className="text-muted-foreground text-[18px] font-normal">({noticias.length})</span>}
+            Notícias {total > 0 && <span className="text-muted-foreground text-[18px] font-normal">({total})</span>}
           </h1>
         </div>
         <Link
@@ -40,46 +55,42 @@ export default async function AdminNoticiasPage() {
       </div>
 
       {noticias && noticias.length > 0 ? (
-        <div className="bg-card ring-1 ring-foreground/10 rounded-xl overflow-hidden">
-          <div className="divide-y divide-border">
-            {noticias.map(({ id, titulo, categoria, status, created_at }) => {
-              const cfg = statusConfig[status as keyof typeof statusConfig] ?? statusConfig.rascunho
-              const data = new Date(created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
-              return (
-                <div key={id} className="flex items-center gap-4 px-5 py-4 hover:bg-muted/40 transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium truncate">{titulo}</p>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-[11px] text-primary font-medium">{categoria}</span>
-                      <span className="text-[11px] text-muted-foreground">{data}</span>
+        <>
+          <div className="bg-card ring-1 ring-foreground/10 rounded-xl overflow-hidden">
+            <div className="divide-y divide-border">
+              {noticias.map(({ id, titulo, categoria, status, created_at }) => {
+                const cfg = statusConfig[status as keyof typeof statusConfig] ?? statusConfig.rascunho
+                const data = new Date(created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })
+                return (
+                  <div key={id} className="flex items-center gap-4 px-5 py-4 hover:bg-muted/40 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-medium truncate">{titulo}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-[11px] text-primary font-medium">{categoria}</span>
+                        <span className="text-[11px] text-muted-foreground">{data}</span>
+                      </div>
+                    </div>
+                    <span className={`flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[.05em] px-2 py-0.5 rounded-full shrink-0 ${cfg.cls}`}>
+                      <cfg.icon size={10} />
+                      {cfg.label}
+                    </span>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Link href={`/admin/noticias/${id}/editar`} className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                        <IconPencil size={14} />
+                      </Link>
+                      <form action={deleteNoticia.bind(null, id)}>
+                        <button type="submit" className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Excluir">
+                          <IconTrash size={14} />
+                        </button>
+                      </form>
                     </div>
                   </div>
-                  <span className={`flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[.05em] px-2 py-0.5 rounded-full shrink-0 ${cfg.cls}`}>
-                    <cfg.icon size={10} />
-                    {cfg.label}
-                  </span>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <Link
-                      href={`/admin/noticias/${id}/editar`}
-                      className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                    >
-                      <IconPencil size={14} />
-                    </Link>
-                    <form action={deleteNoticia.bind(null, id)}>
-                      <button
-                        type="submit"
-                        className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                        title="Excluir"
-                      >
-                        <IconTrash size={14} />
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
-        </div>
+          <Pagination page={page} total={total} pageSize={PAGE_SIZE} basePath="/admin/noticias" />
+        </>
       ) : (
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-12 text-center">
           <p className="text-[14px] font-semibold text-foreground">Nenhuma notícia cadastrada</p>
