@@ -1,73 +1,39 @@
 import Link from "next/link"
 import {
-  IconArrowRight,
-  IconBook2,
-  IconFlame,
-  IconHeart,
-  IconUsers,
-  IconHome,
-  IconMicrophone2,
-  IconWorld,
-  IconStar,
+  IconArrowRight, IconBook2, IconFlame, IconHeart, IconUsers,
+  IconHome, IconMicrophone2, IconWorld, IconStar, IconCross,
 } from "@tabler/icons-react"
+import { createClient } from "@/lib/supabase/server"
 
-const setores = [
-  {
-    icon: <IconBook2 size={22} />,
-    nome: "Catequese",
-    descricao: "Formação e iniciação à fé cristã para crianças, jovens e adultos.",
-    href: "/setores/catequese",
-  },
-  {
-    icon: <IconFlame size={22} />,
-    nome: "Liturgia",
-    descricao: "Animação litúrgica, ministérios e celebrações da Arquidiocese.",
-    href: "/setores/liturgia",
-  },
-  {
-    icon: <IconHeart size={22} />,
-    nome: "Caridade",
-    descricao: "Promoção humana e serviço aos mais vulneráveis da região.",
-    href: "/setores/caridade",
-  },
-  {
-    icon: <IconUsers size={22} />,
-    nome: "Juventude",
-    descricao: "Pastoral juvenil, grupos de jovens e encontros diocesanos.",
-    href: "/setores/juventude",
-  },
-  {
-    icon: <IconHome size={22} />,
-    nome: "Família",
-    descricao: "Acompanhamento pastoral das famílias em todas as fases da vida.",
-    href: "/setores/familia",
-  },
-  {
-    icon: <IconMicrophone2 size={22} />,
-    nome: "Comunicação",
-    descricao: "PASCOM, mídia e comunicação da boa-nova nos meios digitais.",
-    href: "/setores/comunicacao",
-  },
-  {
-    icon: <IconWorld size={22} />,
-    nome: "Missões",
-    descricao: "Animação missionária e cooperação com as missões ad gentes.",
-    href: "/setores/missoes",
-  },
-  {
-    icon: <IconStar size={22} />,
-    nome: "Vocações",
-    descricao: "Promoção e acompanhamento de vocações ao sacerdócio e vida consagrada.",
-    href: "/setores/vocacoes",
-  },
-]
+const iconBySlug: Record<string, React.ReactNode> = {
+  "comunhao-e-participacao": <IconCross size={22} />,
+  "familia":                 <IconHome size={22} />,
+  "vocacoes":                <IconStar size={22} />,
+  "liturgia":                <IconFlame size={22} />,
+  "catequese":               <IconBook2 size={22} />,
+  "juventude":               <IconUsers size={22} />,
+  "movimentos-associacoes":  <IconWorld size={22} />,
+  "pastorais-sociais":       <IconHeart size={22} />,
+  "pascom":                  <IconMicrophone2 size={22} />,
+  "pastoral-universitaria":  <IconUsers size={22} />,
+}
 
-export function SetoresSection() {
+type Setor = { id: string; slug: string; nome: string; descricao: string | null }
+
+export async function SetoresSection() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("arq_setores_pastorais")
+    .select("id, slug, nome, descricao")
+    .order("ordem")
+    .limit(8)
+
+  const setores = (data ?? []) as Setor[]
+  if (setores.length === 0) return null
+
   return (
     <section className="py-16 md:py-20" aria-label="Setores pastorais">
       <div className="max-w-[1100px] mx-auto px-4 md:px-6">
-
-        {/* Section header */}
         <div className="flex items-end justify-between mb-8 pb-4 border-b border-border">
           <div>
             <p className="flex items-center gap-2 text-[11px] font-semibold text-primary uppercase tracking-widest mb-1">
@@ -81,27 +47,21 @@ export function SetoresSection() {
           </Link>
         </div>
 
-        {/* Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {setores.map(({ icon, nome, descricao, href }) => (
+          {setores.map(({ id, slug, nome, descricao }) => (
             <Link
-              key={href}
-              href={href}
+              key={id}
+              href={`/setores/${slug}`}
               className="group bg-card border border-border rounded-lg p-5 flex flex-col gap-3 hover:border-primary hover:shadow-[0_4px_16px_rgba(39,79,160,.10)] transition-all"
             >
-              {/* Icon */}
               <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center text-primary transition-colors group-hover:bg-primary group-hover:text-white flex-shrink-0">
-                {icon}
+                {iconBySlug[slug] ?? <IconCross size={22} />}
               </div>
-
-              {/* Text */}
               <div>
-                <h3 className="font-semibold text-[14px] leading-snug mb-1 group-hover:text-primary transition-colors">
-                  {nome}
-                </h3>
-                <p className="text-[12px] text-muted-foreground leading-[1.5] line-clamp-2">
-                  {descricao}
-                </p>
+                <h3 className="font-semibold text-[14px] leading-snug mb-1 group-hover:text-primary transition-colors">{nome}</h3>
+                {descricao && (
+                  <p className="text-[12px] text-muted-foreground leading-[1.5] line-clamp-2">{descricao}</p>
+                )}
               </div>
             </Link>
           ))}

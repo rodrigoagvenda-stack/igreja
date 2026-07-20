@@ -1,28 +1,39 @@
-"use client"
-
 import Link from "next/link"
-import { useState } from "react"
-import { IconMapPin, IconArrowRight, IconSearch, IconCalendar } from "@tabler/icons-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
+import { IconArrowRight, IconMapPin, IconBuildingChurch, IconCalendar } from "@tabler/icons-react"
+import { createClient } from "@/lib/supabase/server"
 
-const agendaItems = [
-  { day: "08", month: "Jun", title: "Ordenação Presbiteral Arquidiocesana", location: "Catedral de Botucatu · 10h00", dotColor: "bg-primary", href: "/agenda" },
-  { day: "15", month: "Jun", title: "Encontro Regional de Catequistas",     location: "Centro Pastoral · 9h00",         dotColor: "bg-accent",   href: "/agenda" },
-  { day: "22", month: "Jun", title: "Assembleia dos Párocos — 2.º Semestre", location: "Cúria Metropolitana · 14h00",   dotColor: "bg-muted-foreground", href: "/agenda" },
-  { day: "29", month: "Jun", title: "Solenidade de São Pedro e São Paulo",  location: "Todas as paróquias",             dotColor: "bg-info",     href: "/agenda" },
-]
+type Evento = {
+  id: string
+  titulo: string
+  local: string | null
+  categoria: string
+  inicio: string
+}
 
-export function AgendaMissaSection() {
-  const [cidade, setCidade] = useState("")
-  const [dia, setDia] = useState("")
+const catColor: Record<string, string> = {
+  Litúrgico:     "bg-primary",
+  Formação:      "bg-accent",
+  Institucional: "bg-foreground/60",
+  Pastoral:      "bg-green-600",
+}
+
+export async function AgendaMissaSection() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("arq_eventos")
+    .select("id, titulo, local, categoria, inicio")
+    .gte("inicio", new Date().toISOString())
+    .order("inicio")
+    .limit(4)
+
+  const eventos = (data ?? []) as Evento[]
 
   return (
     <section className="py-16 md:py-20 bg-muted/50" aria-label="Agenda pastoral e horários de missa">
       <div className="max-w-[1100px] mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
 
-          {/* ── AGENDA ── */}
+          {/* Agenda */}
           <div className="flex flex-col">
             <div className="flex items-end justify-between mb-5 pb-4 border-b border-border">
               <div>
@@ -38,34 +49,38 @@ export function AgendaMissaSection() {
             </div>
 
             <div className="bg-card border border-border rounded-lg overflow-hidden divide-y divide-border flex-1">
-              {agendaItems.map(({ day, month, title, location, dotColor, href }) => (
-                <Link
-                  key={title}
-                  href={href}
-                  className="flex items-center gap-4 px-6 py-4 hover:bg-primary/5 transition-colors group"
-                >
-                  {/* Date box */}
-                  <div className={`w-11 h-11 ${dotColor} rounded-md flex flex-col items-center justify-center flex-shrink-0`}>
-                    <span className="text-[18px] font-bold text-white leading-none">{day}</span>
-                    <span className="text-[9px] text-white/80 uppercase tracking-wide font-semibold">{month}</span>
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold leading-[1.3] group-hover:text-primary transition-colors truncate">
-                      {title}
-                    </p>
-                    <p className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5">
-                      <IconMapPin size={11} className="text-primary flex-shrink-0" />
-                      {location}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+              {eventos.length > 0 ? eventos.map(({ id, titulo, local, categoria, inicio }) => {
+                const d = new Date(inicio)
+                const dia = d.toLocaleDateString("pt-BR", { day: "2-digit" })
+                const mes = d.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")
+                const cor = catColor[categoria] ?? "bg-muted-foreground"
+                return (
+                  <Link key={id} href="/agenda" className="flex items-center gap-4 px-6 py-4 hover:bg-primary/5 transition-colors group">
+                    <div className={`w-11 h-11 ${cor} rounded-md flex flex-col items-center justify-center flex-shrink-0`}>
+                      <span className="text-[18px] font-bold text-white leading-none">{dia}</span>
+                      <span className="text-[9px] text-white/80 uppercase tracking-wide font-semibold">{mes}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-semibold leading-[1.3] group-hover:text-primary transition-colors truncate">{titulo}</p>
+                      {local && (
+                        <p className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5">
+                          <IconMapPin size={11} className="text-primary flex-shrink-0" />
+                          {local}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                )
+              }) : (
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-2">
+                  <IconCalendar size={32} className="opacity-20" />
+                  <p className="text-[13px]">Nenhum evento programado no momento.</p>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* ── BUSCA DE MISSA ── */}
+          {/* Horários de missa */}
           <div className="flex flex-col">
             <div className="flex items-end justify-between mb-5 pb-4 border-b border-border">
               <div>
@@ -77,89 +92,29 @@ export function AgendaMissaSection() {
               </div>
             </div>
 
-            <div className="bg-white border border-border rounded-lg overflow-hidden shadow-sm flex-1 flex flex-col">
-              {/* Header */}
-              <div className="px-6 pt-5 pb-4 border-b border-border">
-                <p className="text-[10px] font-semibold text-primary uppercase tracking-widest mb-1 flex items-center gap-2">
-                  <span className="block w-3 h-0.5 bg-accent" aria-hidden="true" />
-                  Busca de horários
-                </p>
-                <h3 className="font-serif text-[20px] font-bold text-foreground">
-                  Horários de missa na sua cidade
-                </h3>
-              </div>
-
-              {/* Form */}
-              <div className="px-6 py-5">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-                  <div className="space-y-1.5">
-                    <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
-                      Cidade
-                    </Label>
-                    <Select value={cidade} onValueChange={(v) => setCidade(v ?? "")}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione…" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="botucatu">Botucatu</SelectItem>
-                        <SelectItem value="avare">Avaré</SelectItem>
-                        <SelectItem value="piraju">Piraju</SelectItem>
-                        <SelectItem value="lencois">Lençóis Paulista</SelectItem>
-                        <SelectItem value="ourinhos">Ourinhos</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
-                      Paróquia (opcional)
-                    </Label>
-                    <Select disabled={!cidade}>
-                      <SelectTrigger className="disabled:opacity-60">
-                        <SelectValue placeholder="Todas" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todas">Todas as paróquias</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
-                      Dia da semana
-                    </Label>
-                    <Select value={dia} onValueChange={(v) => setDia(v ?? "")}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Qualquer dia" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="dom">Domingo</SelectItem>
-                        <SelectItem value="seg">Segunda-feira</SelectItem>
-                        <SelectItem value="ter">Terça-feira</SelectItem>
-                        <SelectItem value="qua">Quarta-feira</SelectItem>
-                        <SelectItem value="qui">Quinta-feira</SelectItem>
-                        <SelectItem value="sex">Sexta-feira</SelectItem>
-                        <SelectItem value="sab">Sábado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <div className="bg-white border border-border rounded-lg overflow-hidden shadow-sm flex-1 flex flex-col justify-between">
+              <div className="px-6 pt-6 pb-4">
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <IconBuildingChurch size={28} className="text-primary" />
                 </div>
-
+                <h3 className="font-serif text-[20px] font-bold text-foreground mb-2">
+                  Horários de missa
+                </h3>
+                <p className="text-[14px] text-muted-foreground leading-[1.6]">
+                  Consulte os horários de missa em todas as paróquias e capelas da Arquidiocese de Botucatu por cidade.
+                </p>
+              </div>
+              <div className="px-6 pb-6">
                 <Link
                   href="/horarios-de-missa"
                   className="flex items-center justify-center gap-2 w-full bg-accent text-foreground text-[14px] font-semibold py-3 rounded-md hover:bg-accent/90 transition-colors"
                 >
-                  <IconSearch size={16} />
-                  Buscar horários
+                  Buscar horários <IconArrowRight size={16} />
                 </Link>
               </div>
-
-              {/* Footer */}
-              <p className="text-center text-[12px] text-muted-foreground px-6 pb-5">
-                50 paróquias · 20 municípios da Arquidiocese
-              </p>
             </div>
           </div>
+
         </div>
       </div>
     </section>

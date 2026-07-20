@@ -1,6 +1,5 @@
 import Link from "next/link"
-import Image from "next/image"
-import { IconArrowRight } from "@tabler/icons-react"
+import { IconArrowRight, IconUser } from "@tabler/icons-react"
 
 export function ArcebispoSection() {
   return (
@@ -8,12 +7,12 @@ export function ArcebispoSection() {
       <div className="max-w-[1100px] mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-10">
 
-          {/* Photo */}
-          <div className="w-[110px] h-[110px] rounded-lg overflow-hidden border-2 border-white/25 flex-shrink-0 relative">
-            <Image src="https://picsum.photos/seed/arcebispo-botucatu/110/110" alt="Arcebispo" fill className="object-cover" />
+          {/* Ícone representativo */}
+          <div className="w-[90px] h-[90px] rounded-full bg-white/10 border-2 border-white/25 flex-shrink-0 flex items-center justify-center">
+            <IconUser size={40} className="text-white/60" />
           </div>
 
-          {/* Content */}
+          {/* Conteúdo */}
           <div className="flex-1 text-center md:text-left">
             <p className="flex items-center justify-center md:justify-start gap-2 text-[10px] font-semibold text-accent uppercase tracking-[.1em] mb-4">
               <span className="block w-3 h-0.5 bg-accent hidden md:block" aria-hidden="true" />
@@ -22,12 +21,14 @@ export function ArcebispoSection() {
 
             <blockquote className="font-serif text-[20px] md:text-[22px] font-normal text-white leading-[1.5] italic mb-4 relative pl-5 md:pl-5">
               <span className="absolute left-0 top-[-6px] text-[36px] text-accent font-serif leading-none" aria-hidden="true">"</span>
-              A missão da Igreja é ir ao encontro de cada pessoa, onde ela está, com a misericórdia e a verdade do Evangelho.
+              Sereis minhas testemunhas.
             </blockquote>
 
-            <p className="text-[14px] font-semibold text-white/75 flex items-center justify-center md:justify-start gap-2 mb-4">
+            <p className="text-[13px] text-white/50 mb-1">At 1,8 — Lema episcopal</p>
+
+            <p className="text-[14px] font-semibold text-white/75 flex items-center justify-center md:justify-start gap-2 mb-5">
               <span className="text-accent" aria-hidden="true">—</span>
-              Dom [Nome do Arcebispo] · Arcebispo Metropolitano de Botucatu
+              Dom Maurício Grotto de Camargo · Arcebispo Metropolitano de Botucatu
             </p>
 
             <Link
@@ -35,7 +36,7 @@ export function ArcebispoSection() {
               className="inline-flex items-center gap-2 text-[12px] text-white/60 hover:text-white border border-white/20 hover:bg-white/10 px-3 py-1.5 rounded-md transition-all"
             >
               <IconArrowRight size={13} />
-              Ler mensagem completa
+              Conheça o Arcebispo
             </Link>
           </div>
         </div>

@@ -1,47 +1,30 @@
 import Link from "next/link"
 import { IconArrowRight, IconFileText, IconChevronRight } from "@tabler/icons-react"
-import { Badge } from "@/components/ui/badge"
+import { createClient } from "@/lib/supabase/server"
 
-const documentos = [
-  {
-    tipo: "Decreto",
-    titulo: "Decreto de Nomeação — Pároco da Paróquia Nossa Senhora das Dores",
-    data: "28 mai 2025",
-    href: "/documentos/decreto-nomeacao-paroquia-nossa-senhora",
-  },
-  {
-    tipo: "Comunicado",
-    titulo: "Comunicado sobre o Jubileu de 2025 e as celebrações diocesanas programadas",
-    data: "20 mai 2025",
-    href: "/documentos/comunicado-jubileu-2025",
-  },
-  {
-    tipo: "Nomeação",
-    titulo: "Nomeação de Vigário Episcopal para o Setor Pastoral de Avaré",
-    data: "15 mai 2025",
-    href: "/documentos/nomeacao-vigario-episcopal-avare",
-  },
-  {
-    tipo: "Circular",
-    titulo: "Circular n.º 12/2025 — Orientações para a Semana Nacional da Catequese",
-    data: "08 mai 2025",
-    href: "/documentos/circular-12-2025-catequese",
-  },
-]
+type Documento = { id: string; slug: string; titulo: string; tipo: string; publicado_em: string }
 
-const badgeVariant: Record<string, string> = {
+const tipoColor: Record<string, string> = {
   Decreto:    "bg-primary/10 text-primary",
   Comunicado: "bg-accent/20 text-foreground",
   Nomeação:   "bg-green-100 text-green-700",
   Circular:   "bg-muted text-muted-foreground",
 }
 
-export function DocumentosSection() {
+export async function DocumentosSection() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("arq_documentos")
+    .select("id, slug, titulo, tipo, publicado_em")
+    .order("publicado_em", { ascending: false })
+    .limit(4)
+
+  const docs = (data ?? []) as Documento[]
+  if (docs.length === 0) return null
+
   return (
     <section className="py-16 md:py-20 bg-muted" aria-label="Atos do governo — documentos recentes">
       <div className="max-w-[1100px] mx-auto px-4 md:px-6">
-
-        {/* Section header */}
         <div className="flex items-end justify-between mb-8 pb-4 border-b border-border">
           <div>
             <p className="flex items-center gap-2 text-[11px] font-semibold text-primary uppercase tracking-widest mb-1">
@@ -55,38 +38,28 @@ export function DocumentosSection() {
           </Link>
         </div>
 
-        {/* List */}
         <div className="flex flex-col gap-3">
-          {documentos.map(({ tipo, titulo, data, href }) => (
+          {docs.map(({ id, slug, titulo, tipo, publicado_em }) => (
             <Link
-              key={href}
-              href={href}
+              key={id}
+              href={`/documentos/${slug}`}
               className="group bg-card border border-border rounded-lg px-5 py-4 flex items-center gap-4 hover:border-primary hover:shadow-[0_2px_12px_rgba(39,79,160,.08)] transition-all"
             >
-              {/* Icon */}
               <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center text-primary flex-shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
                 <IconFileText size={18} />
               </div>
-
-              {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={`inline-flex text-[10px] font-semibold uppercase tracking-[.06em] px-2 py-0.5 rounded-sm ${badgeVariant[tipo] ?? "bg-muted text-muted-foreground"}`}>
+                  <span className={`inline-flex text-[10px] font-semibold uppercase tracking-[.06em] px-2 py-0.5 rounded-sm ${tipoColor[tipo] ?? "bg-muted text-muted-foreground"}`}>
                     {tipo}
                   </span>
-                  <span className="text-[11px] text-muted-foreground">{data}</span>
+                  <span className="text-[11px] text-muted-foreground">
+                    {new Date(publicado_em).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}
+                  </span>
                 </div>
-                <p className="text-[14px] font-medium leading-[1.4] truncate group-hover:text-primary transition-colors">
-                  {titulo}
-                </p>
+                <p className="text-[14px] font-medium leading-[1.4] truncate group-hover:text-primary transition-colors">{titulo}</p>
               </div>
-
-              {/* Arrow */}
-              <IconChevronRight
-                size={16}
-                className="text-muted-foreground flex-shrink-0 group-hover:text-primary group-hover:translate-x-0.5 transition-all"
-                aria-hidden="true"
-              />
+              <IconChevronRight size={16} className="text-muted-foreground flex-shrink-0 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
             </Link>
           ))}
         </div>

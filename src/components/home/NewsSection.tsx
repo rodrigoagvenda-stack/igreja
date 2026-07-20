@@ -1,28 +1,42 @@
 import Link from "next/link"
-import Image from "next/image"
-import { IconCalendar, IconArrowRight } from "@tabler/icons-react"
-import { Badge } from "@/components/ui/badge"
+import { IconCalendar, IconArrowRight, IconNews } from "@tabler/icons-react"
+import { createClient } from "@/lib/supabase/server"
 
-const featured = {
-  category: "Pastoral",
-  title: "Dom [Arcebispo] preside encontro de formação para lideranças pastorais da Arquidiocese",
-  excerpt: "Evento reuniu coordenadores e agentes pastorais de todas as paróquias para reflexão e planejamento do ano missionário.",
-  date: "28 de maio de 2025",
-  href: "/noticias/encontro-formacao",
+type Noticia = {
+  id: string
+  slug: string
+  titulo: string
+  resumo: string | null
+  categoria: string
+  publicado_em: string | null
 }
 
-const list = [
-  { category: "Institucional", title: "Nomeação de novo pároco para a Paróquia São José em Botucatu",                    date: "25 mai 2025", href: "#" },
-  { category: "Formação",      title: "Semana de catequese reúne mais de 300 catequistas na Diocese",                     date: "22 mai 2025", href: "#" },
-  { category: "Litúrgico",    title: "Calendário litúrgico arquidiocesano para o segundo semestre é divulgado",           date: "18 mai 2025", href: "#" },
-]
+const catColor: Record<string, string> = {
+  Pastoral:      "bg-primary/10 text-primary",
+  Institucional: "bg-accent/20 text-foreground",
+  Formação:      "bg-green-100 text-green-700",
+  Litúrgico:     "bg-purple-100 text-purple-700",
+  Social:        "bg-orange-100 text-orange-700",
+  Geral:         "bg-muted text-muted-foreground",
+}
 
-export function NewsSection() {
+export async function NewsSection() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("arq_noticias")
+    .select("id, slug, titulo, resumo, categoria, publicado_em")
+    .eq("status", "publicado")
+    .order("publicado_em", { ascending: false })
+    .limit(4)
+
+  const noticias = (data ?? []) as Noticia[]
+  if (noticias.length === 0) return null
+
+  const [destaque, ...lista] = noticias
+
   return (
     <section className="py-16 md:py-20" aria-label="Últimas notícias">
       <div className="max-w-[1100px] mx-auto px-4 md:px-6">
-
-        {/* Section header */}
         <div className="flex items-end justify-between mb-7 pb-4 border-b border-border">
           <div>
             <p className="flex items-center gap-2 text-[11px] font-semibold text-primary uppercase tracking-widest mb-1">
@@ -36,66 +50,54 @@ export function NewsSection() {
           </Link>
         </div>
 
-        {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr] gap-7">
-
-          {/* Featured */}
+          {/* Destaque */}
           <Link
-            href={featured.href}
+            href={`/noticias/${destaque.slug}`}
             className="group bg-card rounded-lg border border-border overflow-hidden hover:border-primary hover:shadow-[0_4px_20px_rgba(139,26,46,.1)] transition-all"
-            aria-label={featured.title}
           >
-            {/* Image */}
-            <div className="h-[200px] md:h-[220px] relative overflow-hidden">
-              <Image src="https://picsum.photos/seed/noticia-destaque/700/300" alt={featured.title} fill className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 px-4 pb-3">
-                <span className="text-[11px] font-semibold text-white/90 uppercase tracking-[.06em]">{featured.category}</span>
-              </div>
+            <div className="h-[200px] md:h-[220px] bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+              <IconNews size={48} className="text-primary/20" />
             </div>
-
-            {/* Body */}
             <div className="p-5">
-              <Badge className="bg-primary/10 text-primary border-0 text-[11px] mb-2 hover:bg-primary/20">
-                {featured.category}
-              </Badge>
+              <span className={`inline-flex text-[10px] font-semibold uppercase tracking-[.06em] px-2 py-0.5 rounded-sm mb-2 ${catColor[destaque.categoria] ?? catColor.Geral}`}>
+                {destaque.categoria}
+              </span>
               <h3 className="font-serif text-[20px] font-bold leading-[1.3] mb-2 group-hover:text-primary transition-colors">
-                {featured.title}
+                {destaque.titulo}
               </h3>
-              <p className="text-[14px] text-muted-foreground leading-[1.6] line-clamp-2">
-                {featured.excerpt}
-              </p>
-              <p className="flex items-center gap-1.5 text-[12px] text-muted-foreground mt-3">
-                <IconCalendar size={12} />
-                {featured.date}
-              </p>
+              {destaque.resumo && (
+                <p className="text-[14px] text-muted-foreground leading-[1.6] line-clamp-2">{destaque.resumo}</p>
+              )}
+              {destaque.publicado_em && (
+                <p className="flex items-center gap-1.5 text-[12px] text-muted-foreground mt-3">
+                  <IconCalendar size={12} />
+                  {new Date(destaque.publicado_em).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+                </p>
+              )}
             </div>
           </Link>
 
-          {/* List */}
+          {/* Lista */}
           <div className="flex flex-col gap-3">
-            {list.map(({ category, title, date, href }) => (
+            {lista.map(n => (
               <Link
-                key={href + title}
-                href={href}
+                key={n.id}
+                href={`/noticias/${n.slug}`}
                 className="group flex gap-4 items-start bg-card border border-border rounded-lg p-4 hover:border-primary hover:bg-primary/5 transition-all"
               >
-                {/* Thumb */}
-                <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 relative">
-                  <Image src={`https://picsum.photos/seed/noticia-${href}/80/80`} alt={title} fill className="object-cover" />
+                <div className="w-14 h-14 rounded-md flex-shrink-0 bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center">
+                  <IconNews size={22} className="text-primary/30" />
                 </div>
-
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-semibold text-primary uppercase tracking-[.06em] mb-1">
-                    {category}
-                  </p>
-                  <h3 className="text-[14px] font-semibold leading-[1.3] mb-1.5 group-hover:text-primary transition-colors line-clamp-2">
-                    {title}
-                  </h3>
-                  <p className="flex items-center gap-1 text-[12px] text-muted-foreground">
-                    <IconCalendar size={11} />
-                    {date}
-                  </p>
+                  <p className="text-[10px] font-semibold text-primary uppercase tracking-[.06em] mb-1">{n.categoria}</p>
+                  <h3 className="text-[14px] font-semibold leading-[1.3] mb-1.5 group-hover:text-primary transition-colors line-clamp-2">{n.titulo}</h3>
+                  {n.publicado_em && (
+                    <p className="flex items-center gap-1 text-[12px] text-muted-foreground">
+                      <IconCalendar size={11} />
+                      {new Date(n.publicado_em).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}
+                    </p>
+                  )}
                 </div>
               </Link>
             ))}
