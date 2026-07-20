@@ -8,26 +8,31 @@ export const metadata = { title: "Editar Horários" }
 const inputCls = "w-full bg-background border border-border rounded-md px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
 const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
 
+type LocalRow = {
+  id: string
+  nome: string
+  tipo: 'Matriz' | 'Capela'
+  paroquia_id: string
+  endereco: string | null
+  arq_horarios_missa: { id: string; descricao: string }[]
+}
+
+type ParoquiaOption = { id: string; nome: string; cidade: string }
+
 export default async function EditarHorarioPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: local } = await supabase
-    .from('arq_locais')
-    .select('*, arq_horarios_missa(id, descricao)')
-    .eq('id', id)
-    .single()
+  const [{ data: localData }, { data: paroquiasData }] = await Promise.all([
+    supabase.from('arq_locais').select('*, arq_horarios_missa(id, descricao)').eq('id', id).single(),
+    supabase.from('arq_paroquias').select('id, nome, cidade').eq('ativa', true).order('nome'),
+  ])
 
-  if (!local) notFound()
+  if (!localData) notFound()
 
-  const { data: paroquias } = await supabase
-    .from('arq_paroquias')
-    .select('id, nome, cidade')
-    .eq('ativa', true)
-    .order('nome')
-
-  const horarios = (local.arq_horarios_missa as { id: string; descricao: string }[]) ?? []
-  const horariosText = horarios.map(h => h.descricao).join('\n')
+  const local = localData as unknown as LocalRow
+  const paroquias = (paroquiasData ?? []) as ParoquiaOption[]
+  const horariosText = local.arq_horarios_missa.map(h => h.descricao).join('\n')
 
   const action = updateLocal.bind(null, id)
 
@@ -62,7 +67,7 @@ export default async function EditarHorarioPage({ params }: { params: Promise<{ 
               <label className={labelCls}>Paróquia *</label>
               <select name="paroquia_id" required defaultValue={local.paroquia_id} className={inputCls}>
                 <option value="">Selecione...</option>
-                {paroquias?.map(p => (
+                {paroquias.map(p => (
                   <option key={p.id} value={p.id}>{p.nome} — {p.cidade}</option>
                 ))}
               </select>

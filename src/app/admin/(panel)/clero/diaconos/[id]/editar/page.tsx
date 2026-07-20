@@ -2,22 +2,27 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateDiacono } from "../../actions"
+import type { Diacono } from "@/types/database"
 
 export const metadata = { title: "Editar Diácono" }
 
 const inputCls = "w-full bg-background border border-border rounded-md px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
 const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
 
+type ParoquiaOption = { id: string; nome: string; cidade: string }
+
 export default async function EditarDiaconoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
 
-  const [{ data: diacono }, { data: paroquias }] = await Promise.all([
+  const [{ data: diaconoData }, { data: paroquiasData }] = await Promise.all([
     supabase.from('arq_diaconos').select('*').eq('id', id).single(),
     supabase.from('arq_paroquias').select('id, nome, cidade').eq('ativa', true).order('nome'),
   ])
 
-  if (!diacono) notFound()
+  if (!diaconoData) notFound()
+  const diacono = diaconoData as unknown as Diacono
+  const paroquias = (paroquiasData ?? []) as ParoquiaOption[]
 
   const action = updateDiacono.bind(null, id)
 
@@ -55,7 +60,7 @@ export default async function EditarDiaconoPage({ params }: { params: Promise<{ 
             <label className={labelCls}>Paróquia</label>
             <select name="paroquia_id" defaultValue={diacono.paroquia_id ?? ''} className={inputCls}>
               <option value="">Sem paróquia vinculada</option>
-              {paroquias?.map(p => (
+              {paroquias.map(p => (
                 <option key={p.id} value={p.id}>{p.nome} — {p.cidade}</option>
               ))}
             </select>

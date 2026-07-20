@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateNoticia } from "../../actions"
+import type { Noticia } from "@/types/database"
 
 export const metadata = { title: "Editar Notícia" }
 
@@ -12,13 +13,14 @@ export default async function EditarNoticiaPage({ params }: { params: Promise<{ 
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: noticia } = await supabase
+  const { data } = await supabase
     .from('arq_noticias')
     .select('*')
     .eq('id', id)
     .single()
 
-  if (!noticia) notFound()
+  if (!data) notFound()
+  const noticia = data as unknown as Noticia
 
   const action = updateNoticia.bind(null, id)
 
@@ -79,7 +81,7 @@ export default async function EditarNoticiaPage({ params }: { params: Promise<{ 
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" name="destaque" defaultChecked={noticia.destaque} className="w-4 h-4 accent-primary" />
+            <input type="checkbox" name="destaque" value="on" defaultChecked={noticia.destaque} className="w-4 h-4 accent-primary" />
             <span className="text-[13px]">Destacar na página inicial</span>
           </label>
         </div>

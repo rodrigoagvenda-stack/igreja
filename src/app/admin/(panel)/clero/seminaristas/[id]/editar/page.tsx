@@ -2,11 +2,14 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateSeminarista } from "../../actions"
+import type { Seminarista } from "@/types/database"
 
 export const metadata = { title: "Editar Seminarista" }
 
 const inputCls = "w-full bg-background border border-border rounded-md px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
 const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
+
+type ParoquiaOption = { id: string; nome: string; cidade: string }
 
 const anosFormacao = [
   "Propedêutico",
@@ -23,12 +26,14 @@ export default async function EditarSeminaryPage({ params }: { params: Promise<{
   const { id } = await params
   const supabase = await createClient()
 
-  const [{ data: sem }, { data: paroquias }] = await Promise.all([
+  const [{ data: semData }, { data: paroquiasData }] = await Promise.all([
     supabase.from('arq_seminaristas').select('*').eq('id', id).single(),
     supabase.from('arq_paroquias').select('id, nome, cidade').eq('ativa', true).order('nome'),
   ])
 
-  if (!sem) notFound()
+  if (!semData) notFound()
+  const sem = semData as unknown as Seminarista
+  const paroquias = (paroquiasData ?? []) as ParoquiaOption[]
 
   const action = updateSeminarista.bind(null, id)
 
@@ -70,7 +75,7 @@ export default async function EditarSeminaryPage({ params }: { params: Promise<{
             <label className={labelCls}>Paróquia de origem</label>
             <select name="paroquia_id" defaultValue={sem.paroquia_id ?? ''} className={inputCls}>
               <option value="">Sem paróquia vinculada</option>
-              {paroquias?.map(p => (
+              {paroquias.map(p => (
                 <option key={p.id} value={p.id}>{p.nome} — {p.cidade}</option>
               ))}
             </select>

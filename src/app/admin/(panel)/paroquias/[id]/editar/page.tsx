@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateParoquia } from "../../actions"
+import type { Paroquia } from "@/types/database"
 
 export const metadata = { title: "Editar Paróquia" }
 
@@ -12,13 +13,14 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: paroquia } = await supabase
+  const { data } = await supabase
     .from('arq_paroquias')
     .select('*')
     .eq('id', id)
     .single()
 
-  if (!paroquia) notFound()
+  if (!data) notFound()
+  const paroquia = data as unknown as Paroquia
 
   const action = updateParoquia.bind(null, id)
 

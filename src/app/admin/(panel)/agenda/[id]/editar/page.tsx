@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateEvento } from "../../actions"
+import type { Evento } from "@/types/database"
 
 export const metadata = { title: "Editar Evento" }
 
@@ -16,13 +17,14 @@ export default async function EditarEventoPage({ params }: { params: Promise<{ i
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: evento } = await supabase
+  const { data } = await supabase
     .from('arq_eventos')
     .select('*')
     .eq('id', id)
     .single()
 
-  if (!evento) notFound()
+  if (!data) notFound()
+  const evento = data as unknown as Evento
 
   const action = updateEvento.bind(null, id)
 
@@ -79,7 +81,7 @@ export default async function EditarEventoPage({ params }: { params: Promise<{ i
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" name="destaque" defaultChecked={evento.destaque} className="w-4 h-4 accent-primary" />
+            <input type="checkbox" name="destaque" value="on" defaultChecked={evento.destaque} className="w-4 h-4 accent-primary" />
             <span className="text-[13px]">Destacar na página inicial</span>
           </label>
         </div>

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateDocumento } from "../../actions"
+import type { Documento } from "@/types/database"
 
 export const metadata = { title: "Editar Documento" }
 
@@ -12,13 +13,14 @@ export default async function EditarDocumentoPage({ params }: { params: Promise<
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: doc } = await supabase
+  const { data } = await supabase
     .from('arq_documentos')
     .select('*')
     .eq('id', id)
     .single()
 
-  if (!doc) notFound()
+  if (!data) notFound()
+  const doc = data as unknown as Documento
 
   const action = updateDocumento.bind(null, id)
 
