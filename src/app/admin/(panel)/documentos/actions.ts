@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { resolveUpload } from '@/lib/supabase/storage'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -17,11 +18,13 @@ export async function createDocumento(formData: FormData) {
   const supabase = await createClient()
   const titulo = formData.get('titulo') as string
 
+  const arquivo_url = await resolveUpload(formData, 'arquivo_file', 'arquivo_url_atual', 'arq-documentos')
+
   const { error } = await supabase.from('arq_documentos').insert({
     titulo,
     slug: slugify(titulo),
     tipo: formData.get('tipo') as 'Decreto' | 'Comunicado' | 'Nomeação' | 'Circular',
-    arquivo_url: (formData.get('arquivo_url') as string) || null,
+    arquivo_url,
     publicado_em: (formData.get('publicado_em') as string) || new Date().toISOString().split('T')[0],
   })
 
@@ -33,10 +36,12 @@ export async function createDocumento(formData: FormData) {
 export async function updateDocumento(id: string, formData: FormData) {
   const supabase = await createClient()
 
+  const arquivo_url = await resolveUpload(formData, 'arquivo_file', 'arquivo_url_atual', 'arq-documentos')
+
   const { error } = await supabase.from('arq_documentos').update({
     titulo: formData.get('titulo') as string,
     tipo: formData.get('tipo') as 'Decreto' | 'Comunicado' | 'Nomeação' | 'Circular',
-    arquivo_url: (formData.get('arquivo_url') as string) || null,
+    arquivo_url,
     publicado_em: (formData.get('publicado_em') as string) || new Date().toISOString().split('T')[0],
   }).eq('id', id)
 

@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { IconDownload } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
 import { updateDocumento } from "../../actions"
 import type { Documento } from "@/types/database"
@@ -36,7 +37,7 @@ export default async function EditarDocumentoPage({ params }: { params: Promise<
         </div>
       </div>
 
-      <form action={action} className="space-y-6">
+      <form action={action} encType="multipart/form-data" className="space-y-6">
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div>
             <label className={labelCls}>Título *</label>
@@ -60,8 +61,29 @@ export default async function EditarDocumentoPage({ params }: { params: Promise<
           </div>
 
           <div>
-            <label className={labelCls}>URL do arquivo</label>
-            <input name="arquivo_url" type="url" defaultValue={doc.arquivo_url ?? ''} className={inputCls} placeholder="https://..." />
+            <label className={labelCls}>Arquivo (PDF)</label>
+            {doc.arquivo_url && (
+              <div className="mb-2 flex items-center gap-2">
+                <a
+                  href={doc.arquivo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-[12px] text-primary hover:underline"
+                >
+                  <IconDownload size={13} />
+                  Arquivo atual — clique para baixar
+                </a>
+                <span className="text-[11px] text-muted-foreground">· envie um novo para substituir</span>
+              </div>
+            )}
+            <input type="hidden" name="arquivo_url_atual" value={doc.arquivo_url ?? ''} />
+            <input
+              name="arquivo_file"
+              type="file"
+              accept="application/pdf,.pdf"
+              className="w-full text-[13px] text-muted-foreground file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-[12px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">PDF — máx. 20 MB</p>
           </div>
         </div>
 

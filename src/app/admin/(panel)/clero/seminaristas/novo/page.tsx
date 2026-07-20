@@ -38,7 +38,7 @@ export default async function NovoSeminaryPage() {
         </div>
       </div>
 
-      <form action={createSeminarista} className="space-y-6">
+      <form action={createSeminarista} encType="multipart/form-data" className="space-y-6">
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div>
             <label className={labelCls}>Nome completo *</label>
@@ -71,8 +71,14 @@ export default async function NovoSeminaryPage() {
           </div>
 
           <div>
-            <label className={labelCls}>URL da foto</label>
-            <input name="foto_url" type="url" className={inputCls} placeholder="https://..." />
+            <label className={labelCls}>Foto</label>
+            <input
+              name="foto_file"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="w-full text-[13px] text-muted-foreground file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-[12px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">JPG, PNG ou WebP — máx. 5 MB</p>
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer">

@@ -21,7 +21,7 @@ export default function NovoDocumentoPage() {
         </div>
       </div>
 
-      <form action={createDocumento} className="space-y-6">
+      <form action={createDocumento} encType="multipart/form-data" className="space-y-6">
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div>
             <label className={labelCls}>Título *</label>
@@ -45,8 +45,14 @@ export default function NovoDocumentoPage() {
           </div>
 
           <div>
-            <label className={labelCls}>URL do arquivo</label>
-            <input name="arquivo_url" type="url" className={inputCls} placeholder="https://... (link para o PDF ou documento)" />
+            <label className={labelCls}>Arquivo (PDF)</label>
+            <input
+              name="arquivo_file"
+              type="file"
+              accept="application/pdf,.pdf"
+              className="w-full text-[13px] text-muted-foreground file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-[12px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">PDF — máx. 20 MB</p>
           </div>
         </div>
 

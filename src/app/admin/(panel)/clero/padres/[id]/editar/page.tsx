@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updatePadre } from "../../actions"
@@ -38,7 +39,7 @@ export default async function EditarPadrePage({ params }: { params: Promise<{ id
         </div>
       </div>
 
-      <form action={action} className="space-y-6">
+      <form action={action} encType="multipart/form-data" className="space-y-6">
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div>
             <label className={labelCls}>Nome completo *</label>
@@ -67,8 +68,27 @@ export default async function EditarPadrePage({ params }: { params: Promise<{ id
           </div>
 
           <div>
-            <label className={labelCls}>URL da foto</label>
-            <input name="foto_url" type="url" defaultValue={padre.foto_url ?? ''} className={inputCls} placeholder="https://..." />
+            <label className={labelCls}>Foto</label>
+            {padre.foto_url && (
+              <div className="mb-2 flex items-center gap-3">
+                <Image
+                  src={padre.foto_url}
+                  alt="Foto atual"
+                  width={56}
+                  height={56}
+                  className="w-14 h-14 rounded-lg object-cover ring-1 ring-border"
+                />
+                <span className="text-[11px] text-muted-foreground">Foto atual — envie um novo arquivo para substituir</span>
+              </div>
+            )}
+            <input type="hidden" name="foto_url_atual" value={padre.foto_url ?? ''} />
+            <input
+              name="foto_file"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="w-full text-[13px] text-muted-foreground file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-[12px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">JPG, PNG ou WebP — máx. 5 MB</p>
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer">
