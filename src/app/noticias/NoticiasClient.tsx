@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { IconCalendar, IconArrowRight, IconNewspaper } from "@tabler/icons-react"
+import { IconCalendar, IconArrowRight, IconNews } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
 type Noticia = {
@@ -51,7 +51,7 @@ export default function NoticiasClient({ noticias, categorias }: { noticias: Not
 
       {filtradas.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
-          <IconNewspaper size={48} className="mx-auto mb-3 opacity-20" />
+          <IconNews size={48} className="mx-auto mb-3 opacity-20" />
           <p className="font-medium">Nenhuma notícia publicada ainda.</p>
           <p className="text-[13px] mt-1">As notícias cadastradas no painel aparecem aqui.</p>
         </div>
@@ -68,7 +68,7 @@ export default function NoticiasClient({ noticias, categorias }: { noticias: Not
                   <img src={imagem_url} alt={titulo} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <IconNewspaper size={40} className="text-muted-foreground/20" />
+                    <IconNews size={40} className="text-muted-foreground/20" />
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
