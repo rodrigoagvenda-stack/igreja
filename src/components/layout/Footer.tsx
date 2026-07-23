@@ -55,7 +55,7 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-10">
 
           {/* Brand col */}
-          <div className="space-y-4">
+          <div className="flex flex-col items-center text-center sm:items-start sm:text-left space-y-4">
             <FooterLogo />
 
             <p className="text-white/50 text-xs leading-relaxed">
@@ -63,21 +63,21 @@ export function Footer() {
             </p>
 
             <address className="not-italic space-y-1.5 text-xs text-white/45">
-              <p className="flex items-center gap-2">
+              <p className="flex items-center justify-center sm:justify-start gap-2">
                 <IconMapPin size={12} className="text-accent flex-shrink-0" />
                 Rua Dr. Costa Leite, 668 — Centro, Botucatu, SP
               </p>
-              <p className="flex items-center gap-2">
+              <p className="flex items-center justify-center sm:justify-start gap-2">
                 <IconPhone size={12} className="text-accent flex-shrink-0" />
                 (14) 3811-5900
               </p>
-              <p className="flex items-center gap-2">
+              <p className="flex items-center justify-center sm:justify-start gap-2">
                 <IconMail size={12} className="text-accent flex-shrink-0" />
                 secretaria@arquidiocesebotucatu.org.br
               </p>
             </address>
 
-            <div className="flex gap-2 pt-1" aria-label="Redes sociais">
+            <div className="flex justify-center sm:justify-start gap-2 pt-1" aria-label="Redes sociais">
               {socials.map(({ icon, label, href }) => (
                 <Link
                   key={label}
@@ -93,7 +93,7 @@ export function Footer() {
 
           {/* Nav cols */}
           {footerCols.map(({ title, links }) => (
-            <div key={title}>
+            <div key={title} className="text-center sm:text-left">
               <h3 className="text-[11px] font-semibold text-accent uppercase tracking-[.08em] mb-4 pb-2 border-b border-white/8">
                 {title}
               </h3>
@@ -102,7 +102,7 @@ export function Footer() {
                   <li key={href}>
                     <Link
                       href={href}
-                      className="flex items-center gap-1.5 text-xs text-white/50 hover:text-white transition-colors"
+                      className="flex items-center justify-center sm:justify-start gap-1.5 text-xs text-white/50 hover:text-white transition-colors"
                     >
                       <IconChevronRight size={11} className="opacity-40" />
                       {label}
@@ -117,7 +117,7 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="bg-[#091530] py-3.5">
-        <div className="max-w-[1100px] mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="max-w-[1100px] mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <p className="text-[12px] text-white/30">
             © 2025 Arquidiocese de Botucatu · Todos os direitos reservados
           </p>

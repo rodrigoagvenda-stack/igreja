@@ -1,8 +1,16 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
+const ADMIN_HOSTNAME = "ads.arquidiocesedebotucatu.com.br"
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const hostname = request.headers.get("host") ?? ""
+
+  // Redireciona o subdomínio do admin para /admin
+  if (hostname === ADMIN_HOSTNAME && !pathname.startsWith("/admin")) {
+    return NextResponse.redirect(new URL("/admin", request.url))
+  }
 
   // Só processa rotas /admin
   if (!pathname.startsWith("/admin")) {
@@ -60,5 +68,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 }
