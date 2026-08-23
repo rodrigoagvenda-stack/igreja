@@ -48,10 +48,19 @@ export async function proxy(request: NextRequest) {
     }
   )
 
+  // Requisições de Server Actions (POST com header next-action) não podem receber um redirect
+  // aqui: o cliente espera uma resposta RSC da action, e um redirect 3xx quebra esse contrato
+  // (aparece como "An unexpected response was received from the server" no navegador). Nesses
+  // casos deixamos passar — a action em si roda contra o banco protegido por RLS (arq_is_admin,
+  // exige AAL2), então uma sessão inválida/expirada é rejeitada como erro tratável, não como
+  // redirect cru.
+  const isServerAction = request.headers.get("next-action") !== null
+
   // Verifica sessão
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
+    if (isServerAction) return response
     return NextResponse.redirect(new URL("/admin/login", request.url))
   }
 
@@ -59,6 +68,7 @@ export async function proxy(request: NextRequest) {
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
 
   if (!aal || aal.currentLevel !== "aal2") {
+    if (isServerAction) return response
     const loginUrl = new URL("/admin/login", request.url)
     loginUrl.searchParams.set("mfa", "required")
     return NextResponse.redirect(loginUrl)
