@@ -62,11 +62,11 @@ export async function resolvePhotoUrls(
   const resolved: (string | null)[] = []
   for (let i = 0; i < count; i++) {
     const n = i + 1
-    if (formData.get(`${fieldPrefix}_${n}_remover`) === 'true') {
-      resolved.push(null)
-    } else {
-      resolved.push((formData.get(`${fieldPrefix}_${n}`) as string) || null)
-    }
+    const removido = formData.get(`${fieldPrefix}_${n}_remover`) === 'true'
+    const valorBruto = formData.get(`${fieldPrefix}_${n}`) as string | null
+    const valor = removido ? null : (valorBruto || null)
+    resolved.push(valor)
+    console.log(`[resolvePhotoUrls] slot=${n} bruto="${valorBruto ? valorBruto.slice(-24) : '(vazio)'}" removido=${removido} resultado="${valor ? valor.slice(-24) : '(vazio)'}"`)
   }
 
   let urls = resolved.filter((url): url is string => !!url)
