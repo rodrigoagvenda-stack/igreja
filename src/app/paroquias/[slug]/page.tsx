@@ -2,8 +2,8 @@ import { notFound } from "next/navigation"
 import { SiteLayout } from "@/components/layout/SiteLayout"
 import { PageHeader } from "@/components/layout/PageHeader"
 import Link from "next/link"
-import Image from "next/image"
 import { createClient } from "@/lib/supabase/server"
+import { ParoquiaGaleria } from "@/components/paroquias/ParoquiaGaleria"
 import {
   IconMapPin, IconPhone, IconMail, IconClock,
   IconUser, IconArrowLeft, IconBuildingChurch,
@@ -116,35 +116,7 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
           {/* Main */}
           <div className="space-y-8">
             {/* Galeria de fotos */}
-            {fotos.length > 0 && (
-              <div className="space-y-3">
-                <div className="relative aspect-[16/9] rounded-xl overflow-hidden ring-1 ring-border">
-                  <Image
-                    src={fotos[0]}
-                    alt={`${paroquia.nome} — foto 1`}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 780px"
-                    priority
-                  />
-                </div>
-                {fotos.length > 1 && (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                    {fotos.slice(1).map((url, i) => (
-                      <div key={url} className="relative aspect-square rounded-xl overflow-hidden ring-1 ring-border">
-                        <Image
-                          src={url}
-                          alt={`${paroquia.nome} — foto ${i + 2}`}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 1024px) 33vw, 190px"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+            <ParoquiaGaleria fotos={fotos} nome={paroquia.nome} />
 
             {/* Badge região */}
             <div className="flex items-center gap-2">
