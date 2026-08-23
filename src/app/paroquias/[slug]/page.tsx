@@ -117,22 +117,32 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
           <div className="space-y-8">
             {/* Galeria de fotos */}
             {fotos.length > 0 && (
-              <div className={`grid gap-3 ${fotos.length === 1 ? "grid-cols-1" : fotos.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
-                {fotos.map((url, i) => (
-                  <div
-                    key={url}
-                    className={`relative rounded-xl overflow-hidden ring-1 ring-border ${fotos.length === 1 ? "aspect-[16/9]" : "aspect-[4/3]"}`}
-                  >
-                    <Image
-                      src={url}
-                      alt={`${paroquia.nome} — foto ${i + 1}`}
-                      fill
-                      className="object-cover"
-                      sizes={fotos.length === 1 ? "(max-width: 1024px) 100vw, 780px" : "(max-width: 1024px) 50vw, 350px"}
-                      priority={i === 0}
-                    />
+              <div className="space-y-3">
+                <div className="relative aspect-[16/9] rounded-xl overflow-hidden ring-1 ring-border">
+                  <Image
+                    src={fotos[0]}
+                    alt={`${paroquia.nome} — foto 1`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 780px"
+                    priority
+                  />
+                </div>
+                {fotos.length > 1 && (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {fotos.slice(1).map((url, i) => (
+                      <div key={url} className="relative aspect-square rounded-xl overflow-hidden ring-1 ring-border">
+                        <Image
+                          src={url}
+                          alt={`${paroquia.nome} — foto ${i + 2}`}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 33vw, 190px"
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             )}
 

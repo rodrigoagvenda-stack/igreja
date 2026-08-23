@@ -97,10 +97,10 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div>
             <label className={labelCls}>Fotos</label>
-            <p className="text-[11px] text-muted-foreground mb-3">Até 3 fotos da paróquia (fachada, interior, eventos) — JPG, PNG ou WebP, máx. 5 MB cada.</p>
+            <p className="text-[11px] text-muted-foreground mb-3">Até 10 fotos da paróquia (fachada, interior, eventos) — JPG, PNG ou WebP, máx. 5 MB cada.</p>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            {[1, 2, 3].map(n => {
+          <div className="grid grid-cols-5 gap-4">
+            {Array.from({ length: 10 }, (_, i) => i + 1).map(n => {
               const atual = fotosAtuais[n - 1] ?? ''
               return (
                 <div key={n}>
