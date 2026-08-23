@@ -3,16 +3,29 @@
 import { createClient } from './server'
 
 export async function uploadToStorage(file: File, bucket: string): Promise<string> {
-  const supabase = await createClient()
-  const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin'
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-  const bytes = await file.arrayBuffer()
-  const { error } = await supabase.storage.from(bucket).upload(path, bytes, {
-    contentType: file.type,
-    upsert: false,
-  })
-  if (error) throw new Error(`Upload falhou: ${error.message}`)
-  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
+  const t0 = Date.now()
+  console.log(`[upload] iniciando bucket=${bucket} nome=${file.name} tamanho=${(file.size / 1024).toFixed(0)}KB tipo=${file.type}`)
+
+  try {
+    const supabase = await createClient()
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin'
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const bytes = await file.arrayBuffer()
+    const { error } = await supabase.storage.from(bucket).upload(path, bytes, {
+      contentType: file.type,
+      upsert: false,
+    })
+    if (error) {
+      console.error(`[upload] FALHOU bucket=${bucket} nome=${file.name} apos=${Date.now() - t0}ms erro=${error.message}`)
+      throw new Error(`Upload falhou (${file.name}): ${error.message}`)
+    }
+    const url = supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
+    console.log(`[upload] ok bucket=${bucket} nome=${file.name} apos=${Date.now() - t0}ms url=${url}`)
+    return url
+  } catch (err) {
+    console.error(`[upload] EXCECAO bucket=${bucket} nome=${file.name} apos=${Date.now() - t0}ms`, err)
+    throw err
+  }
 }
 
 export async function resolveUpload(
