@@ -29,13 +29,15 @@ export async function resolveUpload(
 }
 
 // Resolve até `count` slots de foto (foto_1_file/foto_1_atual/foto_1_remover, foto_2_..., ...)
+// `principalField` aponta pro número (1-based) do slot marcado como principal — vira o índice 0 do array.
 export async function resolveMultiUpload(
   formData: FormData,
   fieldPrefix: string,
   bucket: string,
-  count: number
+  count: number,
+  principalField?: string
 ): Promise<string[]> {
-  const slots = await Promise.all(
+  const resolved = await Promise.all(
     Array.from({ length: count }, async (_, i) => {
       const n = i + 1
       const file = formData.get(`${fieldPrefix}_${n}_file`) as File | null
@@ -44,5 +46,16 @@ export async function resolveMultiUpload(
       return (formData.get(`${fieldPrefix}_${n}_atual`) as string) || null
     })
   )
-  return slots.filter((url): url is string => !!url)
+
+  let urls = resolved.filter((url): url is string => !!url)
+
+  const principalSlot = principalField ? parseInt(formData.get(principalField) as string, 10) : NaN
+  if (!isNaN(principalSlot)) {
+    const principalUrl = resolved[principalSlot - 1]
+    if (principalUrl) {
+      urls = [principalUrl, ...urls.filter(url => url !== principalUrl)]
+    }
+  }
+
+  return urls
 }

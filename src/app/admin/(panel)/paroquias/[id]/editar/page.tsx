@@ -97,11 +97,12 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div>
             <label className={labelCls}>Fotos</label>
-            <p className="text-[11px] text-muted-foreground mb-3">Até 10 fotos da paróquia (fachada, interior, eventos) — JPG, PNG ou WebP, máx. 5 MB cada.</p>
+            <p className="text-[11px] text-muted-foreground mb-3">Até 10 fotos da paróquia (fachada, interior, eventos) — JPG, PNG ou WebP, máx. 5 MB cada. Marque uma como fachada para ela aparecer em destaque na página da paróquia.</p>
           </div>
           <div className="grid grid-cols-5 gap-4">
             {Array.from({ length: 10 }, (_, i) => i + 1).map(n => {
               const atual = fotosAtuais[n - 1] ?? ''
+              const isPrincipalAtual = n === 1 && !!atual
               return (
                 <div key={n}>
                   <label className={labelCls}>Foto {n}</label>
@@ -114,6 +115,11 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
                         height={100}
                         className="w-full h-24 rounded-md object-cover ring-1 ring-border"
                       />
+                      {isPrincipalAtual && (
+                        <span className="absolute top-1 left-1 text-[9px] font-semibold uppercase tracking-[.05em] px-1.5 py-0.5 rounded bg-primary text-white">
+                          Fachada
+                        </span>
+                      )}
                     </div>
                   )}
                   <input type="hidden" name={`foto_${n}_atual`} value={atual} />
@@ -123,8 +129,12 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
                     accept="image/jpeg,image/png,image/webp"
                     className="w-full text-[12px] text-muted-foreground file:mr-2 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
                   />
+                  <label className="flex items-center gap-1.5 mt-1.5 cursor-pointer">
+                    <input type="radio" name="foto_principal" value={n} defaultChecked={isPrincipalAtual} className="w-3.5 h-3.5 accent-primary" />
+                    <span className="text-[11px] text-muted-foreground">Marcar como fachada</span>
+                  </label>
                   {atual && (
-                    <label className="flex items-center gap-1.5 mt-1.5 cursor-pointer">
+                    <label className="flex items-center gap-1.5 mt-1 cursor-pointer">
                       <input type="checkbox" name={`foto_${n}_remover`} value="true" className="w-3.5 h-3.5 accent-destructive" />
                       <span className="text-[11px] text-muted-foreground">Remover esta foto</span>
                     </label>

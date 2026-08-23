@@ -78,7 +78,7 @@ export default function NovaParoquiaPage() {
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div>
             <label className={labelCls}>Fotos</label>
-            <p className="text-[11px] text-muted-foreground mb-3">Até 10 fotos da paróquia (fachada, interior, eventos) — JPG, PNG ou WebP, máx. 5 MB cada.</p>
+            <p className="text-[11px] text-muted-foreground mb-3">Até 10 fotos da paróquia (fachada, interior, eventos) — JPG, PNG ou WebP, máx. 5 MB cada. Marque uma como fachada para ela aparecer em destaque na página da paróquia.</p>
           </div>
           <div className="grid grid-cols-5 gap-4">
             {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
@@ -90,6 +90,10 @@ export default function NovaParoquiaPage() {
                   accept="image/jpeg,image/png,image/webp"
                   className="w-full text-[12px] text-muted-foreground file:mr-2 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
                 />
+                <label className="flex items-center gap-1.5 mt-1.5 cursor-pointer">
+                  <input type="radio" name="foto_principal" value={n} defaultChecked={n === 1} className="w-3.5 h-3.5 accent-primary" />
+                  <span className="text-[11px] text-muted-foreground">Marcar como fachada</span>
+                </label>
               </div>
             ))}
           </div>
