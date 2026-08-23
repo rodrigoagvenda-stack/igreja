@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { createParoquia } from "../actions"
+import { CompressedFileInput } from "@/components/admin/CompressedFileInput"
 
 export const metadata = { title: "Nova Paróquia" }
 
@@ -84,9 +85,8 @@ export default function NovaParoquiaPage() {
             {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
               <div key={n}>
                 <label className={labelCls}>Foto {n}</label>
-                <input
+                <CompressedFileInput
                   name={`foto_${n}_file`}
-                  type="file"
                   accept="image/jpeg,image/png,image/webp"
                   className="w-full text-[12px] text-muted-foreground file:mr-2 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
                 />

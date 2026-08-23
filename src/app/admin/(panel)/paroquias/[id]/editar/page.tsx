@@ -3,6 +3,7 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateParoquia } from "../../actions"
+import { CompressedFileInput } from "@/components/admin/CompressedFileInput"
 import type { Paroquia } from "@/types/database"
 
 export const metadata = { title: "Editar Paróquia" }
@@ -123,9 +124,8 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
                     </div>
                   )}
                   <input type="hidden" name={`foto_${n}_atual`} value={atual} />
-                  <input
+                  <CompressedFileInput
                     name={`foto_${n}_file`}
-                    type="file"
                     accept="image/jpeg,image/png,image/webp"
                     className="w-full text-[12px] text-muted-foreground file:mr-2 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
                   />
