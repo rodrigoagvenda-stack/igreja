@@ -27,3 +27,22 @@ export async function resolveUpload(
   }
   return (formData.get(currentUrlField) as string) || null
 }
+
+// Resolve até `count` slots de foto (foto_1_file/foto_1_atual/foto_1_remover, foto_2_..., ...)
+export async function resolveMultiUpload(
+  formData: FormData,
+  fieldPrefix: string,
+  bucket: string,
+  count: number
+): Promise<string[]> {
+  const slots = await Promise.all(
+    Array.from({ length: count }, async (_, i) => {
+      const n = i + 1
+      const file = formData.get(`${fieldPrefix}_${n}_file`) as File | null
+      if (file && file.size > 0) return uploadToStorage(file, bucket)
+      if (formData.get(`${fieldPrefix}_${n}_remover`) === 'true') return null
+      return (formData.get(`${fieldPrefix}_${n}_atual`) as string) || null
+    })
+  )
+  return slots.filter((url): url is string => !!url)
+}

@@ -104,6 +104,7 @@ export type Database = {
           telefone:        string | null
           email:           string | null
           site:            string | null
+          fotos:           string[]
           ativa:           boolean
           created_at:      string
           updated_at:      string
@@ -121,6 +122,7 @@ export type Database = {
           telefone?:        string | null
           email?:           string | null
           site?:            string | null
+          fotos?:           string[]
           ativa?:           boolean
           created_at?:      string
           updated_at?:      string
@@ -138,6 +140,7 @@ export type Database = {
           telefone?:        string | null
           email?:           string | null
           site?:            string | null
+          fotos?:           string[]
           ativa?:           boolean
           created_at?:      string
           updated_at?:      string

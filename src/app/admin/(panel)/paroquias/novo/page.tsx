@@ -19,7 +19,7 @@ export default function NovaParoquiaPage() {
         </div>
       </div>
 
-      <form action={createParoquia} className="space-y-6">
+      <form action={createParoquia} encType="multipart/form-data" className="space-y-6">
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
@@ -73,6 +73,26 @@ export default function NovaParoquiaPage() {
             <input type="checkbox" name="ativa" value="true" defaultChecked className="w-4 h-4 accent-primary" />
             <span className="text-[13px]">Paróquia ativa</span>
           </label>
+        </div>
+
+        <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
+          <div>
+            <label className={labelCls}>Fotos</label>
+            <p className="text-[11px] text-muted-foreground mb-3">Até 3 fotos da paróquia (fachada, interior, eventos) — JPG, PNG ou WebP, máx. 5 MB cada.</p>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            {[1, 2, 3].map(n => (
+              <div key={n}>
+                <label className={labelCls}>Foto {n}</label>
+                <input
+                  name={`foto_${n}_file`}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="w-full text-[12px] text-muted-foreground file:mr-2 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="flex items-center gap-3">

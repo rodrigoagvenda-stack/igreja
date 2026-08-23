@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateParoquia } from "../../actions"
@@ -23,6 +24,7 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
   const paroquia = data as unknown as Paroquia
 
   const action = updateParoquia.bind(null, id)
+  const fotosAtuais = paroquia.fotos ?? []
 
   return (
     <div className="p-8 max-w-[700px] w-full mx-auto">
@@ -36,7 +38,7 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      <form action={action} className="space-y-6">
+      <form action={action} encType="multipart/form-data" className="space-y-6">
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
@@ -90,6 +92,47 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
             <input type="checkbox" name="ativa" value="true" defaultChecked={paroquia.ativa} className="w-4 h-4 accent-primary" />
             <span className="text-[13px]">Paróquia ativa</span>
           </label>
+        </div>
+
+        <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
+          <div>
+            <label className={labelCls}>Fotos</label>
+            <p className="text-[11px] text-muted-foreground mb-3">Até 3 fotos da paróquia (fachada, interior, eventos) — JPG, PNG ou WebP, máx. 5 MB cada.</p>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            {[1, 2, 3].map(n => {
+              const atual = fotosAtuais[n - 1] ?? ''
+              return (
+                <div key={n}>
+                  <label className={labelCls}>Foto {n}</label>
+                  {atual && (
+                    <div className="relative mb-2">
+                      <Image
+                        src={atual}
+                        alt={`Foto ${n} atual`}
+                        width={160}
+                        height={100}
+                        className="w-full h-24 rounded-md object-cover ring-1 ring-border"
+                      />
+                    </div>
+                  )}
+                  <input type="hidden" name={`foto_${n}_atual`} value={atual} />
+                  <input
+                    name={`foto_${n}_file`}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="w-full text-[12px] text-muted-foreground file:mr-2 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                  />
+                  {atual && (
+                    <label className="flex items-center gap-1.5 mt-1.5 cursor-pointer">
+                      <input type="checkbox" name={`foto_${n}_remover`} value="true" className="w-3.5 h-3.5 accent-destructive" />
+                      <span className="text-[11px] text-muted-foreground">Remover esta foto</span>
+                    </label>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </div>
 
         <div className="flex items-center gap-3">

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import { SiteLayout } from "@/components/layout/SiteLayout"
 import { PageHeader } from "@/components/layout/PageHeader"
 import Link from "next/link"
+import Image from "next/image"
 import { createClient } from "@/lib/supabase/server"
 import {
   IconMapPin, IconPhone, IconMail, IconClock,
@@ -30,6 +31,7 @@ type ParoquiaRow = {
   telefone: string | null
   email: string | null
   site: string | null
+  fotos: string[] | null
 }
 
 type PadreRow = { id: string; nome: string }
@@ -54,7 +56,7 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
   const [{ data: parData }, { data: locaisData }, { data: padresData }] = await Promise.all([
     supabase
       .from("arq_paroquias")
-      .select("id, slug, nome, cidade, regiao_pastoral, padroeiro, data_criacao, endereco, telefone, email, site")
+      .select("id, slug, nome, cidade, regiao_pastoral, padroeiro, data_criacao, endereco, telefone, email, site, fotos")
       .eq("slug", slug)
       .eq("ativa", true)
       .single(),
@@ -93,6 +95,7 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
 
   const locaisReais = (locaisFiltrados ?? []) as unknown as LocalComHorarios[]
   const padresReais = (padresFiltrados ?? []) as unknown as PadreRow[]
+  const fotos = paroquia.fotos ?? []
 
   return (
     <SiteLayout>
@@ -112,6 +115,27 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
 
           {/* Main */}
           <div className="space-y-8">
+            {/* Galeria de fotos */}
+            {fotos.length > 0 && (
+              <div className={`grid gap-3 ${fotos.length === 1 ? "grid-cols-1" : fotos.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+                {fotos.map((url, i) => (
+                  <div
+                    key={url}
+                    className={`relative rounded-xl overflow-hidden ring-1 ring-border ${fotos.length === 1 ? "aspect-[16/9]" : "aspect-[4/3]"}`}
+                  >
+                    <Image
+                      src={url}
+                      alt={`${paroquia.nome} — foto ${i + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes={fotos.length === 1 ? "(max-width: 1024px) 100vw, 780px" : "(max-width: 1024px) 50vw, 350px"}
+                      priority={i === 0}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Badge região */}
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-semibold uppercase tracking-[.06em] px-2.5 py-1 rounded bg-primary/10 text-primary">

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { resolveMultiUpload } from '@/lib/supabase/storage'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -18,6 +19,8 @@ export async function createParoquia(formData: FormData) {
   const nome = formData.get('nome') as string
   const cidade = formData.get('cidade') as string
 
+  const fotos = await resolveMultiUpload(formData, 'foto', 'arq-fotos', 3)
+
   const { error } = await supabase.from('arq_paroquias').insert({
     nome,
     slug: slugify(nome + '-' + cidade),
@@ -30,6 +33,7 @@ export async function createParoquia(formData: FormData) {
     email: (formData.get('email') as string) || null,
     site: (formData.get('site') as string) || null,
     data_criacao: (formData.get('data_criacao') as string) || null,
+    fotos,
     ativa: formData.get('ativa') === 'true',
   })
 
@@ -40,6 +44,8 @@ export async function createParoquia(formData: FormData) {
 
 export async function updateParoquia(id: string, formData: FormData) {
   const supabase = await createClient()
+
+  const fotos = await resolveMultiUpload(formData, 'foto', 'arq-fotos', 3)
 
   const { error } = await supabase.from('arq_paroquias').update({
     nome: formData.get('nome') as string,
@@ -52,6 +58,7 @@ export async function updateParoquia(id: string, formData: FormData) {
     email: (formData.get('email') as string) || null,
     site: (formData.get('site') as string) || null,
     data_criacao: (formData.get('data_criacao') as string) || null,
+    fotos,
     ativa: formData.get('ativa') === 'true',
   }).eq('id', id)
 
