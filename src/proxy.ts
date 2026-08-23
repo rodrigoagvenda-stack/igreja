@@ -56,22 +56,35 @@ export async function proxy(request: NextRequest) {
   // redirect cru.
   const isServerAction = request.headers.get("next-action") !== null
 
-  // Verifica sessão
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    if (isServerAction) return response
-    return NextResponse.redirect(new URL("/admin/login", request.url))
+  if (request.method === "POST") {
+    console.log(`[proxy] POST recebido path=${pathname} isServerAction=${isServerAction}`)
   }
 
-  // Verifica AAL2 (MFA obrigatório)
-  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+  try {
+    // Verifica sessão
+    const { data: { user } } = await supabase.auth.getUser()
 
-  if (!aal || aal.currentLevel !== "aal2") {
+    if (!user) {
+      if (isServerAction) return response
+      return NextResponse.redirect(new URL("/admin/login", request.url))
+    }
+
+    // Verifica AAL2 (MFA obrigatório)
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+
+    if (!aal || aal.currentLevel !== "aal2") {
+      if (isServerAction) return response
+      const loginUrl = new URL("/admin/login", request.url)
+      loginUrl.searchParams.set("mfa", "required")
+      return NextResponse.redirect(loginUrl)
+    }
+  } catch (err) {
+    // getUser()/getAuthenticatorAssuranceLevel() são chamadas de rede pra API de Auth do
+    // Supabase — sem isso, uma falha de rede/timeout aqui derrubava a requisição inteira sem
+    // nenhum log da aplicação (o middleware roda antes de qualquer console.log da action).
+    console.error(`[proxy] falha ao verificar sessão path=${pathname}:`, err)
     if (isServerAction) return response
-    const loginUrl = new URL("/admin/login", request.url)
-    loginUrl.searchParams.set("mfa", "required")
-    return NextResponse.redirect(loginUrl)
+    return NextResponse.redirect(new URL("/admin/login", request.url))
   }
 
   return response
