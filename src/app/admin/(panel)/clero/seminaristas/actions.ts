@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation'
 export async function createSeminarista(formData: FormData) {
   const supabase = await createClient()
 
-  const foto_url = await resolveUpload(formData, 'foto_file', 'foto_url_atual', 'arq-fotos')
+  const foto_url = await resolveUpload(supabase, formData, 'foto_file', 'foto_url_atual', 'arq-fotos')
 
   const { error } = await supabase.from('arq_seminaristas').insert({
     nome: formData.get('nome') as string,
@@ -27,7 +27,7 @@ export async function createSeminarista(formData: FormData) {
 export async function updateSeminarista(id: string, formData: FormData) {
   const supabase = await createClient()
 
-  const foto_url = await resolveUpload(formData, 'foto_file', 'foto_url_atual', 'arq-fotos')
+  const foto_url = await resolveUpload(supabase, formData, 'foto_file', 'foto_url_atual', 'arq-fotos')
 
   const { error } = await supabase.from('arq_seminaristas').update({
     nome: formData.get('nome') as string,

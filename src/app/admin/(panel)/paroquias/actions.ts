@@ -21,7 +21,7 @@ export async function createParoquia(formData: FormData) {
 
   try {
     const supabase = await createClient()
-    const fotos = await resolveMultiUpload(formData, 'foto', 'arq-fotos', 10, 'foto_principal')
+    const fotos = await resolveMultiUpload(supabase, formData, 'foto', 'arq-fotos', 10, 'foto_principal')
     console.log(`[paroquias] createParoquia fotos resolvidas count=${fotos.length}`)
 
     const { error } = await supabase.from('arq_paroquias').insert({
@@ -59,7 +59,7 @@ export async function updateParoquia(id: string, formData: FormData) {
 
   try {
     const supabase = await createClient()
-    const fotos = await resolveMultiUpload(formData, 'foto', 'arq-fotos', 10, 'foto_principal')
+    const fotos = await resolveMultiUpload(supabase, formData, 'foto', 'arq-fotos', 10, 'foto_principal')
     console.log(`[paroquias] updateParoquia fotos resolvidas id=${id} count=${fotos.length}`)
 
     const { error } = await supabase.from('arq_paroquias').update({

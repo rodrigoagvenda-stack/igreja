@@ -18,7 +18,7 @@ export async function createDocumento(formData: FormData) {
   const supabase = await createClient()
   const titulo = formData.get('titulo') as string
 
-  const arquivo_url = await resolveUpload(formData, 'arquivo_file', 'arquivo_url_atual', 'arq-documentos')
+  const arquivo_url = await resolveUpload(supabase, formData, 'arquivo_file', 'arquivo_url_atual', 'arq-documentos')
 
   const { error } = await supabase.from('arq_documentos').insert({
     titulo,
@@ -36,7 +36,7 @@ export async function createDocumento(formData: FormData) {
 export async function updateDocumento(id: string, formData: FormData) {
   const supabase = await createClient()
 
-  const arquivo_url = await resolveUpload(formData, 'arquivo_file', 'arquivo_url_atual', 'arq-documentos')
+  const arquivo_url = await resolveUpload(supabase, formData, 'arquivo_file', 'arquivo_url_atual', 'arq-documentos')
 
   const { error } = await supabase.from('arq_documentos').update({
     titulo: formData.get('titulo') as string,
