@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { compressImage } from "@/lib/compressImage"
 import { IconCheck, IconLoader2, IconAlertTriangle } from "@tabler/icons-react"
 
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export function PhotoUploadSlot({ name, bucket, defaultUrl = "", accept, className }: Props) {
-  const hiddenRef = useRef<HTMLInputElement>(null)
+  const [url, setUrl] = useState(defaultUrl)
   const [status, setStatus] = useState<Status>("idle")
   const [errorMsg, setErrorMsg] = useState("")
 
@@ -39,7 +39,7 @@ export function PhotoUploadSlot({ name, bucket, defaultUrl = "", accept, classNa
       if (!res.ok) throw new Error(data.error || `Falha no upload (HTTP ${res.status}).`)
       if (!data.url) throw new Error("Resposta inválida do servidor.")
 
-      if (hiddenRef.current) hiddenRef.current.value = data.url
+      setUrl(data.url)
       setStatus("done")
     } catch (err) {
       setStatus("error")
@@ -50,7 +50,7 @@ export function PhotoUploadSlot({ name, bucket, defaultUrl = "", accept, classNa
 
   return (
     <div>
-      <input ref={hiddenRef} type="hidden" name={name} defaultValue={defaultUrl} />
+      <input type="hidden" name={name} value={url} readOnly />
       <input
         type="file"
         accept={accept}
