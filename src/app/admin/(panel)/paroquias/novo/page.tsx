@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { createParoquia } from "../actions"
-import { CompressedFileInput } from "@/components/admin/CompressedFileInput"
+import { PhotoUploadSlot } from "@/components/admin/PhotoUploadSlot"
 
 export const metadata = { title: "Nova Paróquia" }
 
@@ -20,7 +20,7 @@ export default function NovaParoquiaPage() {
         </div>
       </div>
 
-      <form action={createParoquia} encType="multipart/form-data" className="space-y-6">
+      <form action={createParoquia} className="space-y-6">
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
@@ -85,8 +85,9 @@ export default function NovaParoquiaPage() {
             {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
               <div key={n}>
                 <label className={labelCls}>Foto {n}</label>
-                <CompressedFileInput
-                  name={`foto_${n}_file`}
+                <PhotoUploadSlot
+                  name={`foto_${n}`}
+                  bucket="arq-fotos"
                   accept="image/jpeg,image/png,image/webp"
                   className="w-full text-[12px] text-muted-foreground file:mr-2 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
                 />

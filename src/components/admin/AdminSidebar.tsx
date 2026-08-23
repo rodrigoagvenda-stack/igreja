@@ -10,6 +10,7 @@ import {
   IconChevronDown,
 } from "@tabler/icons-react"
 import { useState } from "react"
+import { signOut } from "@/app/admin/actions"
 
 type Icon = React.ComponentType<{ size?: number; className?: string }>
 type NavLink  = { label: string; href: string; icon: Icon; children?: never }
@@ -128,10 +129,12 @@ export function AdminSidebar() {
             <p className="text-white/40 text-[10px] truncate">admin@arquidiocese.org.br</p>
           </div>
         </div>
-        <button className="w-full flex items-center gap-2.5 px-3 h-9 rounded-md text-[13px] text-white/50 hover:text-white hover:bg-white/8 transition-colors">
-          <IconLogout size={15} />
-          Sair
-        </button>
+        <form action={signOut}>
+          <button type="submit" className="w-full flex items-center gap-2.5 px-3 h-9 rounded-md text-[13px] text-white/50 hover:text-white hover:bg-white/8 transition-colors">
+            <IconLogout size={15} />
+            Sair
+          </button>
+        </form>
       </div>
     </aside>
   )

@@ -3,7 +3,7 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateParoquia } from "../../actions"
-import { CompressedFileInput } from "@/components/admin/CompressedFileInput"
+import { PhotoUploadSlot } from "@/components/admin/PhotoUploadSlot"
 import type { Paroquia } from "@/types/database"
 
 export const metadata = { title: "Editar Paróquia" }
@@ -39,7 +39,7 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      <form action={action} encType="multipart/form-data" className="space-y-6">
+      <form action={action} className="space-y-6">
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
@@ -123,9 +123,10 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
                       )}
                     </div>
                   )}
-                  <input type="hidden" name={`foto_${n}_atual`} value={atual} />
-                  <CompressedFileInput
-                    name={`foto_${n}_file`}
+                  <PhotoUploadSlot
+                    name={`foto_${n}`}
+                    bucket="arq-fotos"
+                    defaultUrl={atual}
                     accept="image/jpeg,image/png,image/webp"
                     className="w-full text-[12px] text-muted-foreground file:mr-2 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
                   />

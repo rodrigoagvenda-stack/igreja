@@ -49,28 +49,23 @@ export async function resolveUpload(
   return (formData.get(currentUrlField) as string) || null
 }
 
-// Resolve até `count` slots de foto (foto_1_file/foto_1_atual/foto_1_remover, foto_2_..., ...)
-// `principalField` aponta pro número (1-based) do slot marcado como principal — vira o índice 0 do array.
-// Uploads em sequência (não Promise.all) — evita qualquer corrida de renovação de sessão no
-// mesmo client, o que causava falha silenciosa a partir de ~4 uploads simultâneos.
-export async function resolveMultiUpload(
-  supabase: Supabase,
+// Resolve até `count` slots de foto (foto_1/foto_1_remover, foto_2/foto_2_remover, ...).
+// O upload em si já aconteceu antes, via /api/admin/upload (PhotoUploadSlot) — aqui só lemos
+// a URL que já está no campo hidden. Nada de rede, nada de client Supabase, nada de corrida.
+// `principalField` aponta pro número (1-based) do slot marcado como principal — vira o índice 0.
+export async function resolvePhotoUrls(
   formData: FormData,
   fieldPrefix: string,
-  bucket: string,
   count: number,
   principalField?: string
 ): Promise<string[]> {
   const resolved: (string | null)[] = []
   for (let i = 0; i < count; i++) {
     const n = i + 1
-    const file = formData.get(`${fieldPrefix}_${n}_file`) as File | null
-    if (file && file.size > 0) {
-      resolved.push(await uploadToStorage(supabase, file, bucket))
-    } else if (formData.get(`${fieldPrefix}_${n}_remover`) === 'true') {
+    if (formData.get(`${fieldPrefix}_${n}_remover`) === 'true') {
       resolved.push(null)
     } else {
-      resolved.push((formData.get(`${fieldPrefix}_${n}_atual`) as string) || null)
+      resolved.push((formData.get(`${fieldPrefix}_${n}`) as string) || null)
     }
   }
 
