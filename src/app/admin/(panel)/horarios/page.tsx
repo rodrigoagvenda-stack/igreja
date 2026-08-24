@@ -9,7 +9,7 @@ export default async function AdminHorariosPage() {
   const supabase = await createClient()
   const { data: locais } = await supabase
     .from('arq_locais')
-    .select('id, nome, tipo, arq_horarios_missa(id, descricao), arq_paroquias(nome, cidade)')
+    .select('id, nome, tipos, arq_horarios_missa(id, descricao), arq_paroquias(nome, cidade)')
     .order('nome')
 
   return (
@@ -47,9 +47,11 @@ export default async function AdminHorariosPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-[13px] font-medium">{local.nome}</p>
-                      <span className={`text-[10px] font-semibold uppercase tracking-[.05em] px-1.5 py-0.5 rounded ${local.tipo === 'Matriz' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                        {local.tipo}
-                      </span>
+                      {(local.tipos as ('Matriz' | 'Capela')[]).map(tipo => (
+                        <span key={tipo} className={`text-[10px] font-semibold uppercase tracking-[.05em] px-1.5 py-0.5 rounded ${tipo === 'Matriz' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                          {tipo}
+                        </span>
+                      ))}
                     </div>
                     {paroquia && (
                       <p className="text-[11px] text-muted-foreground mt-0.5">{paroquia.nome} — {paroquia.cidade}</p>

@@ -152,7 +152,7 @@ export type Database = {
           id:          string
           paroquia_id: string
           nome:        string
-          tipo:        "Matriz" | "Capela"
+          tipos:       ("Matriz" | "Capela")[]
           endereco:    string | null
           created_at:  string
         }
@@ -160,7 +160,7 @@ export type Database = {
           id?:          string
           paroquia_id:  string
           nome:         string
-          tipo:         "Matriz" | "Capela"
+          tipos:        ("Matriz" | "Capela")[]
           endereco?:    string | null
           created_at?:  string
         }
@@ -168,7 +168,7 @@ export type Database = {
           id?:          string
           paroquia_id?: string
           nome?:        string
-          tipo?:        "Matriz" | "Capela"
+          tipos?:       ("Matriz" | "Capela")[]
           endereco?:    string | null
           created_at?:  string
         }

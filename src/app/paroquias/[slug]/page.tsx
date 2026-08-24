@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic"
 type LocalComHorarios = {
   id: string
   nome: string
-  tipo: "Matriz" | "Capela"
+  tipos: ("Matriz" | "Capela")[]
   endereco: string | null
   arq_horarios_missa: { id: string; descricao: string }[]
 }
@@ -62,8 +62,8 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
       .single(),
     supabase
       .from("arq_locais")
-      .select("id, nome, tipo, endereco, arq_horarios_missa(id, descricao)")
-      .order("tipo"),
+      .select("id, nome, tipos, endereco, arq_horarios_missa(id, descricao)")
+      .order("nome"),
     supabase
       .from("arq_padres")
       .select("id, nome")
@@ -83,9 +83,9 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
   // Re-fetch locais filtrados por paroquia_id
   const { data: locaisFiltrados } = await supabase
     .from("arq_locais")
-    .select("id, nome, tipo, endereco, arq_horarios_missa(id, descricao)")
+    .select("id, nome, tipos, endereco, arq_horarios_missa(id, descricao)")
     .eq("paroquia_id", paroquia.id)
-    .order("tipo")
+    .order("nome")
 
   const { data: padresFiltrados } = await supabase
     .from("arq_padres")
@@ -161,8 +161,12 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
                       <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
                         <IconBuildingChurch size={15} className="text-primary" />
                         <span className="font-semibold text-[14px]">{local.nome}</span>
-                        <span className={`ml-auto text-[10px] font-semibold uppercase tracking-[.05em] px-2 py-0.5 rounded ${local.tipo === "Matriz" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                          {local.tipo}
+                        <span className="ml-auto flex gap-1.5">
+                          {local.tipos.map(tipo => (
+                            <span key={tipo} className={`text-[10px] font-semibold uppercase tracking-[.05em] px-2 py-0.5 rounded ${tipo === "Matriz" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                              {tipo}
+                            </span>
+                          ))}
                         </span>
                       </div>
                       {local.arq_horarios_missa.length > 0 ? (

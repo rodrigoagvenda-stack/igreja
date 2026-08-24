@@ -88,7 +88,7 @@ CREATE TABLE public.arq_locais (
   id           uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   paroquia_id  uuid NOT NULL REFERENCES public.arq_paroquias(id) ON DELETE CASCADE,
   nome         text NOT NULL,
-  tipo         text NOT NULL CHECK (tipo IN ('Matriz','Capela')),
+  tipos        text[] NOT NULL CHECK (tipos <@ ARRAY['Matriz','Capela']::text[] AND array_length(tipos, 1) > 0),
   endereco     text,
   created_at   timestamptz DEFAULT now() NOT NULL
 );

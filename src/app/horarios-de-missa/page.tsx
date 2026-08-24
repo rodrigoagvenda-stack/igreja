@@ -7,14 +7,14 @@ export const metadata = { title: "Horários de Missa — Arquidiocese de Botucat
 export const dynamic = "force-dynamic"
 
 type Horario = { id: string; descricao: string }
-type Local = { id: string; nome: string; tipo: "Matriz" | "Capela"; endereco: string | null; arq_horarios_missa: Horario[] }
+type Local = { id: string; nome: string; tipos: ("Matriz" | "Capela")[]; endereco: string | null; arq_horarios_missa: Horario[] }
 type ParoquiaRaw = { slug: string; nome: string; cidade: string; arq_locais: Local[] }
 
 export default async function HorariosMissaPage() {
   const supabase = await createClient()
   const { data } = await supabase
     .from("arq_paroquias")
-    .select("slug, nome, cidade, arq_locais(id, nome, tipo, endereco, arq_horarios_missa(id, descricao))")
+    .select("slug, nome, cidade, arq_locais(id, nome, tipos, endereco, arq_horarios_missa(id, descricao))")
     .eq("ativa", true)
     .order("cidade")
     .order("nome")

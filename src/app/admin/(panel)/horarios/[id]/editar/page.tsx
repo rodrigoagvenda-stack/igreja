@@ -11,7 +11,7 @@ const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
 type LocalRow = {
   id: string
   nome: string
-  tipo: 'Matriz' | 'Capela'
+  tipos: ('Matriz' | 'Capela')[]
   paroquia_id: string
   endereco: string | null
   arq_horarios_missa: { id: string; descricao: string }[]
@@ -58,10 +58,16 @@ export default async function EditarHorarioPage({ params }: { params: Promise<{ 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Tipo *</label>
-              <select name="tipo" required defaultValue={local.tipo} className={inputCls}>
-                <option value="Matriz">Matriz</option>
-                <option value="Capela">Capela</option>
-              </select>
+              <div className="flex items-center gap-4 h-10">
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input type="checkbox" name="tipo_matriz" value="true" defaultChecked={local.tipos.includes('Matriz')} className="w-4 h-4 accent-primary" />
+                  <span className="text-[13px]">Matriz</span>
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input type="checkbox" name="tipo_capela" value="true" defaultChecked={local.tipos.includes('Capela')} className="w-4 h-4 accent-primary" />
+                  <span className="text-[13px]">Capela</span>
+                </label>
+              </div>
             </div>
             <div>
               <label className={labelCls}>Paróquia *</label>

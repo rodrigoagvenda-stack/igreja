@@ -37,10 +37,16 @@ export default async function NovoHorarioPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Tipo *</label>
-              <select name="tipo" required className={inputCls}>
-                <option value="Matriz">Matriz</option>
-                <option value="Capela">Capela</option>
-              </select>
+              <div className="flex items-center gap-4 h-10">
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input type="checkbox" name="tipo_matriz" value="true" defaultChecked className="w-4 h-4 accent-primary" />
+                  <span className="text-[13px]">Matriz</span>
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input type="checkbox" name="tipo_capela" value="true" className="w-4 h-4 accent-primary" />
+                  <span className="text-[13px]">Capela</span>
+                </label>
+              </div>
             </div>
             <div>
               <label className={labelCls}>Paróquia *</label>

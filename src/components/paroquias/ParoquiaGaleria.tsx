@@ -30,7 +30,7 @@ export function ParoquiaGaleria({ fotos, nome }: Props) {
           src={fotos[selecionada]}
           alt={`${nome} — foto ${selecionada + 1}`}
           fill
-          className="object-cover"
+          className="object-contain"
           sizes="(max-width: 1024px) 100vw, 780px"
           priority={selecionada === 0}
         />

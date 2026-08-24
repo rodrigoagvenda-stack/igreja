@@ -4,6 +4,14 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+function getTipos(formData: FormData): ('Matriz' | 'Capela')[] {
+  const tipos: ('Matriz' | 'Capela')[] = []
+  if (formData.get('tipo_matriz') === 'true') tipos.push('Matriz')
+  if (formData.get('tipo_capela') === 'true') tipos.push('Capela')
+  if (tipos.length === 0) throw new Error('Selecione pelo menos um tipo (Matriz ou Capela).')
+  return tipos
+}
+
 export async function createLocal(formData: FormData) {
   const supabase = await createClient()
 
@@ -11,7 +19,7 @@ export async function createLocal(formData: FormData) {
     .from('arq_locais')
     .insert({
       nome: formData.get('nome') as string,
-      tipo: formData.get('tipo') as 'Matriz' | 'Capela',
+      tipos: getTipos(formData),
       paroquia_id: formData.get('paroquia_id') as string,
       endereco: (formData.get('endereco') as string) || null,
     })
@@ -39,7 +47,7 @@ export async function updateLocal(id: string, formData: FormData) {
 
   const { error } = await supabase.from('arq_locais').update({
     nome: formData.get('nome') as string,
-    tipo: formData.get('tipo') as 'Matriz' | 'Capela',
+    tipos: getTipos(formData),
     paroquia_id: formData.get('paroquia_id') as string,
     endereco: (formData.get('endereco') as string) || null,
   }).eq('id', id)

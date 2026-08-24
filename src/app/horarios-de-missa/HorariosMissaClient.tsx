@@ -8,7 +8,7 @@ import { IconSearch, IconMapPin, IconClock, IconBuildingChurch, IconArrowRight }
 import { cn } from "@/lib/utils"
 
 type Horario = { id: string; descricao: string }
-type Local = { id: string; nome: string; tipo: "Matriz" | "Capela"; endereco: string | null; arq_horarios_missa: Horario[] }
+type Local = { id: string; nome: string; tipos: ("Matriz" | "Capela")[]; endereco: string | null; arq_horarios_missa: Horario[] }
 type Paroquia = { slug: string; nome: string; cidade: string; locais: Local[] }
 
 export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia[] }) {
@@ -119,12 +119,14 @@ export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia
                     </Link>
                   </div>
                   <div className="divide-y divide-border">
-                    {locais.filter(l => l.arq_horarios_missa.length > 0).map(({ id, nome: ln, tipo, arq_horarios_missa: hs }) => (
+                    {locais.filter(l => l.arq_horarios_missa.length > 0).map(({ id, nome: ln, tipos, arq_horarios_missa: hs }) => (
                       <div key={id} className="px-5 py-3">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className={`text-[10px] font-semibold uppercase tracking-[.05em] px-1.5 py-0.5 rounded ${tipo === "Matriz" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                            {tipo}
-                          </span>
+                          {tipos.map(tipo => (
+                            <span key={tipo} className={`text-[10px] font-semibold uppercase tracking-[.05em] px-1.5 py-0.5 rounded ${tipo === "Matriz" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                              {tipo}
+                            </span>
+                          ))}
                           <span className="text-[13px] font-medium">{ln}</span>
                         </div>
                         <div className="flex flex-col gap-1">
