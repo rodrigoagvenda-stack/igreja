@@ -11,6 +11,13 @@ export const metadata = { title: "Editar Paróquia" }
 const inputCls = "w-full bg-background border border-border rounded-md px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
 const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
 
+const TAG_LABELS: Record<string, string> = {
+  Fachada: "Fachada",
+  Padroeiro: "Padroeiro(a)",
+  Capela: "Capela",
+  Paroquia: "Paróquia",
+}
+
 export default async function EditarParoquiaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
@@ -98,27 +105,26 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-6 space-y-5">
           <div>
             <label className={labelCls}>Fotos</label>
-            <p className="text-[11px] text-muted-foreground mb-3">Até 10 fotos da paróquia (fachada, interior, eventos) — JPG, PNG ou WebP, máx. 5 MB cada. Marque uma como fachada para ela aparecer em destaque na página da paróquia.</p>
+            <p className="text-[11px] text-muted-foreground mb-3">Até 10 fotos da paróquia — JPG, PNG ou WebP, máx. 5 MB cada. Marque uma tag pra cada foto (Fachada aparece em destaque na página da paróquia).</p>
           </div>
           <div className="grid grid-cols-5 gap-4">
             {Array.from({ length: 10 }, (_, i) => i + 1).map(n => {
-              const atual = fotosAtuais[n - 1] ?? ''
-              const isPrincipalAtual = n === 1 && !!atual
+              const atual = fotosAtuais[n - 1]
               return (
                 <div key={n}>
                   <label className={labelCls}>Foto {n}</label>
                   {atual && (
                     <div className="relative mb-2">
                       <Image
-                        src={atual}
+                        src={atual.url}
                         alt={`Foto ${n} atual`}
                         width={160}
                         height={100}
                         className="w-full h-24 rounded-md object-cover ring-1 ring-border"
                       />
-                      {isPrincipalAtual && (
+                      {atual.tag && (
                         <span className="absolute top-1 left-1 text-[9px] font-semibold uppercase tracking-[.05em] px-1.5 py-0.5 rounded bg-primary text-white">
-                          Fachada
+                          {TAG_LABELS[atual.tag] ?? atual.tag}
                         </span>
                       )}
                     </div>
@@ -126,14 +132,11 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
                   <PhotoUploadSlot
                     name={`foto_${n}`}
                     bucket="arq-fotos"
-                    defaultUrl={atual}
+                    defaultUrl={atual?.url ?? ''}
+                    defaultTag={atual?.tag ?? ''}
                     accept="image/jpeg,image/png,image/webp"
                     className="w-full text-[12px] text-muted-foreground file:mr-2 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
                   />
-                  <label className="flex items-center gap-1.5 mt-1.5 cursor-pointer">
-                    <input type="radio" name="foto_principal" value={n} defaultChecked={isPrincipalAtual} className="w-3.5 h-3.5 accent-primary" />
-                    <span className="text-[11px] text-muted-foreground">Marcar como fachada</span>
-                  </label>
                   {atual && (
                     <label className="flex items-center gap-1.5 mt-1 cursor-pointer">
                       <input type="checkbox" name={`foto_${n}_remover`} value="true" className="w-3.5 h-3.5 accent-destructive" />

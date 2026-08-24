@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { ParoquiaGaleria } from "@/components/paroquias/ParoquiaGaleria"
+import type { FotoParoquia } from "@/types/database"
 import {
   IconMapPin, IconPhone, IconMail, IconClock,
   IconUser, IconArrowLeft, IconBuildingChurch,
@@ -31,7 +32,7 @@ type ParoquiaRow = {
   telefone: string | null
   email: string | null
   site: string | null
-  fotos: string[] | null
+  fotos: FotoParoquia[] | null
 }
 
 type PadreRow = { id: string; nome: string }

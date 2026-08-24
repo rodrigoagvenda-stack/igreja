@@ -1,9 +1,11 @@
 'use server'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database'
+import type { Database, FotoParoquia, FotoTag } from '@/types/database'
 
 type Supabase = SupabaseClient<Database>
+
+const FOTO_TAGS: FotoTag[] = ['Fachada', 'Padroeiro', 'Capela', 'Paroquia']
 
 // Recebe o client já criado pelo chamador (uma vez por request) em vez de criar o seu próprio.
 // Criar um client por upload fazia cada chamada em paralelo (Promise.all) tentar renovar a
@@ -49,35 +51,29 @@ export async function resolveUpload(
   return (formData.get(currentUrlField) as string) || null
 }
 
-// Resolve até `count` slots de foto (foto_1/foto_1_remover, foto_2/foto_2_remover, ...).
+// Resolve até `count` slots de foto (foto_1/foto_1_tag/foto_1_remover, foto_2/..., ...).
 // O upload em si já aconteceu antes, via /api/admin/upload (PhotoUploadSlot) — aqui só lemos
-// a URL que já está no campo hidden. Nada de rede, nada de client Supabase, nada de corrida.
-// `principalField` aponta pro número (1-based) do slot marcado como principal — vira o índice 0.
-export async function resolvePhotoUrls(
+// a URL e a tag que já estão nos campos hidden. Nada de rede, nada de client Supabase.
+// Fotos marcadas com a tag "Fachada" vêm primeiro (é a foto usada como capa na página pública).
+export async function resolvePhotos(
   formData: FormData,
   fieldPrefix: string,
-  count: number,
-  principalField?: string
-): Promise<string[]> {
-  const resolved: (string | null)[] = []
+  count: number
+): Promise<FotoParoquia[]> {
+  const resolved: (FotoParoquia | null)[] = []
   for (let i = 0; i < count; i++) {
     const n = i + 1
     const removido = formData.get(`${fieldPrefix}_${n}_remover`) === 'true'
-    const valorBruto = formData.get(`${fieldPrefix}_${n}`) as string | null
-    const valor = removido ? null : (valorBruto || null)
-    resolved.push(valor)
-    console.log(`[resolvePhotoUrls] slot=${n} bruto="${valorBruto ? valorBruto.slice(-24) : '(vazio)'}" removido=${removido} resultado="${valor ? valor.slice(-24) : '(vazio)'}"`)
+    const url = formData.get(`${fieldPrefix}_${n}`) as string | null
+    const tagBruta = formData.get(`${fieldPrefix}_${n}_tag`) as string | null
+    const tag = FOTO_TAGS.includes(tagBruta as FotoTag) ? (tagBruta as FotoTag) : null
+    const item = removido || !url ? null : { url, tag }
+    resolved.push(item)
+    console.log(`[resolvePhotos] slot=${n} url="${url ? url.slice(-24) : '(vazio)'}" tag=${tag ?? '(nenhuma)'} removido=${removido}`)
   }
 
-  let urls = resolved.filter((url): url is string => !!url)
-
-  const principalSlot = principalField ? parseInt(formData.get(principalField) as string, 10) : NaN
-  if (!isNaN(principalSlot)) {
-    const principalUrl = resolved[principalSlot - 1]
-    if (principalUrl) {
-      urls = [principalUrl, ...urls.filter(url => url !== principalUrl)]
-    }
-  }
-
-  return urls
+  const fotos = resolved.filter((f): f is FotoParoquia => !!f)
+  const comFachada = fotos.filter(f => f.tag === 'Fachada')
+  const semFachada = fotos.filter(f => f.tag !== 'Fachada')
+  return [...comFachada, ...semFachada]
 }

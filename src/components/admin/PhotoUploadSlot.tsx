@@ -10,11 +10,20 @@ interface Props {
   name: string
   bucket: string
   defaultUrl?: string
+  defaultTag?: string
   accept?: string
   className?: string
 }
 
-export function PhotoUploadSlot({ name, bucket, defaultUrl = "", accept, className }: Props) {
+const TAG_OPTIONS = [
+  { value: "", label: "Sem tag" },
+  { value: "Fachada", label: "Fachada" },
+  { value: "Padroeiro", label: "Padroeiro(a)" },
+  { value: "Capela", label: "Capela" },
+  { value: "Paroquia", label: "Paróquia" },
+]
+
+export function PhotoUploadSlot({ name, bucket, defaultUrl = "", defaultTag = "", accept, className }: Props) {
   const [url, setUrl] = useState(defaultUrl)
   const [status, setStatus] = useState<Status>("idle")
   const [errorMsg, setErrorMsg] = useState("")
@@ -58,6 +67,17 @@ export function PhotoUploadSlot({ name, bucket, defaultUrl = "", accept, classNa
         disabled={status === "working"}
         className={className}
       />
+      {url && (
+        <select
+          name={`${name}_tag`}
+          defaultValue={defaultTag}
+          className="w-full mt-1.5 text-[11px] border border-border rounded px-1.5 py-1 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
+        >
+          {TAG_OPTIONS.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      )}
       {status === "working" && (
         <p className="flex items-center gap-1 text-[10px] text-primary mt-1">
           <IconLoader2 size={11} className="animate-spin" /> Enviando…

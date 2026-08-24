@@ -78,7 +78,7 @@ CREATE TABLE public.arq_paroquias (
   telefone         text,
   email            text,
   site             text,
-  fotos            text[]  DEFAULT '{}' NOT NULL,
+  fotos            jsonb   DEFAULT '[]' NOT NULL, -- [{"url": "...", "tag": "Fachada" | "Padroeiro" | "Capela" | "Paroquia" | null}]
   ativa            boolean DEFAULT true,
   created_at       timestamptz DEFAULT now() NOT NULL,
   updated_at       timestamptz DEFAULT now() NOT NULL

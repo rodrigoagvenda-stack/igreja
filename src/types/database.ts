@@ -1,5 +1,8 @@
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[]
 
+export type FotoTag = "Fachada" | "Padroeiro" | "Capela" | "Paroquia"
+export type FotoParoquia = { url: string; tag: FotoTag | null }
+
 export type Database = {
   public: {
     Tables: {
@@ -104,7 +107,7 @@ export type Database = {
           telefone:        string | null
           email:           string | null
           site:            string | null
-          fotos:           string[]
+          fotos:           FotoParoquia[]
           ativa:           boolean
           created_at:      string
           updated_at:      string
@@ -122,7 +125,7 @@ export type Database = {
           telefone?:        string | null
           email?:           string | null
           site?:            string | null
-          fotos?:           string[]
+          fotos?:           FotoParoquia[]
           ativa?:           boolean
           created_at?:      string
           updated_at?:      string
@@ -140,7 +143,7 @@ export type Database = {
           telefone?:        string | null
           email?:           string | null
           site?:            string | null
-          fotos?:           string[]
+          fotos?:           FotoParoquia[]
           ativa?:           boolean
           created_at?:      string
           updated_at?:      string

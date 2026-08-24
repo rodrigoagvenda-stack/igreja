@@ -3,10 +3,18 @@
 import { useState } from "react"
 import Image from "next/image"
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
+import type { FotoParoquia } from "@/types/database"
 
 interface Props {
-  fotos: string[]
+  fotos: FotoParoquia[]
   nome: string
+}
+
+const TAG_LABELS: Record<string, string> = {
+  Fachada: "Fachada",
+  Padroeiro: "Padroeiro(a)",
+  Capela: "Capela",
+  Paroquia: "Paróquia",
 }
 
 export function ParoquiaGaleria({ fotos, nome }: Props) {
@@ -22,12 +30,14 @@ export function ParoquiaGaleria({ fotos, nome }: Props) {
     setSelecionada(i => (i === fotos.length - 1 ? 0 : i + 1))
   }
 
+  const fotoAtual = fotos[selecionada]
+
   return (
     <div className="space-y-3">
       <div className="relative aspect-[16/9] rounded-xl overflow-hidden ring-1 ring-border bg-muted">
         <Image
-          key={fotos[selecionada]}
-          src={fotos[selecionada]}
+          key={fotoAtual.url}
+          src={fotoAtual.url}
           alt={`${nome} — foto ${selecionada + 1}`}
           fill
           className="object-contain"
@@ -35,9 +45,9 @@ export function ParoquiaGaleria({ fotos, nome }: Props) {
           priority={selecionada === 0}
         />
 
-        {selecionada === 0 && (
+        {fotoAtual.tag && (
           <span className="absolute top-3 left-3 text-[11px] font-semibold uppercase tracking-[.05em] px-2.5 py-1 rounded bg-primary text-white shadow-sm">
-            Fachada
+            {TAG_LABELS[fotoAtual.tag] ?? fotoAtual.tag}
           </span>
         )}
 
@@ -68,9 +78,9 @@ export function ParoquiaGaleria({ fotos, nome }: Props) {
 
       {fotos.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1">
-          {fotos.map((url, i) => (
+          {fotos.map((foto, i) => (
             <button
-              key={url}
+              key={foto.url}
               type="button"
               onClick={() => setSelecionada(i)}
               aria-label={`Ver foto ${i + 1}`}
@@ -78,10 +88,10 @@ export function ParoquiaGaleria({ fotos, nome }: Props) {
                 i === selecionada ? "ring-2 ring-primary" : "ring-1 ring-border opacity-80 hover:opacity-100"
               }`}
             >
-              <Image src={url} alt={`Miniatura ${i + 1}`} fill className="object-cover" sizes="80px" />
-              {i === 0 && (
+              <Image src={foto.url} alt={`Miniatura ${i + 1}`} fill className="object-cover" sizes="80px" />
+              {foto.tag && (
                 <span className="absolute bottom-0.5 left-0.5 text-[8px] font-semibold uppercase px-1 py-px rounded bg-primary/90 text-white">
-                  Fachada
+                  {TAG_LABELS[foto.tag] ?? foto.tag}
                 </span>
               )}
             </button>
