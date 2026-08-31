@@ -44,6 +44,12 @@ export default async function EditarParoquiaPage({ params }: { params: Promise<{
           </p>
           <h1 className="font-serif text-[28px] font-bold">Editar paróquia</h1>
         </div>
+        <Link
+          href={`/admin/paroquias/${id}/horarios`}
+          className="text-[13px] text-primary font-medium hover:underline"
+        >
+          Locais e horários de missa →
+        </Link>
       </div>
 
       <form action={action} className="space-y-6">

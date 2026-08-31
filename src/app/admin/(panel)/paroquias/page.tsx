@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { IconPlus, IconPencil, IconTrash, IconMapPin } from "@tabler/icons-react"
+import { IconPlus, IconPencil, IconTrash, IconMapPin, IconClock } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
 import { deleteParoquia } from "./actions"
 import { Pagination } from "@/components/admin/Pagination"
@@ -58,16 +58,17 @@ export default async function AdminParoquiasPage({
       {paroquias && paroquias.length > 0 ? (
         <>
           <div className="bg-card ring-1 ring-foreground/10 rounded-xl overflow-hidden">
-            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] text-[11px] font-semibold text-muted-foreground uppercase tracking-widest px-5 py-3 border-b border-border bg-muted/40">
+            <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] text-[11px] font-semibold text-muted-foreground uppercase tracking-widest px-5 py-3 border-b border-border bg-muted/40">
               <span>Paróquia</span>
               <span className="text-center px-4">Região</span>
               <span className="text-center px-4">Status</span>
               <span className="w-8" />
               <span className="w-8" />
+              <span className="w-8" />
             </div>
             <div className="divide-y divide-border">
               {paroquias.map(({ id, nome, cidade, regiao_pastoral, ativa }) => (
-                <div key={id} className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center px-5 py-3.5 hover:bg-muted/40 transition-colors">
+                <div key={id} className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] items-center px-5 py-3.5 hover:bg-muted/40 transition-colors">
                   <div>
                     <p className="text-[13px] font-medium">{nome}</p>
                     <p className="flex items-center gap-1 text-[11px] text-muted-foreground mt-0.5">
@@ -81,6 +82,13 @@ export default async function AdminParoquiasPage({
                   <span className={`text-[10px] font-semibold uppercase tracking-[.05em] px-2 py-0.5 rounded-full mx-4 ${ativa ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
                     {ativa ? "Ativa" : "Inativa"}
                   </span>
+                  <Link
+                    href={`/admin/paroquias/${id}/horarios`}
+                    className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                    title="Locais e horários de missa"
+                  >
+                    <IconClock size={14} />
+                  </Link>
                   <Link
                     href={`/admin/paroquias/${id}/editar`}
                     className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
