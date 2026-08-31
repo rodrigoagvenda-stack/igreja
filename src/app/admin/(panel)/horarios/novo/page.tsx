@@ -7,13 +7,30 @@ export const metadata = { title: "Novo Horário" }
 const inputCls = "w-full bg-background border border-border rounded-md px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
 const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
 
-export default async function NovoHorarioPage() {
+export default async function NovoHorarioPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ paroquia_id?: string }>
+}) {
+  const { paroquia_id: paroquiaIdPreSelecionada } = await searchParams
   const supabase = await createClient()
   const { data: paroquias } = await supabase
     .from('arq_paroquias')
     .select('id, nome, cidade')
     .eq('ativa', true)
     .order('nome')
+
+  let locaisExistentes: { id: string; nome: string; tipos: string[] }[] = []
+  if (paroquiaIdPreSelecionada) {
+    const { data } = await supabase
+      .from('arq_locais')
+      .select('id, nome, tipos')
+      .eq('paroquia_id', paroquiaIdPreSelecionada)
+      .order('nome')
+    locaisExistentes = data ?? []
+  }
+
+  const paroquiaSelecionada = paroquias?.find(p => p.id === paroquiaIdPreSelecionada)
 
   return (
     <div className="p-8 max-w-[700px] w-full mx-auto">
@@ -50,7 +67,7 @@ export default async function NovoHorarioPage() {
             </div>
             <div>
               <label className={labelCls}>Paróquia *</label>
-              <select name="paroquia_id" required className={inputCls}>
+              <select name="paroquia_id" required defaultValue={paroquiaIdPreSelecionada ?? ''} className={inputCls}>
                 <option value="">Selecione...</option>
                 {paroquias?.map(p => (
                   <option key={p.id} value={p.id}>{p.nome} — {p.cidade}</option>
@@ -59,6 +76,22 @@ export default async function NovoHorarioPage() {
             </div>
           </div>
 
+          {locaisExistentes.length > 0 && (
+            <div className="bg-warning/10 border border-warning/30 rounded-md px-3 py-2.5">
+              <p className="text-[11px] font-semibold text-warning-foreground mb-1.5">
+                {paroquiaSelecionada?.nome} já tem {locaisExistentes.length} local{locaisExistentes.length > 1 ? "is" : ""} cadastrado{locaisExistentes.length > 1 ? "s" : ""}:
+              </p>
+              <ul className="space-y-1">
+                {locaisExistentes.map(l => (
+                  <li key={l.id} className="flex items-center justify-between text-[12px]">
+                    <span>{l.nome} <span className="text-muted-foreground">({l.tipos.join(", ")})</span></span>
+                    <Link href={`/admin/horarios/${l.id}/editar`} className="text-primary hover:underline">Editar</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div>
             <label className={labelCls}>Endereço</label>
             <input name="endereco" className={inputCls} placeholder="Rua, número, bairro" />
@@ -66,7 +99,7 @@ export default async function NovoHorarioPage() {
 
           <div>
             <label className={labelCls}>Horários de missa</label>
-            <p className="text-[11px] text-muted-foreground mb-2">Um horário por linha. Ex.: "Dom 8h, 10h, 18h" ou "Seg–Sex 7h"</p>
+            <p className="text-[11px] text-muted-foreground mb-2">Um horário por linha. Ex.: "Dom 8h, 10h, 18h" ou "Seg–Sex 7h". Só os horários <strong>deste local</strong> — se a paróquia tem Capela com horário próprio, cadastre como outro local em vez de misturar aqui.</p>
             <textarea
               name="horarios"
               rows={6}

@@ -34,6 +34,14 @@ export default async function EditarHorarioPage({ params }: { params: Promise<{ 
   const paroquias = (paroquiasData ?? []) as ParoquiaOption[]
   const horariosText = local.arq_horarios_missa.map(h => h.descricao).join('\n')
 
+  const { data: outrosLocaisData } = await supabase
+    .from('arq_locais')
+    .select('id, nome, tipos')
+    .eq('paroquia_id', local.paroquia_id)
+    .neq('id', id)
+    .order('nome')
+  const outrosLocais = (outrosLocaisData ?? []) as { id: string; nome: string; tipos: string[] }[]
+
   const action = updateLocal.bind(null, id)
 
   return (
@@ -87,16 +95,33 @@ export default async function EditarHorarioPage({ params }: { params: Promise<{ 
 
           <div>
             <label className={labelCls}>Horários de missa</label>
-            <p className="text-[11px] text-muted-foreground mb-2">Um horário por linha</p>
+            <p className="text-[11px] text-muted-foreground mb-2">Um horário por linha. Só os horários <strong>deste local</strong> — se a paróquia tem Capela com horário próprio, cadastre como outro local em vez de misturar aqui.</p>
             <textarea name="horarios" rows={6} defaultValue={horariosText} className={inputCls + " resize-y"} />
           </div>
         </div>
+
+        {outrosLocais.length > 0 && (
+          <div className="bg-muted/40 border border-border rounded-md px-3 py-2.5">
+            <p className="text-[11px] font-semibold text-foreground mb-1.5">Outros locais desta paróquia:</p>
+            <ul className="space-y-1">
+              {outrosLocais.map(l => (
+                <li key={l.id} className="flex items-center justify-between text-[12px]">
+                  <span>{l.nome} <span className="text-muted-foreground">({l.tipos.join(", ")})</span></span>
+                  <Link href={`/admin/horarios/${l.id}/editar`} className="text-primary hover:underline">Editar</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="flex items-center gap-3">
           <button type="submit" className="bg-primary text-white text-[13px] font-semibold px-5 py-2.5 rounded-md hover:bg-primary/90 transition-colors">
             Salvar alterações
           </button>
-          <Link href="/admin/horarios" className="text-[13px] text-muted-foreground hover:text-foreground transition-colors">
+          <Link href={`/admin/horarios/novo?paroquia_id=${local.paroquia_id}`} className="text-[13px] text-primary font-medium hover:underline">
+            + Adicionar outro local para esta paróquia
+          </Link>
+          <Link href="/admin/horarios" className="text-[13px] text-muted-foreground hover:text-foreground transition-colors ml-auto">
             Cancelar
           </Link>
         </div>
