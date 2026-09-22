@@ -6,14 +6,24 @@ type Props = {
   total: number
   pageSize: number
   basePath: string
+  query?: Record<string, string | undefined>
 }
 
-export function Pagination({ page, total, pageSize, basePath }: Props) {
+export function Pagination({ page, total, pageSize, basePath, query }: Props) {
   const totalPages = Math.ceil(total / pageSize)
   if (totalPages <= 1) return null
 
   const prev = page > 1 ? page - 1 : null
   const next = page < totalPages ? page + 1 : null
+
+  function hrefFor(p: number) {
+    const params = new URLSearchParams()
+    for (const [key, value] of Object.entries(query ?? {})) {
+      if (value) params.set(key, value)
+    }
+    params.set("page", String(p))
+    return `${basePath}?${params.toString()}`
+  }
 
   const btnBase = "flex items-center gap-1 text-[12px] font-medium px-3 py-1.5 rounded-md border transition-colors"
   const btnActive = `${btnBase} border-border hover:border-primary hover:text-primary`
@@ -26,14 +36,14 @@ export function Pagination({ page, total, pageSize, basePath }: Props) {
       </p>
       <div className="flex items-center gap-2">
         {prev ? (
-          <Link href={`${basePath}?page=${prev}`} className={btnActive}>
+          <Link href={hrefFor(prev)} className={btnActive}>
             <IconChevronLeft size={14} /> Anterior
           </Link>
         ) : (
           <span className={btnDisabled}><IconChevronLeft size={14} /> Anterior</span>
         )}
         {next ? (
-          <Link href={`${basePath}?page=${next}`} className={btnActive}>
+          <Link href={hrefFor(next)} className={btnActive}>
             Próxima <IconChevronRight size={14} />
           </Link>
         ) : (

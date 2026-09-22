@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { IconPlus, IconPencil, IconTrash, IconMapPin, IconClock } from "@tabler/icons-react"
+import { IconPlus, IconPencil, IconTrash, IconMapPin, IconClock, IconSearch } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
 import { deleteParoquia } from "./actions"
 import { Pagination } from "@/components/admin/Pagination"
@@ -18,19 +18,24 @@ const regiaoColor: Record<string, string> = {
 export default async function AdminParoquiasPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string; q?: string }>
 }) {
-  const { page: pageParam } = await searchParams
+  const { page: pageParam, q } = await searchParams
+  const busca = (q ?? "").trim()
   const page = Math.max(1, parseInt(pageParam ?? "1", 10))
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
 
   const supabase = await createClient()
-  const { data: paroquias, count } = await supabase
+  let query = supabase
     .from("arq_paroquias")
     .select("id, nome, cidade, regiao_pastoral, ativa", { count: "exact" })
-    .order("nome")
-    .range(from, to)
+
+  if (busca) {
+    query = query.or(`nome.ilike.%${busca}%,cidade.ilike.%${busca}%`)
+  }
+
+  const { data: paroquias, count } = await query.order("nome").range(from, to)
 
   const total = count ?? 0
 
@@ -54,6 +59,17 @@ export default async function AdminParoquiasPage({
           Nova paróquia
         </Link>
       </div>
+
+      <form className="relative mb-5">
+        <IconSearch size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <input
+          type="text"
+          name="q"
+          defaultValue={busca}
+          placeholder="Buscar por nome ou cidade…"
+          className="w-full bg-background border border-border rounded-md pl-9 pr-3 py-2.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+        />
+      </form>
 
       {paroquias && paroquias.length > 0 ? (
         <>
@@ -104,12 +120,21 @@ export default async function AdminParoquiasPage({
               ))}
             </div>
           </div>
-          <Pagination page={page} total={total} pageSize={PAGE_SIZE} basePath="/admin/paroquias" />
+          <Pagination page={page} total={total} pageSize={PAGE_SIZE} basePath="/admin/paroquias" query={{ q: busca }} />
         </>
       ) : (
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-12 text-center">
-          <p className="text-[14px] font-semibold text-foreground">Nenhuma paróquia cadastrada</p>
-          <p className="text-[13px] text-muted-foreground mt-1">Clique em "Nova paróquia" para começar.</p>
+          {busca ? (
+            <>
+              <p className="text-[14px] font-semibold text-foreground">Nenhuma paróquia encontrada para "{busca}"</p>
+              <p className="text-[13px] text-muted-foreground mt-1">Tente outro nome ou cidade.</p>
+            </>
+          ) : (
+            <>
+              <p className="text-[14px] font-semibold text-foreground">Nenhuma paróquia cadastrada</p>
+              <p className="text-[13px] text-muted-foreground mt-1">Clique em "Nova paróquia" para começar.</p>
+            </>
+          )}
         </div>
       )}
     </div>
