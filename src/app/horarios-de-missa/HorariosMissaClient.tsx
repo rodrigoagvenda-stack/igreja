@@ -131,9 +131,15 @@ export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia
                         </div>
                         <div className="flex flex-col gap-1">
                           {hs.map(h => (
-                            <p key={h.id} className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
-                              <IconClock size={12} className="text-primary flex-shrink-0" /> {h.descricao}
-                            </p>
+                            /\d/.test(h.descricao) ? (
+                              <p key={h.id} className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
+                                <IconClock size={12} className="text-primary flex-shrink-0" /> {h.descricao}
+                              </p>
+                            ) : (
+                              <p key={h.id} className="text-[12px] font-semibold text-foreground mt-1 first:mt-0">
+                                {h.descricao}
+                              </p>
+                            )
                           ))}
                         </div>
                       </div>

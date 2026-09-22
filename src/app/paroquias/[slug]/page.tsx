@@ -173,10 +173,16 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
                       {local.arq_horarios_missa.length > 0 ? (
                         <div className="divide-y divide-border">
                           {local.arq_horarios_missa.map(h => (
-                            <div key={h.id} className="flex items-center gap-2 px-4 py-3">
-                              <IconClock size={13} className="text-primary flex-shrink-0" />
-                              <span className="text-[13px]">{h.descricao}</span>
-                            </div>
+                            /\d/.test(h.descricao) ? (
+                              <div key={h.id} className="flex items-center gap-2 px-4 py-3">
+                                <IconClock size={13} className="text-primary flex-shrink-0" />
+                                <span className="text-[13px]">{h.descricao}</span>
+                              </div>
+                            ) : (
+                              <div key={h.id} className="px-4 py-2.5 bg-muted/30">
+                                <span className="text-[12px] font-semibold text-foreground">{h.descricao}</span>
+                              </div>
+                            )
                           ))}
                         </div>
                       ) : (
