@@ -2,9 +2,12 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { IconSearch, IconMapPin, IconUser, IconBuildingChurch } from "@tabler/icons-react"
+import { getFotoCapa } from "@/lib/paroquia"
+import type { FotoParoquia } from "@/types/database"
 
 type Paroquia = {
   slug: string
@@ -12,6 +15,7 @@ type Paroquia = {
   cidade: string
   regiao_pastoral: string
   padroeiro: string | null
+  fotos: FotoParoquia[] | null
 }
 
 const regioes = ["Todas as regiões", "RP1 — Botucatu", "RP2 — Avaré", "RP3 — Laranjal Paulista", "RP4 — Lençóis Paulista"]
@@ -66,15 +70,21 @@ export default function ParoquiasClient({ paroquias }: { paroquias: Paroquia[] }
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filtradas.map(({ slug, nome, cidade, regiao_pastoral, padroeiro }) => (
+        {filtradas.map(({ slug, nome, cidade, regiao_pastoral, padroeiro, fotos }) => {
+          const capa = getFotoCapa(fotos)
+          return (
           <Link
             key={slug}
             href={`/paroquias/${slug}`}
             className="group bg-card border border-border rounded-lg p-5 hover:border-primary hover:shadow-[0_4px_16px_rgba(39,79,160,.10)] transition-all"
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
-                <IconBuildingChurch size={20} />
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0 overflow-hidden relative group-hover:bg-primary group-hover:text-white transition-colors">
+                {capa ? (
+                  <Image src={capa} alt={nome} fill className="object-cover" sizes="40px" />
+                ) : (
+                  <IconBuildingChurch size={20} />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="font-serif text-[15px] font-bold leading-[1.3] mb-1.5 group-hover:text-primary transition-colors line-clamp-2">
@@ -96,7 +106,8 @@ export default function ParoquiasClient({ paroquias }: { paroquias: Paroquia[] }
               </div>
             </div>
           </Link>
-        ))}
+          )
+        })}
       </div>
 
       {filtradas.length === 0 && (

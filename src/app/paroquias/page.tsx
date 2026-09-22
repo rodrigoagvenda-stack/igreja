@@ -10,7 +10,7 @@ export default async function ParoquiasPage() {
   const supabase = await createClient()
   const { data } = await supabase
     .from("arq_paroquias")
-    .select("slug, nome, cidade, regiao_pastoral, padroeiro")
+    .select("slug, nome, cidade, regiao_pastoral, padroeiro, fotos")
     .eq("ativa", true)
     .order("regiao_pastoral")
     .order("nome")
