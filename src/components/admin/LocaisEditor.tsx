@@ -14,6 +14,12 @@ export type GrupoHorarioInicial = {
   horarios: string[]
 }
 
+// Se nenhum dos 7 dias padrão bate com o que veio salvo (ex: "Todo dia 13 de cada mês"),
+// é porque esse grupo foi salvo com o campo de padrão personalizado preenchido.
+function isDiaCustom(dias: string[]): boolean {
+  return dias.length > 0 && !dias.every(d => DIAS_SEMANA.includes(d))
+}
+
 export type LocalInicial = {
   id: string
   nome: string
@@ -171,6 +177,7 @@ function GrupoHorarios({ localKey, gruposIniciais }: { localKey: string; gruposI
     <div className="space-y-3">
       {grupoKeys.map(grupoKey => {
         const dados = dadosPorGrupo.get(grupoKey)
+        const custom = dados ? isDiaCustom(dados.dias) : false
         return (
           <div key={grupoKey} className="border border-border rounded-md p-3 space-y-2">
             <input type="hidden" name={`local_${localKey}_grupo_key`} value={grupoKey} />
@@ -182,7 +189,7 @@ function GrupoHorarios({ localKey, gruposIniciais }: { localKey: string; gruposI
                       type="checkbox"
                       name={`local_${localKey}_grupo_${grupoKey}_dias`}
                       value={dia}
-                      defaultChecked={dados?.dias.includes(dia) ?? false}
+                      defaultChecked={!custom && (dados?.dias.includes(dia) ?? false)}
                       className="w-3.5 h-3.5 accent-primary"
                     />
                     <span className="text-[11px]">{dia}</span>
@@ -197,12 +204,21 @@ function GrupoHorarios({ localKey, gruposIniciais }: { localKey: string; gruposI
             </div>
             <div>
               <input
+                name={`local_${localKey}_grupo_${grupoKey}_dia_personalizado`}
+                defaultValue={custom ? dados!.dias.join(", ") : ""}
+                className={inputCls}
+                placeholder="Ou padrão personalizado — ex.: Todo dia 13 de cada mês"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">Preenchendo isso, ignora os dias marcados acima.</p>
+            </div>
+            <div>
+              <input
                 name={`local_${localKey}_grupo_${grupoKey}_horarios`}
                 defaultValue={dados?.horarios.join(", ") ?? ""}
                 className={inputCls}
                 placeholder="Ex.: 8h, 10h, 19h"
               />
-              <p className="text-[10px] text-muted-foreground mt-1">Horários separados por vírgula, pros dias marcados acima.</p>
+              <p className="text-[10px] text-muted-foreground mt-1">Horários separados por vírgula.</p>
             </div>
           </div>
         )

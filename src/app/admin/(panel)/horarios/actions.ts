@@ -31,7 +31,12 @@ export async function saveLocaisDaParoquia(paroquiaId: string, formData: FormDat
     const grupoKeys = formData.getAll(`local_${key}_grupo_key`) as string[]
     const grupos: { dias: string[]; horarios: string[] }[] = []
     for (const grupoKey of grupoKeys) {
-      const dias = formData.getAll(`local_${key}_grupo_${grupoKey}_dias`) as string[]
+      // Padrão personalizado (ex: "Todo dia 13 de cada mês") substitui os dias marcados —
+      // pra escalas que não cabem em "dia da semana" (data fixa do mês, feriado móvel, etc.)
+      const diaPersonalizado = (formData.get(`local_${key}_grupo_${grupoKey}_dia_personalizado`) as string)?.trim()
+      const dias = diaPersonalizado
+        ? [diaPersonalizado]
+        : (formData.getAll(`local_${key}_grupo_${grupoKey}_dias`) as string[])
       const horariosText = (formData.get(`local_${key}_grupo_${grupoKey}_horarios`) as string) ?? ''
       const horarios = horariosText.split(',').map(h => h.trim()).filter(Boolean)
       if (dias.length > 0 && horarios.length > 0) {
