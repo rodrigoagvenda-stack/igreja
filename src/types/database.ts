@@ -189,19 +189,25 @@ export type Database = {
         Row: {
           id:         string
           local_id:   string
-          descricao:  string
+          descricao:  string | null
+          dias:       string[]
+          horarios:   string[]
           created_at: string
         }
         Insert: {
           id?:         string
           local_id:    string
-          descricao:   string
+          descricao?:  string | null
+          dias?:       string[]
+          horarios?:   string[]
           created_at?: string
         }
         Update: {
           id?:         string
           local_id?:   string
-          descricao?:  string
+          descricao?:  string | null
+          dias?:       string[]
+          horarios?:   string[]
           created_at?: string
         }
         Relationships: [

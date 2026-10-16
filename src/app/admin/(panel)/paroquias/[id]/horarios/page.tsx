@@ -11,7 +11,7 @@ type LocalRaw = {
   nome: string
   tipos: string[]
   endereco: string | null
-  arq_horarios_missa: { descricao: string }[]
+  arq_horarios_missa: { id: string; dias: string[]; horarios: string[] }[]
 }
 
 export default async function ParoquiaHorariosPage({ params }: { params: Promise<{ id: string }> }) {
@@ -22,7 +22,7 @@ export default async function ParoquiaHorariosPage({ params }: { params: Promise
     supabase.from('arq_paroquias').select('id, nome, cidade').eq('id', id).single(),
     supabase
       .from('arq_locais')
-      .select('id, nome, tipos, endereco, arq_horarios_missa(descricao)')
+      .select('id, nome, tipos, endereco, arq_horarios_missa(id, dias, horarios)')
       .eq('paroquia_id', id)
       .order('nome'),
   ])
@@ -35,7 +35,7 @@ export default async function ParoquiaHorariosPage({ params }: { params: Promise
     nome: l.nome,
     tipos: l.tipos,
     endereco: l.endereco,
-    horarios: l.arq_horarios_missa.map(h => h.descricao).join('\n'),
+    grupos: l.arq_horarios_missa.map(h => ({ id: h.id, dias: h.dias, horarios: h.horarios })),
   }))
 
   const action = saveLocaisDaParoquia.bind(null, id)

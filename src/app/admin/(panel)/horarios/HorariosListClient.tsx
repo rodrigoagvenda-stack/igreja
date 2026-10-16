@@ -8,7 +8,7 @@ type LocalRaw = {
   id: string
   nome: string
   tipos: ("Matriz" | "Capela")[]
-  arq_horarios_missa: { id: string }[]
+  arq_horarios_missa: { id: string; horarios: string[] }[]
 }
 
 type ParoquiaRaw = {
@@ -44,7 +44,7 @@ export function HorariosListClient({ paroquias }: { paroquias: ParoquiaRaw[] }) 
           <div className="divide-y divide-border">
             {filtradas.map((paroquia) => {
               const locais = paroquia.arq_locais ?? []
-              const totalHorarios = locais.reduce((sum, l) => sum + l.arq_horarios_missa.length, 0)
+              const totalHorarios = locais.reduce((sum, l) => sum + l.arq_horarios_missa.reduce((s2, h) => s2 + h.horarios.length, 0), 0)
               return (
                 <Link
                   key={paroquia.id}

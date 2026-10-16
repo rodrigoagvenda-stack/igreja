@@ -7,7 +7,7 @@ export default async function AdminHorariosPage() {
   const supabase = await createClient()
   const { data } = await supabase
     .from('arq_paroquias')
-    .select('id, nome, cidade, arq_locais(id, nome, tipos, arq_horarios_missa(id))')
+    .select('id, nome, cidade, arq_locais(id, nome, tipos, arq_horarios_missa(id, horarios))')
     .eq('ativa', true)
     .order('nome')
 

@@ -96,7 +96,9 @@ CREATE TABLE public.arq_locais (
 CREATE TABLE public.arq_horarios_missa (
   id          uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   local_id    uuid NOT NULL REFERENCES public.arq_locais(id) ON DELETE CASCADE,
-  descricao   text NOT NULL,
+  descricao   text,           -- legado, não usado por telas novas
+  dias        text[] NOT NULL DEFAULT '{}',
+  horarios    text[] NOT NULL DEFAULT '{}',
   created_at  timestamptz DEFAULT now() NOT NULL
 );
 

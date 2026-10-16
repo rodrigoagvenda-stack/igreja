@@ -6,8 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label"
 import { IconSearch, IconMapPin, IconClock, IconBuildingChurch, IconArrowRight } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { formatDias } from "@/lib/horarios"
 
-type Horario = { id: string; descricao: string }
+type Horario = { id: string; dias: string[]; horarios: string[] }
 type Local = { id: string; nome: string; tipos: ("Matriz" | "Capela")[]; endereco: string | null; arq_horarios_missa: Horario[] }
 type Paroquia = { slug: string; nome: string; cidade: string; locais: Local[] }
 
@@ -131,15 +132,10 @@ export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia
                         </div>
                         <div className="flex flex-col gap-1">
                           {hs.map(h => (
-                            /\d/.test(h.descricao) ? (
-                              <p key={h.id} className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
-                                <IconClock size={12} className="text-primary flex-shrink-0" /> {h.descricao}
-                              </p>
-                            ) : (
-                              <p key={h.id} className="text-[12px] font-semibold text-foreground mt-1 first:mt-0">
-                                {h.descricao}
-                              </p>
-                            )
+                            <p key={h.id} className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
+                              <IconClock size={12} className="text-primary flex-shrink-0" />
+                              <span><strong className="text-foreground">{formatDias(h.dias)}:</strong> {h.horarios.join(", ")}</span>
+                            </p>
                           ))}
                         </div>
                       </div>

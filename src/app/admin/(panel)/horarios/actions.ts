@@ -24,8 +24,20 @@ export async function saveLocaisDaParoquia(paroquiaId: string, formData: FormDat
     if (tipos.length === 0) tipos.push('Matriz')
 
     const endereco = (formData.get(`local_${key}_endereco`) as string) || null
-    const horariosText = (formData.get(`local_${key}_horarios`) as string) ?? ''
-    const linhas = horariosText.split('\n').map(l => l.trim()).filter(Boolean)
+
+    // Cada "grupo" é uma combinação de dias + os horários daquela combinação (ex: Seg-Sex 7h).
+    // Estruturado assim — nunca texto livre — pra não ter mais como um nome de capela acabar
+    // entrando no lugar de horário.
+    const grupoKeys = formData.getAll(`local_${key}_grupo_key`) as string[]
+    const grupos: { dias: string[]; horarios: string[] }[] = []
+    for (const grupoKey of grupoKeys) {
+      const dias = formData.getAll(`local_${key}_grupo_${grupoKey}_dias`) as string[]
+      const horariosText = (formData.get(`local_${key}_grupo_${grupoKey}_horarios`) as string) ?? ''
+      const horarios = horariosText.split(',').map(h => h.trim()).filter(Boolean)
+      if (dias.length > 0 && horarios.length > 0) {
+        grupos.push({ dias, horarios })
+      }
+    }
 
     let localId: string
     if (key.startsWith('novo-')) {
@@ -45,9 +57,9 @@ export async function saveLocaisDaParoquia(paroquiaId: string, formData: FormDat
     idsAtuais.add(localId)
 
     await supabase.from('arq_horarios_missa').delete().eq('local_id', localId)
-    if (linhas.length > 0) {
+    if (grupos.length > 0) {
       const { error: hErr } = await supabase.from('arq_horarios_missa').insert(
-        linhas.map(descricao => ({ local_id: localId, descricao }))
+        grupos.map(g => ({ local_id: localId, dias: g.dias, horarios: g.horarios }))
       )
       if (hErr) throw new Error(hErr.message)
     }

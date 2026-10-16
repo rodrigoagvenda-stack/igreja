@@ -5,6 +5,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { ParoquiaGaleria } from "@/components/paroquias/ParoquiaGaleria"
 import type { FotoParoquia } from "@/types/database"
+import { formatDias } from "@/lib/horarios"
 import {
   IconMapPin, IconPhone, IconMail, IconClock,
   IconUser, IconArrowLeft, IconBuildingChurch,
@@ -17,7 +18,7 @@ type LocalComHorarios = {
   nome: string
   tipos: ("Matriz" | "Capela")[]
   endereco: string | null
-  arq_horarios_missa: { id: string; descricao: string }[]
+  arq_horarios_missa: { id: string; dias: string[]; horarios: string[] }[]
 }
 
 type ParoquiaRow = {
@@ -63,7 +64,7 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
       .single(),
     supabase
       .from("arq_locais")
-      .select("id, nome, tipos, endereco, arq_horarios_missa(id, descricao)")
+      .select("id, nome, tipos, endereco, arq_horarios_missa(id, dias, horarios)")
       .order("nome"),
     supabase
       .from("arq_padres")
@@ -84,7 +85,7 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
   // Re-fetch locais filtrados por paroquia_id
   const { data: locaisFiltrados } = await supabase
     .from("arq_locais")
-    .select("id, nome, tipos, endereco, arq_horarios_missa(id, descricao)")
+    .select("id, nome, tipos, endereco, arq_horarios_missa(id, dias, horarios)")
     .eq("paroquia_id", paroquia.id)
     .order("nome")
 
@@ -173,16 +174,12 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
                       {local.arq_horarios_missa.length > 0 ? (
                         <div className="divide-y divide-border">
                           {local.arq_horarios_missa.map(h => (
-                            /\d/.test(h.descricao) ? (
-                              <div key={h.id} className="flex items-center gap-2 px-4 py-3">
-                                <IconClock size={13} className="text-primary flex-shrink-0" />
-                                <span className="text-[13px]">{h.descricao}</span>
-                              </div>
-                            ) : (
-                              <div key={h.id} className="px-4 py-2.5 bg-muted/30">
-                                <span className="text-[12px] font-semibold text-foreground">{h.descricao}</span>
-                              </div>
-                            )
+                            <div key={h.id} className="flex items-center gap-2 px-4 py-3">
+                              <IconClock size={13} className="text-primary flex-shrink-0" />
+                              <span className="text-[13px]">
+                                <strong>{formatDias(h.dias)}:</strong> {h.horarios.join(", ")}
+                              </span>
+                            </div>
                           ))}
                         </div>
                       ) : (
