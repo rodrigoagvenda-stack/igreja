@@ -1,19 +1,27 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Source_Sans_3 } from "next/font/google";
+import localFont from "next/font/local";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
-const playfairDisplay = Playfair_Display({
+// Fontes hospedadas localmente (não buscadas do Google a cada build) — next/font/google
+// via Turbopack depende de buscar os arquivos ao vivo durante o build, e uma falha de
+// rede nesse fetch (aconteceu em produção) derruba o build inteiro. Arquivos em
+// src/fonts/ são variable fonts, cobrem todo o intervalo de peso num arquivo só.
+const playfairDisplay = localFont({
+  src: [
+    { path: "../fonts/PlayfairDisplay-normal.woff2", weight: "400 700", style: "normal" },
+    { path: "../fonts/PlayfairDisplay-italic.woff2", weight: "400 700", style: "italic" },
+  ],
   variable: "--font-playfair-display",
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  style: ["normal", "italic"],
+  display: "swap",
 });
 
-const sourceSans3 = Source_Sans_3({
+const sourceSans3 = localFont({
+  src: [
+    { path: "../fonts/SourceSans3-normal.woff2", weight: "300 600", style: "normal" },
+  ],
   variable: "--font-source-sans-3",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
