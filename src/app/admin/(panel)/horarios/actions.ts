@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { resolvePhotos } from '@/lib/supabase/storage'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -24,6 +25,7 @@ export async function saveLocaisDaParoquia(paroquiaId: string, formData: FormDat
     if (tipos.length === 0) tipos.push('Matriz')
 
     const endereco = (formData.get(`local_${key}_endereco`) as string) || null
+    const fotos = await resolvePhotos(formData, `local_${key}_foto`, 3)
 
     // Cada "grupo" é uma combinação de dias + os horários daquela combinação (ex: Seg-Sex 7h).
     // Estruturado assim — nunca texto livre — pra não ter mais como um nome de capela acabar
@@ -48,14 +50,14 @@ export async function saveLocaisDaParoquia(paroquiaId: string, formData: FormDat
     if (key.startsWith('novo-')) {
       const { data, error } = await supabase
         .from('arq_locais')
-        .insert({ nome, tipos, paroquia_id: paroquiaId, endereco })
+        .insert({ nome, tipos, paroquia_id: paroquiaId, endereco, fotos })
         .select('id')
         .single()
       if (error || !data) throw new Error(error?.message ?? 'Erro ao criar local')
       localId = data.id
     } else {
       localId = key
-      const { error } = await supabase.from('arq_locais').update({ nome, tipos, endereco }).eq('id', localId)
+      const { error } = await supabase.from('arq_locais').update({ nome, tipos, endereco, fotos }).eq('id', localId)
       if (error) throw new Error(error.message)
     }
 

@@ -1,7 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { IconTrash, IconPlus } from "@tabler/icons-react"
+import { PhotoUploadSlot } from "@/components/admin/PhotoUploadSlot"
+import type { FotoParoquia } from "@/types/database"
 
 const inputCls = "w-full bg-background border border-border rounded-md px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
 const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
@@ -25,7 +28,15 @@ export type LocalInicial = {
   nome: string
   tipos: string[]
   endereco: string | null
+  fotos: FotoParoquia[]
   grupos: GrupoHorarioInicial[]
+}
+
+const TAG_LABELS: Record<string, string> = {
+  Fachada: "Fachada",
+  Padroeiro: "Padroeiro(a)",
+  Capela: "Capela",
+  Paroquia: "Paróquia",
 }
 
 interface Props {
@@ -155,6 +166,56 @@ function LocalBlock({
         <p className="text-[11px] text-muted-foreground mb-2">Marque o(s) dia(s) e digite os horários daquele dia. Um grupo por combinação de dias.</p>
         <GrupoHorarios localKey={localKey} gruposIniciais={dados?.grupos ?? []} />
       </div>
+
+      <div>
+        <label className={labelCls}>Fotos deste local</label>
+        <p className="text-[11px] text-muted-foreground mb-2">Até 3 fotos — JPG, PNG ou WebP, máx. 5 MB cada.</p>
+        <FotosLocal localKey={localKey} fotosIniciais={dados?.fotos ?? []} />
+      </div>
+    </div>
+  )
+}
+
+function FotosLocal({ localKey, fotosIniciais }: { localKey: string; fotosIniciais: FotoParoquia[] }) {
+  return (
+    <div className="grid grid-cols-3 gap-3">
+      {Array.from({ length: 3 }, (_, i) => i + 1).map(n => {
+        const atual = fotosIniciais[n - 1]
+        return (
+          <div key={n}>
+            {atual && (
+              <div className="relative mb-1.5">
+                <Image
+                  src={atual.url}
+                  alt={`Foto ${n} atual`}
+                  width={160}
+                  height={100}
+                  className="w-full h-20 rounded-md object-cover ring-1 ring-border"
+                />
+                {atual.tag && (
+                  <span className="absolute top-1 left-1 text-[9px] font-semibold uppercase tracking-[.05em] px-1.5 py-0.5 rounded bg-primary text-white">
+                    {TAG_LABELS[atual.tag] ?? atual.tag}
+                  </span>
+                )}
+              </div>
+            )}
+            <PhotoUploadSlot
+              name={`local_${localKey}_foto_${n}`}
+              bucket="arq-fotos"
+              defaultUrl={atual?.url ?? ""}
+              defaultTag={atual?.tag ?? ""}
+              accept="image/jpeg,image/png,image/webp"
+              className="w-full text-[11px] text-muted-foreground file:mr-1.5 file:py-1.5 file:px-2.5 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+            />
+            {atual && (
+              <label className="flex items-center gap-1.5 mt-1 cursor-pointer">
+                <input type="checkbox" name={`local_${localKey}_foto_${n}_remover`} value="true" className="w-3.5 h-3.5 accent-destructive" />
+                <span className="text-[10px] text-muted-foreground">Remover</span>
+              </label>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

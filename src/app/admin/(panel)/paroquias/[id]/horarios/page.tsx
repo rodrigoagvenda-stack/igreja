@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { saveLocaisDaParoquia } from "../../../horarios/actions"
 import { LocaisEditor, type LocalInicial } from "@/components/admin/LocaisEditor"
+import type { FotoParoquia } from "@/types/database"
 
 export const metadata = { title: "Locais e Horários" }
 
@@ -11,6 +12,7 @@ type LocalRaw = {
   nome: string
   tipos: string[]
   endereco: string | null
+  fotos: FotoParoquia[]
   arq_horarios_missa: { id: string; dias: string[]; horarios: string[] }[]
 }
 
@@ -22,7 +24,7 @@ export default async function ParoquiaHorariosPage({ params }: { params: Promise
     supabase.from('arq_paroquias').select('id, nome, cidade').eq('id', id).single(),
     supabase
       .from('arq_locais')
-      .select('id, nome, tipos, endereco, arq_horarios_missa(id, dias, horarios)')
+      .select('id, nome, tipos, endereco, fotos, arq_horarios_missa(id, dias, horarios)')
       .eq('paroquia_id', id)
       .order('nome'),
   ])
@@ -35,6 +37,7 @@ export default async function ParoquiaHorariosPage({ params }: { params: Promise
     nome: l.nome,
     tipos: l.tipos,
     endereco: l.endereco,
+    fotos: l.fotos ?? [],
     grupos: l.arq_horarios_missa.map(h => ({ id: h.id, dias: h.dias, horarios: h.horarios })),
   }))
 

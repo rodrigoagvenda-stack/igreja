@@ -157,6 +157,7 @@ export type Database = {
           nome:        string
           tipos:       ("Matriz" | "Capela")[]
           endereco:    string | null
+          fotos:       FotoParoquia[]
           created_at:  string
         }
         Insert: {
@@ -165,6 +166,7 @@ export type Database = {
           nome:         string
           tipos:        ("Matriz" | "Capela")[]
           endereco?:    string | null
+          fotos?:       FotoParoquia[]
           created_at?:  string
         }
         Update: {
@@ -173,6 +175,7 @@ export type Database = {
           nome?:        string
           tipos?:       ("Matriz" | "Capela")[]
           endereco?:    string | null
+          fotos?:       FotoParoquia[]
           created_at?:  string
         }
         Relationships: [

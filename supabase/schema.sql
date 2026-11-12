@@ -90,6 +90,7 @@ CREATE TABLE public.arq_locais (
   nome         text NOT NULL,
   tipos        text[] NOT NULL CHECK (tipos <@ ARRAY['Matriz','Capela']::text[] AND array_length(tipos, 1) > 0),
   endereco     text,
+  fotos        jsonb NOT NULL DEFAULT '[]'::jsonb,  -- FotoParoquia[] — fotos específicas desse local (Matriz/Capela)
   created_at   timestamptz DEFAULT now() NOT NULL
 );
 

@@ -18,6 +18,7 @@ type LocalComHorarios = {
   nome: string
   tipos: ("Matriz" | "Capela")[]
   endereco: string | null
+  fotos: FotoParoquia[]
   arq_horarios_missa: { id: string; dias: string[]; horarios: string[] }[]
 }
 
@@ -64,7 +65,7 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
       .single(),
     supabase
       .from("arq_locais")
-      .select("id, nome, tipos, endereco, arq_horarios_missa(id, dias, horarios)")
+      .select("id, nome, tipos, endereco, fotos, arq_horarios_missa(id, dias, horarios)")
       .order("nome"),
     supabase
       .from("arq_padres")
@@ -85,7 +86,7 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
   // Re-fetch locais filtrados por paroquia_id
   const { data: locaisFiltrados } = await supabase
     .from("arq_locais")
-    .select("id, nome, tipos, endereco, arq_horarios_missa(id, dias, horarios)")
+    .select("id, nome, tipos, endereco, fotos, arq_horarios_missa(id, dias, horarios)")
     .eq("paroquia_id", paroquia.id)
     .order("nome")
 
@@ -171,6 +172,11 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
                           ))}
                         </span>
                       </div>
+                      {local.fotos && local.fotos.length > 0 && (
+                        <div className="px-4 pt-3">
+                          <ParoquiaGaleria fotos={local.fotos} nome={local.nome} />
+                        </div>
+                      )}
                       {local.arq_horarios_missa.length > 0 ? (
                         <div className="divide-y divide-border">
                           {local.arq_horarios_missa.map(h => (
