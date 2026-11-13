@@ -52,38 +52,38 @@ export function Footer() {
     <footer className="bg-[#0d1a30] text-white/70 text-sm">
       {/* Main grid */}
       <div className="max-w-[1100px] mx-auto px-4 md:px-6 py-14 md:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-6 sm:gap-10">
 
           {/* Brand col */}
-          <div className="flex flex-col items-center text-center sm:items-start sm:text-left space-y-4">
+          <div className="flex flex-col items-start text-left space-y-4">
             <FooterLogo />
 
-            <p className="text-white/50 text-xs leading-relaxed">
+            <p className="text-white/50 text-[13px] sm:text-xs leading-relaxed">
               Portal Oficial da Arquidiocese de Botucatu — Cúria Metropolitana. Servindo às 47 paróquias em 4 regiões pastorais.
             </p>
 
-            <address className="not-italic space-y-1.5 text-xs text-white/45">
-              <p className="flex items-center justify-center sm:justify-start gap-2">
-                <IconMapPin size={12} className="text-accent flex-shrink-0" />
+            <address className="not-italic space-y-2 text-[13px] sm:text-xs text-white/45">
+              <p className="flex items-center justify-start gap-2">
+                <IconMapPin size={14} className="text-accent flex-shrink-0" />
                 Rua Dr. Costa Leite, 668 — Centro, Botucatu, SP
               </p>
-              <p className="flex items-center justify-center sm:justify-start gap-2">
-                <IconPhone size={12} className="text-accent flex-shrink-0" />
+              <p className="flex items-center justify-start gap-2">
+                <IconPhone size={14} className="text-accent flex-shrink-0" />
                 (14) 3811-5900
               </p>
-              <p className="flex items-center justify-center sm:justify-start gap-2">
-                <IconMail size={12} className="text-accent flex-shrink-0" />
+              <p className="flex items-center justify-start gap-2">
+                <IconMail size={14} className="text-accent flex-shrink-0" />
                 secretaria@arquidiocesebotucatu.org.br
               </p>
             </address>
 
-            <div className="flex justify-center sm:justify-start gap-2 pt-1" aria-label="Redes sociais">
+            <div className="flex justify-start gap-2 pt-1" aria-label="Redes sociais">
               {socials.map(({ icon, label, href }) => (
                 <Link
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="w-8 h-8 rounded-md bg-white/8 flex items-center justify-center text-white/50 hover:bg-primary hover:text-white transition-colors"
+                  className="w-9 h-9 sm:w-8 sm:h-8 rounded-md bg-white/8 flex items-center justify-center text-white/50 hover:bg-primary hover:text-white transition-colors"
                 >
                   {icon}
                 </Link>
@@ -93,19 +93,19 @@ export function Footer() {
 
           {/* Nav cols — acordeão no mobile, sempre abertas no desktop */}
           {footerCols.map(({ title, links }) => (
-            <details key={title} className="footer-accordion group text-center sm:text-left [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex items-center justify-center sm:justify-between gap-2 cursor-pointer sm:cursor-default text-[11px] font-semibold text-accent uppercase tracking-[.08em] mb-4 pb-2 border-b border-white/8">
+            <details key={title} className="footer-accordion group text-left">
+              <summary className="flex items-center justify-between gap-2 cursor-pointer sm:cursor-default text-[12px] sm:text-[11px] font-semibold text-accent uppercase tracking-[.08em] py-3 sm:py-0 sm:mb-4 sm:pb-2 border-b border-white/8 [&::-webkit-details-marker]:hidden">
                 {title}
-                <IconChevronDown size={13} className="sm:hidden opacity-60 transition-transform group-open:rotate-180" />
+                <IconChevronDown size={14} className="sm:hidden opacity-60 transition-transform group-open:rotate-180" />
               </summary>
-              <ul className="flex flex-col gap-2">
+              <ul className="flex flex-col gap-2.5 sm:gap-2 pb-4 sm:pb-0">
                 {links.map(({ label, href }) => (
                   <li key={href}>
                     <Link
                       href={href}
-                      className="flex items-center justify-center sm:justify-start gap-1.5 text-xs text-white/50 hover:text-white transition-colors"
+                      className="flex items-center justify-start gap-1.5 text-[13px] sm:text-xs text-white/50 hover:text-white transition-colors"
                     >
-                      <IconChevronRight size={11} className="opacity-40" />
+                      <IconChevronRight size={12} className="opacity-40" />
                       {label}
                     </Link>
                   </li>
@@ -118,7 +118,7 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="bg-[#091530] py-3.5">
-        <div className="max-w-[1100px] mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+        <div className="max-w-[1100px] mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
           <p className="text-[12px] text-white/30">
             © 2025 Arquidiocese de Botucatu · Todos os direitos reservados
           </p>
