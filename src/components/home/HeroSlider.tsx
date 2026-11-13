@@ -44,12 +44,12 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
         alt="Catedral Metropolitana Basílica Menor de Sant'Ana"
         fill
         priority
-        className="object-cover object-[center_35%]"
+        className="object-cover object-[center_60%]"
         sizes="100vw"
       />
       <div
         className="absolute inset-0"
-        style={{ background: "linear-gradient(180deg, rgba(13,26,48,.25) 0%, rgba(13,26,48,.35) 45%, rgba(13,26,48,.9) 100%)" }}
+        style={{ background: "linear-gradient(180deg, rgba(13,26,48,.1) 0%, rgba(13,26,48,.3) 45%, rgba(13,26,48,.88) 100%)" }}
       />
 
       {/* Setas de navegação */}

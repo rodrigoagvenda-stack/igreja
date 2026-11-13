@@ -47,14 +47,14 @@ export async function SetoresEDocumentos() {
 
           {/* Setores pastorais */}
           {setores.length > 0 && (
-            <div className="flex flex-col gap-5 w-full lg:w-[680px]">
+            <div className={`flex flex-col gap-5 w-full ${docs.length > 0 ? "lg:w-[680px]" : ""}`}>
               <h2 className="font-serif text-[26px] font-bold">Setores pastorais</h2>
               <div className="flex flex-wrap gap-3.5">
                 {setores.map(({ id, slug, nome, descricao }) => (
                   <Link
                     key={id}
                     href={`/setores/${slug}`}
-                    className="group flex flex-col gap-2.5 w-full sm:w-[calc(50%-7px)] bg-muted rounded-[10px] p-5 hover:bg-primary/5 transition-colors"
+                    className={`group flex flex-col gap-2.5 bg-muted rounded-[10px] p-5 hover:bg-primary/5 transition-colors ${docs.length > 0 ? "w-full sm:w-[calc(50%-7px)]" : "w-full sm:w-[calc(25%-11px)]"}`}
                   >
                     <div className="w-[42px] h-[42px] rounded-[10px] bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors flex-shrink-0">
                       {iconBySlug[slug] ?? <IconCross size={20} />}

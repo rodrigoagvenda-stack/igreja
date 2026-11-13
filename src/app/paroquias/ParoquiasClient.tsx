@@ -76,34 +76,32 @@ export default function ParoquiasClient({ paroquias }: { paroquias: Paroquia[] }
           <Link
             key={slug}
             href={`/paroquias/${slug}`}
-            className="group bg-card border border-border rounded-lg p-5 hover:border-primary hover:shadow-[0_4px_16px_rgba(39,79,160,.10)] transition-all"
+            className="group bg-card border border-border rounded-xl overflow-hidden hover:border-primary hover:shadow-[0_4px_16px_rgba(39,79,160,.10)] transition-all"
           >
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0 overflow-hidden relative group-hover:bg-primary group-hover:text-white transition-colors">
-                {capa ? (
-                  <Image src={capa} alt={nome} fill className="object-cover" sizes="40px" />
-                ) : (
-                  <IconBuildingChurch size={20} />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="font-serif text-[15px] font-bold leading-[1.3] mb-1.5 group-hover:text-primary transition-colors line-clamp-2">
-                  {nome}
-                </h2>
-                <p className="flex items-center gap-1 text-[12px] text-muted-foreground mb-0.5">
-                  <IconMapPin size={11} className="text-primary flex-shrink-0" />
-                  {cidade}
+            <div className="relative w-full h-[180px] bg-primary/5 flex items-center justify-center overflow-hidden">
+              {capa ? (
+                <Image src={capa} alt={nome} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px" />
+              ) : (
+                <IconBuildingChurch size={40} className="text-primary/20" />
+              )}
+              <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-[.05em] px-2.5 py-1 rounded bg-[#0d1a30]/70 text-white backdrop-blur-sm">
+                {regiao_pastoral}
+              </span>
+            </div>
+            <div className="p-5">
+              <h2 className="font-serif text-[16px] font-bold leading-[1.3] mb-1.5 group-hover:text-primary transition-colors line-clamp-2">
+                {nome}
+              </h2>
+              <p className="flex items-center gap-1 text-[12px] text-muted-foreground mb-0.5">
+                <IconMapPin size={11} className="text-primary flex-shrink-0" />
+                {cidade}
+              </p>
+              {padroeiro && (
+                <p className="flex items-center gap-1 text-[12px] text-muted-foreground">
+                  <IconUser size={11} className="text-primary flex-shrink-0" />
+                  {padroeiro}
                 </p>
-                {padroeiro && (
-                  <p className="flex items-center gap-1 text-[12px] text-muted-foreground">
-                    <IconUser size={11} className="text-primary flex-shrink-0" />
-                    {padroeiro}
-                  </p>
-                )}
-                <span className="inline-block mt-2 text-[10px] font-semibold uppercase tracking-[.05em] px-2 py-0.5 rounded bg-primary/10 text-primary">
-                  {regiao_pastoral}
-                </span>
-              </div>
+              )}
             </div>
           </Link>
           )
