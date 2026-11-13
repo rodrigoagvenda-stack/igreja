@@ -47,19 +47,19 @@ export async function SetoresEDocumentos() {
 
           {/* Setores pastorais */}
           {setores.length > 0 && (
-            <div className={`flex flex-col gap-5 w-full ${docs.length > 0 ? "lg:w-[680px]" : ""}`}>
+            <div className="flex flex-col gap-5 w-full lg:w-[680px]">
               <h2 className="font-serif text-[26px] font-bold">Setores pastorais</h2>
-              <div className="flex flex-wrap gap-3.5">
+              <div className="flex flex-wrap gap-3.5 items-stretch">
                 {setores.map(({ id, slug, nome, descricao }) => (
                   <Link
                     key={id}
                     href={`/setores/${slug}`}
-                    className={`group flex flex-col gap-2.5 bg-muted rounded-[10px] p-5 hover:bg-primary/5 transition-colors ${docs.length > 0 ? "w-full sm:w-[calc(50%-7px)]" : "w-full sm:w-[calc(25%-11px)]"}`}
+                    className="group flex flex-col gap-2.5 w-full sm:w-[calc(50%-7px)] bg-muted rounded-[10px] p-5 hover:bg-primary/5 transition-colors"
                   >
                     <div className="w-[42px] h-[42px] rounded-[10px] bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors flex-shrink-0">
                       {iconBySlug[slug] ?? <IconCross size={20} />}
                     </div>
-                    <span className="font-semibold text-[15px] leading-snug group-hover:text-primary transition-colors">{nome}</span>
+                    <span className="font-semibold text-[15px] leading-snug group-hover:text-primary transition-colors line-clamp-2">{nome}</span>
                     {descricao && (
                       <span className="text-[13px] text-muted-foreground leading-[1.5] line-clamp-2">{descricao}</span>
                     )}
@@ -70,32 +70,39 @@ export async function SetoresEDocumentos() {
           )}
 
           {/* Documentos oficiais */}
-          {docs.length > 0 && (
-            <div className="flex flex-col gap-5 flex-1">
-              <h2 className="font-serif text-[26px] font-bold">Atos oficiais</h2>
-              <div className="flex flex-col gap-2.5">
-                {docs.map(({ id, slug, titulo, tipo }) => (
-                  <Link
-                    key={id}
-                    href={`/documentos/${slug}`}
-                    className="group flex items-center gap-3 bg-muted rounded-[10px] px-4 py-3.5 hover:bg-primary/5 transition-colors"
-                  >
-                    <div className="w-[34px] h-[34px] rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-                      <IconFileText size={15} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-[10px] font-semibold uppercase tracking-[.06em] ${tipoColor[tipo] ?? "text-muted-foreground"}`}>{tipo}</p>
-                      <p className="text-[13px] font-medium leading-[1.4] truncate">{titulo}</p>
-                    </div>
-                    <IconChevronRight size={14} className="text-muted-foreground flex-shrink-0 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                  </Link>
-                ))}
+          <div className="flex flex-col gap-5 flex-1">
+            <h2 className="font-serif text-[26px] font-bold">Atos oficiais</h2>
+            {docs.length > 0 ? (
+              <>
+                <div className="flex flex-col gap-2.5">
+                  {docs.map(({ id, slug, titulo, tipo }) => (
+                    <Link
+                      key={id}
+                      href={`/documentos/${slug}`}
+                      className="group flex items-center gap-3 bg-muted rounded-[10px] px-4 py-3.5 hover:bg-primary/5 transition-colors"
+                    >
+                      <div className="w-[34px] h-[34px] rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                        <IconFileText size={15} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[10px] font-semibold uppercase tracking-[.06em] ${tipoColor[tipo] ?? "text-muted-foreground"}`}>{tipo}</p>
+                        <p className="text-[13px] font-medium leading-[1.4] truncate">{titulo}</p>
+                      </div>
+                      <IconChevronRight size={14} className="text-muted-foreground flex-shrink-0 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                    </Link>
+                  ))}
+                </div>
+                <Link href="/documentos" className="text-[13px] font-semibold text-primary flex items-center justify-center gap-1">
+                  Ver todos os documentos <IconArrowRight size={13} />
+                </Link>
+              </>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center gap-2 bg-muted rounded-[10px] py-10 text-muted-foreground">
+                <IconFileText size={32} className="opacity-25" />
+                <p className="text-[13px]">Nenhum documento publicado ainda.</p>
               </div>
-              <Link href="/documentos" className="text-[13px] font-semibold text-primary flex items-center justify-center gap-1">
-                Ver todos os documentos <IconArrowRight size={13} />
-              </Link>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </section>

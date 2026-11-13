@@ -2,7 +2,7 @@ import Link from "next/link"
 import {
   IconMapPin, IconPhone, IconMail,
   IconBrandInstagram, IconBrandFacebook, IconBrandYoutube,
-  IconChevronRight,
+  IconChevronRight, IconChevronDown,
 } from "@tabler/icons-react"
 import { FooterLogo } from "./Logo"
 
@@ -91,13 +91,14 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Nav cols */}
+          {/* Nav cols — acordeão no mobile, sempre abertas no desktop */}
           {footerCols.map(({ title, links }) => (
-            <div key={title} className="text-center sm:text-left">
-              <h3 className="text-[11px] font-semibold text-accent uppercase tracking-[.08em] mb-4 pb-2 border-b border-white/8">
+            <details key={title} className="footer-accordion group text-center sm:text-left [&_summary::-webkit-details-marker]:hidden">
+              <summary className="flex items-center justify-center sm:justify-between gap-2 cursor-pointer sm:cursor-default text-[11px] font-semibold text-accent uppercase tracking-[.08em] mb-4 pb-2 border-b border-white/8">
                 {title}
-              </h3>
-              <ul className="space-y-2">
+                <IconChevronDown size={13} className="sm:hidden opacity-60 transition-transform group-open:rotate-180" />
+              </summary>
+              <ul className="flex flex-col gap-2">
                 {links.map(({ label, href }) => (
                   <li key={href}>
                     <Link
@@ -110,7 +111,7 @@ export function Footer() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </details>
           ))}
         </div>
       </div>
