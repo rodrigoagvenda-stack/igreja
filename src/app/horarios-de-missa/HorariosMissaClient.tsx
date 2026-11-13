@@ -1,9 +1,9 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { IconSearch, IconMapPin, IconClock, IconBuildingChurch, IconArrowRight } from "@tabler/icons-react"
+import { IconSearch, IconMapPin, IconClock, IconBuildingChurch, IconArrowRight, IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { formatDias, diaDeHojePt, horarioBateHoje } from "@/lib/horarios"
 
@@ -13,6 +13,8 @@ type Paroquia = { slug: string; nome: string; cidade: string; capa: string | nul
 
 type Filtro = "hoje" | "domingo" | "todos"
 
+const POR_PAGINA = 10
+
 function semAcentoLower(s: string) {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
 }
@@ -20,15 +22,26 @@ function semAcentoLower(s: string) {
 export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia[] }) {
   const [busca, setBusca] = useState("")
   const [filtro, setFiltro] = useState<Filtro>("todos")
+  const [pagina, setPagina] = useState(1)
   const hoje = diaDeHojePt()
 
+  const termo = semAcentoLower(busca.trim())
+  const buscouOuFiltrou = termo.length > 0 || filtro !== "todos"
+
   const resultados = useMemo(() => {
-    const termo = semAcentoLower(busca.trim())
+    if (!buscouOuFiltrou) return []
     return paroquias.filter(p => {
       if (termo && !semAcentoLower(`${p.nome} ${p.cidade}`).includes(termo)) return false
       return p.locais.some(l => l.arq_horarios_missa.length > 0)
     })
-  }, [paroquias, busca])
+  }, [paroquias, termo, buscouOuFiltrou])
+
+  const totalPaginas = Math.max(1, Math.ceil(resultados.length / POR_PAGINA))
+
+  useEffect(() => { setPagina(1) }, [termo, filtro])
+  useEffect(() => { if (pagina > totalPaginas) setPagina(totalPaginas) }, [pagina, totalPaginas])
+
+  const resultadosPagina = resultados.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA)
 
   return (
     <div className="max-w-[800px] mx-auto px-4 md:px-6 py-10 flex flex-col gap-5">
@@ -77,7 +90,13 @@ export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia
       </div>
 
       {/* Resultados */}
-      {resultados.length === 0 ? (
+      {!buscouOuFiltrou ? (
+        <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
+          <IconSearch size={40} className="mb-3 opacity-20" />
+          <p className="font-medium">Busque uma cidade ou paróquia, ou escolha um filtro de dia.</p>
+          <p className="text-[13px] mt-1">Os resultados aparecem aqui.</p>
+        </div>
+      ) : resultados.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
           <IconBuildingChurch size={48} className="mb-3 opacity-20" />
           <p className="font-medium">Nenhuma paróquia encontrada.</p>
@@ -89,13 +108,14 @@ export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia
             {resultados.length} paróquia{resultados.length !== 1 ? "s" : ""} encontrada{resultados.length !== 1 ? "s" : ""}
           </p>
           <div className="flex flex-col gap-4">
-            {resultados.map(({ slug, nome, cidade, capa, locais }) => {
+            {resultadosPagina.map(({ slug, nome, cidade, capa, locais }) => {
               const matriz = locais.find(l => l.tipos.includes("Matriz")) ?? locais[0]
               const horariosMatriz = matriz?.arq_horarios_missa ?? []
-              const diaFiltro = filtro === "hoje" ? hoje : filtro === "domingo" ? "Domingo" : null
-              const batemHoje = diaFiltro
-                ? horariosMatriz.filter(h => filtro === "hoje" ? horarioBateHoje(h.dias) : h.dias.includes("Domingo"))
-                : horariosMatriz
+              const batemHoje = filtro === "hoje"
+                ? horariosMatriz.filter(h => horarioBateHoje(h.dias))
+                : filtro === "domingo"
+                ? horariosMatriz.filter(h => h.dias.includes("Domingo"))
+                : []
 
               return (
                 <div key={slug} className="bg-card border border-border rounded-lg overflow-hidden hover:border-primary hover:shadow-[0_2px_12px_rgba(39,79,160,.08)] transition-all">
@@ -118,11 +138,11 @@ export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia
                     </Link>
                   </div>
 
-                  {filtro === "hoje" && (
+                  {filtro !== "todos" && (
                     batemHoje.length > 0 ? null : (
                       <div className="flex items-center gap-2 px-5 py-3 bg-muted/50 text-[13px] text-muted-foreground">
                         <IconClock size={14} />
-                        Sem missa hoje ({hoje.toLowerCase()}-feira) na Matriz
+                        Sem missa {filtro === "hoje" ? `hoje (${hoje.toLowerCase()}-feira)` : "domingo"} na Matriz
                         {horariosMatriz.length > 0 && (
                           <>
                             {" — próxima: "}
@@ -133,19 +153,24 @@ export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia
                     )
                   )}
 
-                  <div className="flex flex-wrap gap-2 px-5 py-4">
-                    {horariosMatriz.map(h => {
-                      const ativo = filtro === "todos" || batemHoje.some(b => b.id === h.id)
+                  <div className="flex flex-col">
+                    {horariosMatriz.map((h, i) => {
+                      const ativo = batemHoje.some(b => b.id === h.id)
                       return (
                         <div
                           key={h.id}
                           className={cn(
-                            "flex flex-col gap-0.5 rounded-lg px-3.5 py-2.5",
-                            ativo ? "bg-primary" : "bg-muted"
+                            "flex items-baseline gap-2.5 px-5 py-2.5",
+                            i < horariosMatriz.length - 1 && "border-b border-border/60",
+                            ativo && "bg-muted"
                           )}
                         >
-                          <span className={cn("text-[12px] font-semibold", ativo ? "text-white" : "text-foreground")}>{formatDias(h.dias)}</span>
-                          <span className={cn("text-[12px]", ativo ? "text-white/85" : "text-muted-foreground")}>{h.horarios.join(", ")}</span>
+                          <span className={cn("text-[13px] w-[220px] flex-shrink-0", ativo ? "font-bold text-primary" : "font-semibold text-foreground")}>
+                            {formatDias(h.dias)}
+                          </span>
+                          <span className={cn("text-[13px]", ativo ? "font-bold text-primary" : "text-muted-foreground")}>
+                            {h.horarios.join(", ")}
+                          </span>
                         </div>
                       )
                     })}
@@ -154,6 +179,40 @@ export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia
               )
             })}
           </div>
+
+          {/* Paginação */}
+          {totalPaginas > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <button
+                onClick={() => setPagina(p => Math.max(1, p - 1))}
+                disabled={pagina === 1}
+                aria-label="Página anterior"
+                className="w-9 h-9 rounded-lg border border-border flex items-center justify-center disabled:opacity-40 hover:border-primary transition-colors"
+              >
+                <IconChevronLeft size={14} />
+              </button>
+              {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(n => (
+                <button
+                  key={n}
+                  onClick={() => setPagina(n)}
+                  className={cn(
+                    "w-9 h-9 rounded-lg text-[13px] font-semibold transition-colors",
+                    n === pagina ? "bg-primary text-white" : "border border-border text-foreground hover:border-primary"
+                  )}
+                >
+                  {n}
+                </button>
+              ))}
+              <button
+                onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
+                disabled={pagina === totalPaginas}
+                aria-label="Próxima página"
+                className="w-9 h-9 rounded-lg border border-border flex items-center justify-center disabled:opacity-40 hover:border-primary transition-colors"
+              >
+                <IconChevronRight size={14} />
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>

@@ -25,7 +25,9 @@ export default async function HorariosMissaPage() {
   const paroquias = raw.map(p => {
     const locais = p.arq_locais ?? []
     const matriz = locais.find(l => l.tipos.includes("Matriz"))
-    const capa = matriz?.fotos?.[0]?.url ?? p.fotos?.[0]?.url ?? null
+    const capa = matriz?.fotos?.find(f => f.tag === "Fachada")?.url
+      ?? p.fotos?.find(f => f.tag === "Fachada")?.url
+      ?? null
     return {
       slug: p.slug,
       nome: p.nome,
