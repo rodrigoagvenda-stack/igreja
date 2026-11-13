@@ -31,7 +31,7 @@ export default function ArcebispoPage() {
           <div className="space-y-4">
             <div className="w-full aspect-[3/4] max-w-[260px] mx-auto lg:mx-0 rounded-xl overflow-hidden relative border border-border">
               <Image
-                src="https://picsum.photos/seed/arcebispo-mauricio/280/380"
+                src="https://dkvznmmiiiljyrkopiqx.supabase.co/storage/v1/object/public/arq-fotos/1794995000-arcebispo-dom-mauricio.jpg"
                 alt="Dom Maurício Grotto de Camargo"
                 fill
                 className="object-cover"
