@@ -1,152 +1,161 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
 import { IconSearch, IconMapPin, IconClock, IconBuildingChurch, IconArrowRight } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
-import { formatDias } from "@/lib/horarios"
+import { formatDias, diaDeHojePt, horarioBateHoje } from "@/lib/horarios"
 
 type Horario = { id: string; dias: string[]; horarios: string[] }
 type Local = { id: string; nome: string; tipos: ("Matriz" | "Capela")[]; endereco: string | null; arq_horarios_missa: Horario[] }
-type Paroquia = { slug: string; nome: string; cidade: string; locais: Local[] }
+type Paroquia = { slug: string; nome: string; cidade: string; capa: string | null; locais: Local[] }
+
+type Filtro = "hoje" | "domingo" | "todos"
+
+function semAcentoLower(s: string) {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+}
 
 export default function HorariosMissaClient({ paroquias }: { paroquias: Paroquia[] }) {
-  const cidades = ["", ...Array.from(new Set(paroquias.map(p => p.cidade))).sort()]
-  const [cidade, setCidade] = useState("")
-  const [paroquiaSel, setParoquiaSel] = useState("")
-  const [buscou, setBuscou] = useState(false)
+  const [busca, setBusca] = useState("")
+  const [filtro, setFiltro] = useState<Filtro>("todos")
+  const hoje = diaDeHojePt()
 
-  const paroquiasDaCidade = cidade ? paroquias.filter(p => p.cidade === cidade) : []
-
-  const resultados = (() => {
-    if (!buscou || !cidade) return []
-    const pool = paroquiaSel
-      ? paroquiasDaCidade.filter(p => p.slug === paroquiaSel)
-      : paroquiasDaCidade
-    return pool.filter(p => p.locais.some(l => l.arq_horarios_missa.length > 0))
-  })()
+  const resultados = useMemo(() => {
+    const termo = semAcentoLower(busca.trim())
+    return paroquias.filter(p => {
+      if (termo && !semAcentoLower(`${p.nome} ${p.cidade}`).includes(termo)) return false
+      return p.locais.some(l => l.arq_horarios_missa.length > 0)
+    })
+  }, [paroquias, busca])
 
   return (
-    <div className="max-w-[1100px] mx-auto px-4 md:px-6 py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-8">
+    <div className="max-w-[800px] mx-auto px-4 md:px-6 py-10 flex flex-col gap-5">
 
-        {/* Formulário */}
-        <div className="bg-white border border-border rounded-xl overflow-hidden shadow-sm h-fit">
-          <div className="px-6 pt-6 pb-4 border-b border-border">
-            <p className="text-[10px] font-semibold text-primary uppercase tracking-widest mb-1 flex items-center gap-2">
-              <span className="block w-3 h-0.5 bg-accent" />
-              Busca de horários
-            </p>
-            <h2 className="font-serif text-[22px] font-bold text-foreground">Encontre uma missa</h2>
-          </div>
+      {/* Busca única */}
+      <div className="bg-white border border-border rounded-xl px-5 py-3.5 flex items-center gap-3">
+        <IconSearch size={20} className="text-muted-foreground flex-shrink-0" />
+        <input
+          value={busca}
+          onChange={e => setBusca(e.target.value)}
+          placeholder="Busque por cidade ou paróquia…"
+          className="flex-1 bg-transparent outline-none text-[16px] placeholder:text-muted-foreground"
+        />
+      </div>
 
-          <div className="px-6 py-5 space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">Cidade</Label>
-              <Select value={cidade} onValueChange={v => { setCidade(v ?? ""); setParoquiaSel(""); setBuscou(false) }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a cidade…" />
-                </SelectTrigger>
-                <SelectContent>
-                  {cidades.filter(Boolean).map(c => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Filtros rápidos por dia */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[12px] text-muted-foreground">Filtrar por:</span>
+        <button
+          onClick={() => setFiltro("hoje")}
+          className={cn(
+            "text-[13px] font-semibold px-4 py-2 rounded-full transition-colors",
+            filtro === "hoje" ? "bg-primary text-white" : "bg-white border border-border text-foreground hover:border-primary"
+          )}
+        >
+          Hoje · {hoje.toLowerCase()}-feira
+        </button>
+        <button
+          onClick={() => setFiltro("domingo")}
+          className={cn(
+            "text-[13px] font-medium px-4 py-2 rounded-full transition-colors",
+            filtro === "domingo" ? "bg-primary text-white" : "bg-white border border-border text-foreground hover:border-primary"
+          )}
+        >
+          Domingo
+        </button>
+        <button
+          onClick={() => setFiltro("todos")}
+          className={cn(
+            "text-[13px] font-medium px-4 py-2 rounded-full transition-colors",
+            filtro === "todos" ? "bg-primary text-white" : "bg-white border border-border text-foreground hover:border-primary"
+          )}
+        >
+          Todos os dias
+        </button>
+      </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">Paróquia (opcional)</Label>
-              <Select value={paroquiaSel} onValueChange={v => setParoquiaSel(v ?? "")} disabled={!cidade}>
-                <SelectTrigger className="disabled:opacity-60">
-                  <SelectValue placeholder="Todas as paróquias" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Todas as paróquias</SelectItem>
-                  {paroquiasDaCidade.map(p => (
-                    <SelectItem key={p.slug} value={p.slug}>{p.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <button
-              onClick={() => setBuscou(true)}
-              disabled={!cidade}
-              className="flex items-center justify-center gap-2 w-full bg-accent text-foreground text-[14px] font-semibold py-3 rounded-md hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <IconSearch size={16} />
-              Buscar horários
-            </button>
-          </div>
-
-          <p className="text-center text-[12px] text-muted-foreground px-6 pb-5">
-            {paroquias.length} paróquias · Arquidiocese de Botucatu
-          </p>
+      {/* Resultados */}
+      {resultados.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
+          <IconBuildingChurch size={48} className="mb-3 opacity-20" />
+          <p className="font-medium">Nenhuma paróquia encontrada.</p>
+          <p className="text-[13px] mt-1">Tente buscar por outra cidade ou nome.</p>
         </div>
+      ) : (
+        <>
+          <p className="text-[13px] text-muted-foreground">
+            {resultados.length} paróquia{resultados.length !== 1 ? "s" : ""} encontrada{resultados.length !== 1 ? "s" : ""}
+          </p>
+          <div className="flex flex-col gap-4">
+            {resultados.map(({ slug, nome, cidade, capa, locais }) => {
+              const matriz = locais.find(l => l.tipos.includes("Matriz")) ?? locais[0]
+              const horariosMatriz = matriz?.arq_horarios_missa ?? []
+              const diaFiltro = filtro === "hoje" ? hoje : filtro === "domingo" ? "Domingo" : null
+              const batemHoje = diaFiltro
+                ? horariosMatriz.filter(h => filtro === "hoje" ? horarioBateHoje(h.dias) : h.dias.includes("Domingo"))
+                : horariosMatriz
 
-        {/* Resultados */}
-        <div>
-          {!buscou ? (
-            <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
-              <IconBuildingChurch size={48} className="mb-3 opacity-20" />
-              <p className="font-medium">Selecione uma cidade e clique em buscar</p>
-              <p className="text-[13px] mt-1">Os resultados aparecerão aqui</p>
-            </div>
-          ) : resultados.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
-              <IconBuildingChurch size={48} className="mb-3 opacity-20" />
-              <p className="font-medium">Nenhum horário cadastrado para essa seleção.</p>
-              <p className="text-[13px] mt-1">Entre em contato diretamente com a paróquia.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-[13px] text-muted-foreground">
-                {resultados.length} paróquia{resultados.length !== 1 ? "s" : ""} encontrada{resultados.length !== 1 ? "s" : ""}
-              </p>
-              {resultados.map(({ slug, nome, cidade: c, locais }) => (
+              return (
                 <div key={slug} className="bg-card border border-border rounded-lg overflow-hidden hover:border-primary hover:shadow-[0_2px_12px_rgba(39,79,160,.08)] transition-all">
-                  <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-3 border-b border-border">
-                    <div>
-                      <h3 className="font-serif font-bold text-[16px] leading-snug">{nome}</h3>
-                      <p className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5">
-                        <IconMapPin size={11} className="text-primary" /> {c}
-                      </p>
+                  <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-border">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      {capa && (
+                        <div className="relative w-[52px] h-[52px] rounded-lg overflow-hidden flex-shrink-0">
+                          <Image src={capa} alt={nome} fill className="object-cover" sizes="52px" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <h3 className="font-serif font-bold text-[16px] leading-snug truncate">{nome}</h3>
+                        <p className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5">
+                          <IconMapPin size={11} className="text-primary flex-shrink-0" /> {cidade}
+                        </p>
+                      </div>
                     </div>
                     <Link href={`/paroquias/${slug}`} className="text-[12px] text-primary font-medium flex items-center gap-1 hover:gap-1.5 transition-all whitespace-nowrap flex-shrink-0">
                       Ver paróquia <IconArrowRight size={12} />
                     </Link>
                   </div>
-                  <div className="divide-y divide-border">
-                    {locais.filter(l => l.arq_horarios_missa.length > 0).map(({ id, nome: ln, tipos, arq_horarios_missa: hs }) => (
-                      <div key={id} className="px-5 py-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          {tipos.map(tipo => (
-                            <span key={tipo} className={`text-[10px] font-semibold uppercase tracking-[.05em] px-1.5 py-0.5 rounded ${tipo === "Matriz" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                              {tipo}
-                            </span>
-                          ))}
-                          <span className="text-[13px] font-medium">{ln}</span>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          {hs.map(h => (
-                            <p key={h.id} className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
-                              <IconClock size={12} className="text-primary flex-shrink-0" />
-                              <span><strong className="text-foreground">{formatDias(h.dias)}:</strong> {h.horarios.join(", ")}</span>
-                            </p>
-                          ))}
-                        </div>
+
+                  {filtro === "hoje" && (
+                    batemHoje.length > 0 ? null : (
+                      <div className="flex items-center gap-2 px-5 py-3 bg-muted/50 text-[13px] text-muted-foreground">
+                        <IconClock size={14} />
+                        Sem missa hoje ({hoje.toLowerCase()}-feira) na Matriz
+                        {horariosMatriz.length > 0 && (
+                          <>
+                            {" — próxima: "}
+                            <span className="font-semibold text-primary">{formatDias(horariosMatriz[0].dias)}, {horariosMatriz[0].horarios.join(", ")}</span>
+                          </>
+                        )}
                       </div>
-                    ))}
+                    )
+                  )}
+
+                  <div className="flex flex-wrap gap-2 px-5 py-4">
+                    {horariosMatriz.map(h => {
+                      const ativo = filtro === "todos" || batemHoje.some(b => b.id === h.id)
+                      return (
+                        <div
+                          key={h.id}
+                          className={cn(
+                            "flex flex-col gap-0.5 rounded-lg px-3.5 py-2.5",
+                            ativo ? "bg-primary" : "bg-muted"
+                          )}
+                        >
+                          <span className={cn("text-[12px] font-semibold", ativo ? "text-white" : "text-foreground")}>{formatDias(h.dias)}</span>
+                          <span className={cn("text-[12px]", ativo ? "text-white/85" : "text-muted-foreground")}>{h.horarios.join(", ")}</span>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+              )
+            })}
+          </div>
+        </>
+      )}
     </div>
   )
 }

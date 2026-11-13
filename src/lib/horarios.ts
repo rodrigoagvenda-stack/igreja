@@ -1,5 +1,21 @@
 const ORDEM_DIAS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"]
 
+function semAcento(s: string): string {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+}
+
+// Nome do dia da semana de hoje, no mesmo vocabulário de ORDEM_DIAS.
+export function diaDeHojePt(): string {
+  return ORDEM_DIAS[new Date().getDay()]
+}
+
+// Verifica se algum item de `dias` (incluindo padrões como "1ª sexta-feira do mês")
+// corresponde ao dia da semana de hoje.
+export function horarioBateHoje(dias: string[]): boolean {
+  const hoje = semAcento(diaDeHojePt())
+  return dias.some(d => semAcento(d).includes(hoje))
+}
+
 // Junta dias consecutivos em faixa ("Segunda a Sexta") e o resto por vírgula.
 export function formatDias(dias: string[]): string {
   if (dias.length === 0) return ""

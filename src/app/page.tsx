@@ -1,12 +1,10 @@
 import { SiteLayout } from "@/components/layout/SiteLayout"
 import { Hero } from "@/components/home/Hero"
 import { QuickLinks } from "@/components/home/QuickLinks"
-import { NewsSection } from "@/components/home/NewsSection"
-import { AgendaMissaSection } from "@/components/home/AgendaMissaSection"
+import { NoticiasEAgenda } from "@/components/home/NoticiasEAgenda"
 import { ParoquiasDestaque } from "@/components/home/ParoquiasDestaque"
 import { ArcebispoSection } from "@/components/home/ArcebispoSection"
-import { SetoresSection } from "@/components/home/SetoresSection"
-import { DocumentosSection } from "@/components/home/DocumentosSection"
+import { SetoresEDocumentos } from "@/components/home/SetoresEDocumentos"
 import { ScrollReveal } from "@/components/providers/ScrollReveal"
 
 export default function Home() {
@@ -20,11 +18,7 @@ export default function Home() {
       </ScrollReveal>
 
       <ScrollReveal delay={0.05}>
-        <NewsSection />
-      </ScrollReveal>
-
-      <ScrollReveal delay={0.05}>
-        <AgendaMissaSection />
+        <NoticiasEAgenda />
       </ScrollReveal>
 
       <ScrollReveal delay={0.05}>
@@ -36,11 +30,7 @@ export default function Home() {
       </ScrollReveal>
 
       <ScrollReveal delay={0.05}>
-        <SetoresSection />
-      </ScrollReveal>
-
-      <ScrollReveal delay={0.05}>
-        <DocumentosSection />
+        <SetoresEDocumentos />
       </ScrollReveal>
     </SiteLayout>
   )

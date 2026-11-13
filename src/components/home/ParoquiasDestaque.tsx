@@ -20,16 +20,10 @@ export async function ParoquiasDestaque() {
     <section className="py-16 md:py-20 bg-muted" aria-label="Paróquias em destaque">
       <div className="max-w-[1100px] mx-auto px-4 md:px-6">
 
-        <div className="flex items-end justify-between mb-7 pb-4 border-b border-border">
-          <div>
-            <p className="flex items-center gap-2 text-[11px] font-semibold text-primary uppercase tracking-widest mb-1">
-              <span className="block w-4 h-0.5 bg-primary" aria-hidden="true" />
-              Comunidades
-            </p>
-            <h2 className="font-serif text-2xl font-bold">Paróquias em destaque</h2>
-          </div>
-          <Link href="/paroquias" className="text-[13px] text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all">
-            Ver todas <IconArrowRight size={14} />
+        <div className="flex items-baseline gap-3.5 mb-7">
+          <h2 className="font-serif text-[28px] md:text-[30px] font-bold">Comunidades da Arquidiocese</h2>
+          <Link href="/paroquias" className="ml-auto text-[13px] text-primary font-semibold flex items-center gap-1 hover:gap-1.5 transition-all whitespace-nowrap">
+            Ver as 50 paróquias <IconArrowRight size={14} />
           </Link>
         </div>
 
@@ -57,7 +51,7 @@ export async function ParoquiasDestaque() {
                       <div className="absolute inset-0 bg-primary/5 group-hover:bg-primary/10 transition-colors" />
                     </>
                   )}
-                  <span className="absolute top-2 right-2 text-[10px] font-semibold uppercase tracking-[.05em] px-2 py-0.5 rounded bg-primary/10 text-primary backdrop-blur-sm">
+                  <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-[.05em] px-2.5 py-1 rounded bg-[#0d1a30]/70 text-white backdrop-blur-sm">
                     {regiao_pastoral.split(" ")[0]}
                   </span>
                 </div>

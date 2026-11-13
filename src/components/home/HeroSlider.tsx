@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { IconArrowRight, IconChevronLeft, IconChevronRight, IconCross } from "@tabler/icons-react"
+import Image from "next/image"
+import { IconArrowRight, IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
 export type HeroSlide = {
@@ -13,6 +14,8 @@ export type HeroSlide = {
   href: string
   cta: string
 }
+
+const FOTO_FUNDO = "https://dkvznmmiiiljyrkopiqx.supabase.co/storage/v1/object/public/arq-fotos/1794577900-catedral-santana-aerea.jpg"
 
 export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const [current, setCurrent] = useState(0)
@@ -35,61 +38,72 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const slide = slides[current]
 
   return (
-    <section className="flex flex-col md:flex-row min-h-[480px] md:min-h-[560px]" aria-label="Banner principal">
-      {/* Painel decorativo */}
-      <div className="relative flex-[1.2] min-h-[220px] md:min-h-0 overflow-hidden bg-gradient-to-br from-sidebar via-primary/90 to-primary flex items-center justify-center">
-        <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="relative z-10 flex flex-col items-center gap-4 opacity-30">
-          <IconCross size={80} className="text-white" />
+    <section className="relative h-[520px] md:h-[640px] overflow-hidden" aria-label="Banner principal">
+      <Image
+        src={FOTO_FUNDO}
+        alt="Catedral Metropolitana Basílica Menor de Sant'Ana"
+        fill
+        priority
+        className="object-cover object-[center_70%]"
+        sizes="100vw"
+      />
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(180deg, rgba(13,26,48,.25) 0%, rgba(13,26,48,.35) 45%, rgba(13,26,48,.9) 100%)" }}
+      />
+
+      {/* Setas de navegação */}
+      {slides.length > 1 && (
+        <div className="absolute inset-y-0 left-0 right-0 hidden md:flex items-center justify-between px-7 pointer-events-none z-10">
+          <button onClick={prev} aria-label="Slide anterior" className="pointer-events-auto w-11 h-11 rounded-full bg-white/10 border border-white/25 backdrop-blur-sm hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+            <IconChevronLeft size={18} />
+          </button>
+          <button onClick={next} aria-label="Próximo slide" className="pointer-events-auto w-11 h-11 rounded-full bg-white/10 border border-white/25 backdrop-blur-sm hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+            <IconChevronRight size={18} />
+          </button>
         </div>
-        {slides.length > 1 && (
-          <div className="absolute inset-y-0 left-0 right-0 hidden md:flex items-center justify-between px-3 pointer-events-none z-10">
-            <button onClick={prev} aria-label="Slide anterior" className="pointer-events-auto w-8 h-8 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition-colors">
-              <IconChevronLeft size={18} />
-            </button>
-            <button onClick={next} aria-label="Próximo slide" className="pointer-events-auto w-8 h-8 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition-colors">
-              <IconChevronRight size={18} />
-            </button>
-          </div>
-        )}
-        {/* Badge */}
-        <div className="absolute bottom-6 left-6 z-10">
-          <span className="bg-accent text-foreground text-[11px] font-semibold px-3 py-1 rounded-sm tracking-[.06em] uppercase transition-opacity duration-300" style={{ opacity: visible ? 1 : 0 }}>
-            {slide.badge}
-          </span>
-        </div>
-      </div>
+      )}
 
       {/* Conteúdo */}
-      <div className="flex-1 bg-primary px-8 py-12 md:px-12 md:py-14 flex flex-col justify-center gap-6">
-        <div className="flex flex-col gap-5 transition-opacity duration-300" style={{ opacity: visible ? 1 : 0 }}>
-          <p className="flex items-center gap-2 text-[11px] font-semibold text-accent tracking-[.1em] uppercase">
-            <span className="block w-6 h-0.5 bg-accent" aria-hidden="true" />
+      <div className="absolute inset-0 flex flex-col justify-end max-w-[1100px] mx-auto px-4 md:px-[170px] pb-16 md:pb-20">
+        <div className="flex flex-col gap-4 max-w-[620px] transition-opacity duration-300" style={{ opacity: visible ? 1 : 0 }}>
+          <p className="flex items-center gap-2.5 text-[12px] font-semibold text-accent tracking-[.12em] uppercase">
+            <span className="block w-6 h-[1.5px] bg-accent" aria-hidden="true" />
             {slide.eyebrow}
           </p>
-          <h1 className="font-serif text-[28px] md:text-[34px] font-bold text-white leading-[1.15] max-w-[400px]">
+          <h1 className="font-serif text-[36px] md:text-[48px] font-bold text-white leading-[1.1]">
             {slide.title}
           </h1>
-          <p className="text-[15px] text-white/75 leading-[1.7] max-w-[400px]">
+          <p className="text-[16px] text-white/80 leading-[1.7] max-w-[480px]">
             {slide.excerpt}
           </p>
-          <Link href={slide.href} className="inline-flex items-center gap-2 bg-white text-primary text-[13px] font-semibold px-5 py-2.5 rounded-md w-fit hover:bg-accent hover:text-white transition-colors">
-            <IconArrowRight size={14} /> {slide.cta}
-          </Link>
+          <div className="flex items-center gap-3.5 pt-1.5">
+            <Link href={slide.href} className="inline-flex items-center gap-2 bg-white text-primary text-[14px] font-semibold px-6 py-3.5 rounded-full w-fit hover:bg-accent hover:text-white transition-colors">
+              {slide.cta} <IconArrowRight size={14} />
+            </Link>
+            <Link href="/agenda" className="inline-flex items-center gap-2 border border-white/40 text-white text-[14px] font-semibold px-6 py-3.5 rounded-full w-fit hover:bg-white/10 transition-colors">
+              Ver agenda pastoral
+            </Link>
+          </div>
         </div>
 
         {slides.length > 1 && (
-          <div className="flex gap-2 mt-1" role="tablist" aria-label="Slides">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                role="tab"
-                aria-selected={i === current}
-                aria-label={`Slide ${i + 1}`}
-                onClick={() => goTo(i)}
-                className={cn("h-1.5 rounded-full transition-all duration-300", i === current ? "bg-white w-6" : "bg-white/30 hover:bg-white/60 w-1.5")}
-              />
-            ))}
+          <div className="flex items-center gap-4 mt-8 max-w-[620px]">
+            <span className="font-serif italic text-[14px] text-white/60">
+              {String(current + 1).padStart(2, "0")} — {String(slides.length).padStart(2, "0")}
+            </span>
+            <div className="flex items-center gap-2" role="tablist" aria-label="Slides">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  role="tab"
+                  aria-selected={i === current}
+                  aria-label={`Slide ${i + 1}`}
+                  onClick={() => goTo(i)}
+                  className={cn("h-[2px] rounded-full transition-all duration-300", i === current ? "bg-accent w-10" : "bg-white/25 hover:bg-white/50 w-[18px]")}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
