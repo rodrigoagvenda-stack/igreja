@@ -36,7 +36,7 @@ export async function ParoquiasDestaque() {
                 href={`/paroquias/${slug}`}
                 className="group bg-card border border-border rounded-lg overflow-hidden hover:border-primary hover:shadow-[0_4px_16px_rgba(139,26,46,.12)] transition-all"
               >
-                <div className="h-[120px] relative overflow-hidden bg-primary/5 flex items-center justify-center">
+                <div className="h-[200px] relative overflow-hidden bg-primary/5 flex items-center justify-center">
                   {capa ? (
                     <Image
                       src={capa}
