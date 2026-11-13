@@ -1,4 +1,7 @@
 import Link from "next/link"
+import Image from "next/image"
+
+const FOTO_ARCEBISPO = "https://dkvznmmiiiljyrkopiqx.supabase.co/storage/v1/object/public/arq-fotos/1794995000-arcebispo-dom-mauricio.jpg"
 
 export function ArcebispoSection() {
   return (
@@ -6,9 +9,9 @@ export function ArcebispoSection() {
       <div className="max-w-[1100px] mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
 
-          {/* Monograma */}
-          <div className="w-[110px] h-[110px] rounded-full bg-accent/10 border-[1.5px] border-accent flex-shrink-0 flex items-center justify-center">
-            <span className="font-serif font-bold text-[34px] text-accent">MG</span>
+          {/* Foto do Arcebispo */}
+          <div className="relative w-[110px] h-[110px] rounded-full border-[1.5px] border-accent flex-shrink-0 overflow-hidden">
+            <Image src={FOTO_ARCEBISPO} alt="Dom Maurício Grotto de Camargo" fill className="object-cover" sizes="110px" />
           </div>
 
           {/* Conteúdo */}

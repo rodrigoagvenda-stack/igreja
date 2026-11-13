@@ -15,7 +15,7 @@ export type HeroSlide = {
   cta: string
 }
 
-const FOTO_FUNDO = "https://dkvznmmiiiljyrkopiqx.supabase.co/storage/v1/object/public/arq-fotos/1794577900-catedral-santana-aerea.jpg"
+const FOTO_FUNDO = "https://dkvznmmiiiljyrkopiqx.supabase.co/storage/v1/object/public/arq-fotos/1794995500-catedral-santana-fachada-rua.jpg"
 
 export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const [current, setCurrent] = useState(0)
@@ -44,7 +44,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
         alt="Catedral Metropolitana Basílica Menor de Sant'Ana"
         fill
         priority
-        className="object-cover object-[center_70%]"
+        className="object-cover object-[center_35%]"
         sizes="100vw"
       />
       <div
@@ -77,13 +77,15 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
           <p className="text-[16px] text-white/80 leading-[1.7] max-w-[480px]">
             {slide.excerpt}
           </p>
-          <div className="flex items-center gap-3.5 pt-1.5">
-            <Link href={slide.href} className="inline-flex items-center gap-2 bg-white text-primary text-[14px] font-semibold px-6 py-3.5 rounded-full w-fit hover:bg-accent hover:text-white transition-colors">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-3.5 pt-1.5">
+            <Link href={slide.href} className="inline-flex items-center justify-center gap-2 bg-white text-primary text-[14px] font-semibold px-6 py-3.5 rounded-full w-fit hover:bg-accent hover:text-white transition-colors">
               {slide.cta} <IconArrowRight size={14} />
             </Link>
-            <Link href="/agenda" className="inline-flex items-center gap-2 border border-white/40 text-white text-[14px] font-semibold px-6 py-3.5 rounded-full w-fit hover:bg-white/10 transition-colors">
-              Ver agenda pastoral
-            </Link>
+            {slide.href !== "/agenda" && (
+              <Link href="/agenda" className="inline-flex items-center justify-center gap-2 border border-white/40 text-white text-[14px] font-semibold px-6 py-3.5 rounded-full w-fit hover:bg-white/10 transition-colors">
+                Ver agenda pastoral
+              </Link>
+            )}
           </div>
         </div>
 

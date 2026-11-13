@@ -89,7 +89,10 @@ export async function NoticiasEAgenda() {
               </div>
             </Link>
           ) : (
-            <div className="w-full lg:w-[640px]" />
+            <div className="w-full lg:w-[640px] h-[300px] md:h-[360px] rounded-[14px] bg-muted flex flex-col items-center justify-center gap-2 text-muted-foreground flex-shrink-0">
+              <IconBuildingChurch size={40} className="opacity-25" />
+              <p className="text-[13px]">Nenhuma notícia publicada ainda.</p>
+            </div>
           )}
 
           {/* Agenda / horários de missa */}

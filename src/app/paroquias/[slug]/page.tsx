@@ -86,7 +86,7 @@ export default async function ParoquiaSlugPage({ params }: { params: Promise<{ s
   const matriz = locaisReais.find(l => l.tipos.includes("Matriz")) ?? null
   const capelas = locaisReais.filter(l => l.id !== matriz?.id)
 
-  const galeriaFotos = matriz?.fotos?.length ? matriz.fotos : (paroquia.fotos ?? [])
+  const galeriaFotos = [...(matriz?.fotos ?? []), ...(paroquia.fotos ?? [])]
   const fotoPadroeiro = matriz?.fotos?.find(f => f.tag === "Padroeiro")
     ?? paroquia.fotos?.find(f => f.tag === "Padroeiro")
     ?? null
