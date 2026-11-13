@@ -1,9 +1,13 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
 import {
   IconMapPin, IconPhone, IconMail,
   IconBrandInstagram, IconBrandFacebook, IconBrandYoutube,
   IconChevronRight, IconChevronDown,
 } from "@tabler/icons-react"
+import { cn } from "@/lib/utils"
 import { FooterLogo } from "./Logo"
 
 const footerCols = [
@@ -48,6 +52,12 @@ const socials = [
 ]
 
 export function Footer() {
+  const [abertos, setAbertos] = useState<boolean[]>(footerCols.map(() => false))
+
+  function toggle(i: number) {
+    setAbertos(prev => prev.map((v, idx) => (idx === i ? !v : v)))
+  }
+
   return (
     <footer className="bg-[#0d1a30] text-white/70 text-sm">
       {/* Main grid */}
@@ -91,14 +101,22 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Nav cols — acordeão no mobile, sempre abertas no desktop */}
-          {footerCols.map(({ title, links }) => (
-            <details key={title} className="footer-accordion group text-left">
-              <summary className="flex items-center justify-between gap-2 cursor-pointer sm:cursor-default text-[12px] sm:text-[11px] font-semibold text-accent uppercase tracking-[.08em] py-3 sm:py-0 sm:mb-4 sm:pb-2 border-b border-white/8 [&::-webkit-details-marker]:hidden">
+          {/* Nav cols — acordeão no mobile (fechado por padrão), sempre abertas no desktop */}
+          {footerCols.map(({ title, links }, i) => (
+            <div key={title} className="text-left">
+              <button
+                type="button"
+                onClick={() => toggle(i)}
+                aria-expanded={abertos[i]}
+                className="flex items-center justify-between gap-2 w-full sm:pointer-events-none text-[12px] sm:text-[11px] font-semibold text-accent uppercase tracking-[.08em] py-3 sm:py-0 sm:mb-4 sm:pb-2 border-b border-white/8"
+              >
                 {title}
-                <IconChevronDown size={14} className="sm:hidden opacity-60 transition-transform group-open:rotate-180" />
-              </summary>
-              <ul className="flex flex-col gap-2.5 sm:gap-2 pb-4 sm:pb-0">
+                <IconChevronDown
+                  size={14}
+                  className={cn("sm:hidden opacity-60 transition-transform", abertos[i] && "rotate-180")}
+                />
+              </button>
+              <ul className={cn("flex-col gap-2.5 sm:gap-2 pb-4 sm:pb-0 sm:!flex", abertos[i] ? "flex" : "hidden")}>
                 {links.map(({ label, href }) => (
                   <li key={href}>
                     <Link
@@ -111,7 +129,7 @@ export function Footer() {
                   </li>
                 ))}
               </ul>
-            </details>
+            </div>
           ))}
         </div>
       </div>

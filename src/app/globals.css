@@ -213,11 +213,3 @@
     font-family: var(--font-heading);
   }
 }
-
-/* Acordeão do rodapé: fechado por padrão só no mobile; no desktop sempre aberto,
-   mesmo sem o atributo "open" (o <summary> vira só um rótulo, sem clique). */
-@media (min-width: 640px) {
-  .footer-accordion:not([open]) > :not(summary) {
-    display: flex !important;
-  }
-}
