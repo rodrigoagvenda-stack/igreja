@@ -52,7 +52,7 @@ export function AdminSidebar() {
             src="/Arqu de botucatu.svg"
             alt="Arquidiocese de Botucatu"
             width={32} height={32}
-            className="brightness-0 invert opacity-90 w-8 h-8 object-contain"
+            className="w-8 h-8 object-contain"
           />
           <div>
             <p className="text-white text-[12px] font-semibold leading-tight">Arquidiocese</p>

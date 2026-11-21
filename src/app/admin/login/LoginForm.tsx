@@ -129,8 +129,8 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: Props) {
           <Image
             src="/Arqu de botucatu.svg"
             alt="Arquidiocese de Botucatu"
-            width={56} height={56}
-            className="brightness-0 invert opacity-90 w-14 h-14 object-contain mb-3"
+            width={88} height={88}
+            className="w-[88px] h-[88px] object-contain mb-3"
           />
           <h1 className="text-white font-serif text-[22px] font-bold">Arquidiocese de Botucatu</h1>
           <p className="text-white/40 text-[13px] mt-1">Painel administrativo</p>

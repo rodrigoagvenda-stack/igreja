@@ -6,10 +6,9 @@ interface LogoProps {
   variant?: "full" | "icon"
   className?: string
   href?: string
-  inverted?: boolean
 }
 
-export function Logo({ variant = "full", className, href = "/", inverted = false }: LogoProps) {
+export function Logo({ variant = "full", className, href = "/" }: LogoProps) {
   const content = (
     <div className={cn("flex items-center select-none", className)}>
       <Image
@@ -17,7 +16,7 @@ export function Logo({ variant = "full", className, href = "/", inverted = false
         alt="Arquidiocese de Botucatu"
         width={220}
         height={78}
-        className={cn("h-10 w-auto object-contain", inverted && "brightness-0 invert")}
+        className="h-10 w-auto object-contain"
         priority
       />
     </div>
@@ -57,7 +56,7 @@ export function FooterLogo() {
         alt="Arquidiocese de Botucatu"
         width={220}
         height={78}
-        className="h-10 w-auto object-contain brightness-0 invert opacity-90"
+        className="h-10 w-auto object-contain"
         priority
       />
     </Link>
