@@ -451,6 +451,93 @@ export type Database = {
         }
         Relationships: []
       }
+      arq_usuarios_admin: {
+        Row: {
+          user_id:   string
+          nome:      string
+          email:     string
+          papel:     "admin" | "editor" | "leitura"
+          criado_em: string
+        }
+        Insert: {
+          user_id:    string
+          nome:       string
+          email:      string
+          papel?:     "admin" | "editor" | "leitura"
+          criado_em?: string
+        }
+        Update: {
+          user_id?:   string
+          nome?:      string
+          email?:     string
+          papel?:     "admin" | "editor" | "leitura"
+          criado_em?: string
+        }
+        Relationships: []
+      }
+      arq_audit_log: {
+        Row: {
+          id:          number
+          user_id:     string | null
+          user_email:  string
+          acao:        string
+          entidade:    string
+          entidade_id: string | null
+          detalhes:    Json | null
+          ip:          string | null
+          user_agent:  string | null
+          criado_em:   string
+        }
+        Insert: {
+          id?:          number
+          user_id?:     string | null
+          user_email:   string
+          acao:         string
+          entidade:     string
+          entidade_id?: string | null
+          detalhes?:    Json | null
+          ip?:          string | null
+          user_agent?:  string | null
+          criado_em?:   string
+        }
+        Update: {
+          id?:          number
+          user_id?:     string | null
+          user_email?:  string
+          acao?:        string
+          entidade?:    string
+          entidade_id?: string | null
+          detalhes?:    Json | null
+          ip?:          string | null
+          user_agent?:  string | null
+          criado_em?:   string
+        }
+        Relationships: []
+      }
+      arq_login_attempts: {
+        Row: {
+          id:        number
+          email:     string
+          ip:        string | null
+          sucesso:   boolean
+          criado_em: string
+        }
+        Insert: {
+          id?:        number
+          email:      string
+          ip?:        string | null
+          sucesso:    boolean
+          criado_em?: string
+        }
+        Update: {
+          id?:        number
+          email?:     string
+          ip?:        string | null
+          sucesso?:   boolean
+          criado_em?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import Image from "next/image"
 import {
   IconLock, IconShieldCheck, IconLoader2,
@@ -9,6 +10,7 @@ import {
 } from "@tabler/icons-react"
 import { createBrowserClient } from "@supabase/ssr"
 import type { Database } from "@/types/database"
+import { loginComSenha } from "./actions"
 
 type Step = "credentials" | "mfa-enroll" | "mfa-verify"
 
@@ -49,9 +51,9 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: Props) {
       return
     }
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-    if (signInError) {
-      setError("E-mail ou senha incorretos.")
+    const result = await loginComSenha(email, password)
+    if (!result.ok) {
+      setError(result.error)
       setLoading(false)
       return
     }
@@ -164,6 +166,11 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: Props) {
                     />
                   </div>
                   {error && <p className="text-[13px] text-destructive">{error}</p>}
+                  <div className="flex justify-end">
+                    <Link href="/admin/esqueci-senha" className="text-[12.5px] text-primary hover:underline">
+                      Esqueci minha senha
+                    </Link>
+                  </div>
                   <button type="submit" disabled={loading}
                     className="w-full h-10 bg-primary text-white text-[14px] font-semibold rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
                     {loading ? <IconLoader2 size={16} className="animate-spin" /> : <IconLock size={14} />}

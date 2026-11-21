@@ -1,4 +1,5 @@
 import { IconUser, IconLock, IconBuildingChurch } from "@tabler/icons-react"
+import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { updateConfig } from "./actions"
 
@@ -113,6 +114,18 @@ export default async function AdminConfiguracoesPage() {
                 <IconUser size={11} className="inline mr-1" />
                 Admin
               </span>
+            </div>
+            <div className="flex items-center justify-between pt-3 border-t border-border">
+              <div>
+                <p className="text-[13px] font-semibold">Histórico de atividades</p>
+                <p className="text-[12px] text-muted-foreground mt-0.5">Quem criou, editou ou excluiu algo, quando e de onde</p>
+              </div>
+              <Link
+                href="/admin/configuracoes/historico"
+                className="text-[12px] font-semibold text-foreground bg-muted hover:bg-muted/70 transition-colors px-3 py-1.5 rounded-md"
+              >
+                Ver histórico
+              </Link>
             </div>
           </div>
         </section>

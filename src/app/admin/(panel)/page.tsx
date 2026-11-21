@@ -3,6 +3,7 @@ import {
   IconNews, IconCalendar, IconBuildingChurch, IconUsers,
   IconFileText, IconPlus, IconArrowRight,
   IconClock, IconCircleCheck, IconAlertCircle, IconPencil,
+  IconPhotoOff, IconMapPinOff,
 } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
 
@@ -44,6 +45,12 @@ export default async function AdminDashboardPage() {
     { count: totalHorarios },
     { data: recentNoticias },
     { data: proximosEventos },
+    { count: paroquiasSemEndereco },
+    { count: padresSemFoto },
+    { count: diaconosSemFoto },
+    { count: seminaristasSemFoto },
+    { data: paroquiasFotos },
+    { data: locaisFotos },
   ] = await Promise.all([
     supabase.from('arq_noticias').select('*', { count: 'exact', head: true }).eq('status', 'publicado'),
     supabase.from('arq_eventos').select('*', { count: 'exact', head: true }).gte('inicio', new Date().toISOString()),
@@ -55,7 +62,47 @@ export default async function AdminDashboardPage() {
     supabase.from('arq_horarios_missa').select('*', { count: 'exact', head: true }),
     supabase.from('arq_noticias').select('titulo, status, created_at').order('created_at', { ascending: false }).limit(4),
     supabase.from('arq_eventos').select('titulo, local, inicio').gte('inicio', new Date().toISOString()).order('inicio').limit(3),
+    supabase.from('arq_paroquias').select('*', { count: 'exact', head: true }).eq('ativa', true).or('endereco.is.null,endereco.eq.'),
+    supabase.from('arq_padres').select('*', { count: 'exact', head: true }).eq('ativo', true).is('foto_url', null),
+    supabase.from('arq_diaconos').select('*', { count: 'exact', head: true }).eq('ativo', true).is('foto_url', null),
+    supabase.from('arq_seminaristas').select('*', { count: 'exact', head: true }).eq('ativo', true).is('foto_url', null),
+    supabase.from('arq_paroquias').select('id, fotos').eq('ativa', true),
+    supabase.from('arq_locais').select('paroquia_id, fotos'),
   ])
+
+  const locaisFotosPorParoquia = new Map<string, boolean>()
+  for (const l of locaisFotos ?? []) {
+    const temFoto = Array.isArray(l.fotos) && l.fotos.length > 0
+    if (temFoto) locaisFotosPorParoquia.set(l.paroquia_id, true)
+  }
+  const paroquiasSemFoto = (paroquiasFotos ?? []).filter(p => {
+    const temFotoProprio = Array.isArray(p.fotos) && p.fotos.length > 0
+    return !temFotoProprio && !locaisFotosPorParoquia.get(p.id)
+  }).length
+
+  const totalClero = (totalPadres ?? 0) + (totalDiaconos ?? 0) + (totalSeminaristas ?? 0)
+  const cleroSemFoto = (padresSemFoto ?? 0) + (diaconosSemFoto ?? 0) + (seminaristasSemFoto ?? 0)
+
+  const pendencias = [
+    paroquiasSemFoto > 0 && {
+      icon: IconPhotoOff,
+      titulo: `${paroquiasSemFoto} paróquia${paroquiasSemFoto > 1 ? 's' : ''} sem nenhuma foto`,
+      sub: "Aguardando material das paróquias",
+      href: "/admin/paroquias",
+    },
+    (paroquiasSemEndereco ?? 0) > 0 && {
+      icon: IconMapPinOff,
+      titulo: `${paroquiasSemEndereco} paróquia${(paroquiasSemEndereco ?? 0) > 1 ? 's' : ''} sem endereço cadastrado`,
+      sub: 'Impede o botão "Ver no mapa" na página pública',
+      href: "/admin/paroquias",
+    },
+    cleroSemFoto > 0 && {
+      icon: IconUsers,
+      titulo: `${cleroSemFoto} de ${totalClero} do clero sem foto`,
+      sub: `${padresSemFoto ?? 0} padres, ${diaconosSemFoto ?? 0} diáconos, ${seminaristasSemFoto ?? 0} seminaristas`,
+      href: "/admin/clero/padres",
+    },
+  ].filter(Boolean) as { icon: typeof IconPhotoOff; titulo: string; sub: string; href: string }[]
 
   const stats = [
     { label: "Notícias publicadas",   value: totalNoticias ?? 0,    sub: "publicadas",          icon: IconNews,           variant: "primary" },
@@ -128,6 +175,38 @@ export default async function AdminDashboardPage() {
           ))}
         </div>
       </div>
+
+      {/* Pendências */}
+      {pendencias.length > 0 && (
+        <div className="mb-10">
+          <div className="flex items-end justify-between pb-4 border-b border-border mb-5">
+            <div>
+              <SectionLabel>Atenção</SectionLabel>
+              <h2 className="font-serif text-[20px] font-bold">Pendências</h2>
+            </div>
+          </div>
+          <div className="bg-card ring-1 ring-foreground/10 rounded-xl overflow-hidden">
+            {pendencias.map(({ icon: Icon, titulo, sub, href }) => (
+              <Link
+                key={titulo}
+                href={href}
+                className="flex items-center gap-4 px-5 py-4 border-b border-border last:border-0 hover:bg-muted/40 transition-colors"
+              >
+                <div className="w-9 h-9 rounded-lg bg-warning/15 text-warning-foreground flex items-center justify-center shrink-0">
+                  <Icon size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold truncate">{titulo}</p>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">{sub}</p>
+                </div>
+                <span className="text-[12px] text-primary font-medium flex items-center gap-1 shrink-0">
+                  Ver lista <IconArrowRight size={12} />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Bottom grid */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">

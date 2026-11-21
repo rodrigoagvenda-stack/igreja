@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { resolvePhotos } from '@/lib/supabase/storage'
+import { requireRole, logAudit } from '@/lib/supabase/admin-guard'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -11,6 +12,7 @@ import { redirect } from 'next/navigation'
 // é assim que o botão "Remover este local" do editor funciona, sem precisar de um campo
 // hidden de "removido" separado.
 export async function saveLocaisDaParoquia(paroquiaId: string, formData: FormData) {
+  const admin = await requireRole(['admin'])
   const supabase = await createClient()
   const keys = formData.getAll('local_key') as string[]
   const idsAtuais = new Set<string>()
@@ -82,7 +84,8 @@ export async function saveLocaisDaParoquia(paroquiaId: string, formData: FormDat
     await supabase.from('arq_locais').delete().in('id', idsParaRemover)
   }
 
+  await logAudit({ user: admin, acao: 'update', entidade: 'horarios_paroquia', entidadeId: paroquiaId })
   revalidatePath('/admin/horarios')
   revalidatePath(`/admin/paroquias/${paroquiaId}/horarios`)
-  redirect('/admin/horarios')
+  redirect('/admin/horarios?ok=atualizado')
 }

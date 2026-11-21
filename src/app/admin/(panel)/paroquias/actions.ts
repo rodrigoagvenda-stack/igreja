@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { resolvePhotos } from '@/lib/supabase/storage'
+import { requireRole, logAudit } from '@/lib/supabase/admin-guard'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -15,85 +16,78 @@ function slugify(text: string) {
 }
 
 export async function createParoquia(formData: FormData) {
+  const admin = await requireRole(['admin'])
   const nome = formData.get('nome') as string
   const cidade = formData.get('cidade') as string
-  console.log(`[paroquias] createParoquia iniciado nome="${nome}"`)
 
-  try {
-    const supabase = await createClient()
-    const fotos = await resolvePhotos(formData, 'foto', 10)
-    console.log(`[paroquias] createParoquia fotos resolvidas count=${fotos.length}`)
+  const supabase = await createClient()
+  const fotos = await resolvePhotos(formData, 'foto', 10)
 
-    const { error } = await supabase.from('arq_paroquias').insert({
-      nome,
-      slug: slugify(nome + '-' + cidade),
-      cidade,
-      regiao_pastoral: formData.get('regiao_pastoral') as 'RP1' | 'RP2' | 'RP3' | 'RP4',
-      padroeiro: (formData.get('padroeiro') as string) || null,
-      endereco: (formData.get('endereco') as string) || null,
-      cep: (formData.get('cep') as string) || null,
-      telefone: (formData.get('telefone') as string) || null,
-      email: (formData.get('email') as string) || null,
-      site: (formData.get('site') as string) || null,
-      data_criacao: (formData.get('data_criacao') as string) || null,
-      fotos,
-      ativa: formData.get('ativa') === 'true',
-    })
+  const { data: inserted, error } = await supabase.from('arq_paroquias').insert({
+    nome,
+    slug: slugify(nome + '-' + cidade),
+    cidade,
+    regiao_pastoral: formData.get('regiao_pastoral') as 'RP1' | 'RP2' | 'RP3' | 'RP4',
+    padroeiro: (formData.get('padroeiro') as string) || null,
+    endereco: (formData.get('endereco') as string) || null,
+    cep: (formData.get('cep') as string) || null,
+    telefone: (formData.get('telefone') as string) || null,
+    email: (formData.get('email') as string) || null,
+    site: (formData.get('site') as string) || null,
+    data_criacao: (formData.get('data_criacao') as string) || null,
+    fotos,
+    ativa: formData.get('ativa') === 'true',
+  }).select('id').single()
 
-    if (error) {
-      console.error(`[paroquias] createParoquia erro insert:`, error)
-      throw new Error(error.message)
-    }
-    console.log(`[paroquias] createParoquia sucesso nome="${nome}"`)
-  } catch (err) {
-    console.error(`[paroquias] createParoquia FALHOU nome="${nome}":`, err)
-    throw err
+  if (error) {
+    console.error(`[paroquias] createParoquia erro insert:`, error)
+    redirect(`/admin/paroquias?erro=${encodeURIComponent(error.message)}`)
   }
 
+  await logAudit({ user: admin, acao: 'create', entidade: 'paroquia', entidadeId: inserted?.id, detalhes: { nome, cidade } })
   revalidatePath('/admin/paroquias')
-  redirect('/admin/paroquias')
+  redirect('/admin/paroquias?ok=criado')
 }
 
 export async function updateParoquia(id: string, formData: FormData) {
-  console.log(`[paroquias] updateParoquia iniciado id=${id}`)
+  const admin = await requireRole(['admin'])
 
-  try {
-    const supabase = await createClient()
-    const fotos = await resolvePhotos(formData, 'foto', 10)
-    console.log(`[paroquias] updateParoquia fotos resolvidas id=${id} count=${fotos.length}`)
+  const supabase = await createClient()
+  const fotos = await resolvePhotos(formData, 'foto', 10)
 
-    const { error } = await supabase.from('arq_paroquias').update({
-      nome: formData.get('nome') as string,
-      cidade: formData.get('cidade') as string,
-      regiao_pastoral: formData.get('regiao_pastoral') as 'RP1' | 'RP2' | 'RP3' | 'RP4',
-      padroeiro: (formData.get('padroeiro') as string) || null,
-      endereco: (formData.get('endereco') as string) || null,
-      cep: (formData.get('cep') as string) || null,
-      telefone: (formData.get('telefone') as string) || null,
-      email: (formData.get('email') as string) || null,
-      site: (formData.get('site') as string) || null,
-      data_criacao: (formData.get('data_criacao') as string) || null,
-      fotos,
-      ativa: formData.get('ativa') === 'true',
-    }).eq('id', id)
+  const { error } = await supabase.from('arq_paroquias').update({
+    nome: formData.get('nome') as string,
+    cidade: formData.get('cidade') as string,
+    regiao_pastoral: formData.get('regiao_pastoral') as 'RP1' | 'RP2' | 'RP3' | 'RP4',
+    padroeiro: (formData.get('padroeiro') as string) || null,
+    endereco: (formData.get('endereco') as string) || null,
+    cep: (formData.get('cep') as string) || null,
+    telefone: (formData.get('telefone') as string) || null,
+    email: (formData.get('email') as string) || null,
+    site: (formData.get('site') as string) || null,
+    data_criacao: (formData.get('data_criacao') as string) || null,
+    fotos,
+    ativa: formData.get('ativa') === 'true',
+  }).eq('id', id)
 
-    if (error) {
-      console.error(`[paroquias] updateParoquia erro update id=${id}:`, error)
-      throw new Error(error.message)
-    }
-    console.log(`[paroquias] updateParoquia sucesso id=${id}`)
-  } catch (err) {
-    console.error(`[paroquias] updateParoquia FALHOU id=${id}:`, err)
-    throw err
+  if (error) {
+    console.error(`[paroquias] updateParoquia erro update id=${id}:`, error)
+    redirect(`/admin/paroquias?erro=${encodeURIComponent(error.message)}`)
   }
 
+  await logAudit({ user: admin, acao: 'update', entidade: 'paroquia', entidadeId: id })
   revalidatePath('/admin/paroquias')
-  redirect('/admin/paroquias')
+  redirect('/admin/paroquias?ok=atualizado')
 }
 
 export async function deleteParoquia(id: string) {
+  const admin = await requireRole(['admin'])
   const supabase = await createClient()
   const { error } = await supabase.from('arq_paroquias').delete().eq('id', id)
-  if (error) throw new Error(error.message)
+
+  if (error) redirect(`/admin/paroquias?erro=${encodeURIComponent(error.message)}`)
+
+  await logAudit({ user: admin, acao: 'delete', entidade: 'paroquia', entidadeId: id })
   revalidatePath('/admin/paroquias')
+  redirect('/admin/paroquias?ok=excluido')
 }
