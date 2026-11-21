@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import { Montserrat } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
-import { AdminSidebar } from "@/components/admin/AdminSidebar"
+import { AdminShell } from "@/components/admin/AdminShell"
 import { ActionToastListener } from "@/components/admin/ActionToastListener"
 
 const montserrat = Montserrat({
@@ -17,10 +17,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       <Suspense fallback={null}>
         <ActionToastListener />
       </Suspense>
-      <AdminSidebar />
-      <div className="flex-1 min-w-0 overflow-y-auto">
-        {children}
-      </div>
+      <AdminShell>{children}</AdminShell>
     </div>
   )
 }

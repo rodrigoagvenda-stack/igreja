@@ -145,15 +145,22 @@ const nav: NavItem[] = [
   { label: "Configurações", href: "/admin/configuracoes", Icon: ConfiguracoesIcon },
 ]
 
-export function AdminSidebar() {
+export function AdminSidebar({ open = true, onNavigate }: { open?: boolean; onNavigate?: () => void }) {
   const pathname = usePathname()
   const [cleroOpen, setCleroOpen] = useState(pathname.startsWith("/admin/clero"))
 
   return (
-    <aside className="w-[232px] flex-shrink-0 bg-[#16305E] flex flex-col h-full">
+    <aside
+      className={cn(
+        "w-[232px] flex-shrink-0 bg-[#16305E] flex flex-col h-full",
+        "fixed inset-y-0 left-0 z-50 transition-transform duration-200 lg:static lg:translate-x-0",
+        open ? "translate-x-0" : "-translate-x-full"
+      )}
+    >
       {/* Logo */}
       <Link
         href="/admin"
+        onClick={onNavigate}
         className="flex items-center justify-center border-b border-white/[0.08] pt-5 pb-[18px] px-5"
       >
         <Image
@@ -188,6 +195,7 @@ export function AdminSidebar() {
                         <Link
                           key={child.href}
                           href={child.href}
+                          onClick={onNavigate}
                           className={cn(
                             "py-[7px] px-2.5 text-[12.5px] font-medium",
                             childActive ? "text-white" : "text-white/45"
@@ -208,6 +216,7 @@ export function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               className={cn(
                 "flex items-center gap-2.5 py-[9px] px-3 rounded-lg text-[13px]",
                 isActive ? "bg-white/10 font-bold text-white" : "font-semibold text-white/70"
