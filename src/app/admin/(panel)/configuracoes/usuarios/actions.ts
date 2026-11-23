@@ -16,6 +16,18 @@ function papelValido(v: unknown): v is Papel {
   return typeof v === 'string' && (PAPEIS as readonly string[]).includes(v)
 }
 
+// Textos que o e-mail de convite mostra ("Fulano convidou você ... com permissão de X (detalhe)").
+const PERMISSAO: Record<Papel, { permissao: string; permissao_detalhe: string }> = {
+  admin: { permissao: 'Administrador', permissao_detalhe: 'acesso total ao painel' },
+  editor: { permissao: 'Editor de conteúdo', permissao_detalhe: 'Notícias, Agenda e Documentos' },
+  leitura: { permissao: 'Somente leitura', permissao_detalhe: 'visualiza tudo, sem editar' },
+}
+
+async function dadosConvite(adminId: string, nome: string, papel: Papel) {
+  const { data } = await adminClient().from('arq_usuarios_admin').select('nome').eq('user_id', adminId).maybeSingle()
+  return { nome, convidado_por: data?.nome ?? 'O administrador', ...PERMISSAO[papel] }
+}
+
 export async function convidarUsuario(formData: FormData) {
   const admin = await requireRole(['admin'])
   const nome = String(formData.get('nome') ?? '').trim()
@@ -31,7 +43,9 @@ export async function convidarUsuario(formData: FormData) {
   const { data: existente } = await sb.from('arq_usuarios_admin').select('user_id').eq('email', email).maybeSingle()
   if (existente) erro('Esse e-mail já tem acesso ao painel.')
 
-  const { data: convite, error: conviteErr } = await sb.auth.admin.inviteUserByEmail(email, { data: { nome } })
+  const { data: convite, error: conviteErr } = await sb.auth.admin.inviteUserByEmail(email, {
+    data: await dadosConvite(admin.id, nome, papel),
+  })
   if (conviteErr || !convite.user) {
     erro(
       conviteErr?.message.toLowerCase().includes('already been registered')
@@ -61,13 +75,15 @@ export async function reenviarConvite(userId: string) {
   const admin = await requireRole(['admin'])
   const sb = adminClient()
 
-  const { data: perfil } = await sb.from('arq_usuarios_admin').select('email, nome').eq('user_id', userId).maybeSingle()
+  const { data: perfil } = await sb.from('arq_usuarios_admin').select('email, nome, papel').eq('user_id', userId).maybeSingle()
   if (!perfil) erro('Usuário não encontrado.')
 
   const { data: auth } = await sb.auth.admin.getUserById(userId)
   if (auth.user?.email_confirmed_at) erro('Essa pessoa já aceitou o convite.')
 
-  const { error } = await sb.auth.admin.inviteUserByEmail(perfil.email, { data: { nome: perfil.nome } })
+  const { error } = await sb.auth.admin.inviteUserByEmail(perfil.email, {
+    data: await dadosConvite(admin.id, perfil.nome, perfil.papel),
+  })
   if (error) erro('Não foi possível reenviar o convite. Tente de novo em instantes.')
 
   await logAudit({ user: admin, acao: 'update', entidade: 'usuario_admin', entidadeId: userId, detalhes: { reenvio_convite: true } })
