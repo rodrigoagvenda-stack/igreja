@@ -17,9 +17,10 @@ type Step = "credentials" | "mfa-enroll" | "mfa-verify"
 interface Props {
   supabaseUrl: string
   supabaseAnonKey: string
+  aviso?: { tipo: "ok" | "erro"; texto: string } | null
 }
 
-export function LoginForm({ supabaseUrl, supabaseAnonKey }: Props) {
+export function LoginForm({ supabaseUrl, supabaseAnonKey, aviso = null }: Props) {
   const router = useRouter()
 
   const [step, setStep]         = useState<Step>("credentials")
@@ -142,6 +143,15 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: Props) {
             {step === "credentials" && (
               <>
                 <h2 className="font-serif text-[20px] font-bold mb-5">Acesso restrito</h2>
+                {aviso && (
+                  <p className={
+                    aviso.tipo === "ok"
+                      ? "mb-4 rounded-md bg-success/10 px-3 py-2.5 text-[12.5px] text-success"
+                      : "mb-4 rounded-md bg-destructive/10 px-3 py-2.5 text-[12.5px] text-destructive"
+                  }>
+                    {aviso.texto}
+                  </p>
+                )}
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">

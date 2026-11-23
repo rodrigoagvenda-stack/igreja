@@ -10,15 +10,19 @@ import type { Database } from "@/types/database"
 interface Props {
   supabaseUrl: string
   supabaseAnonKey: string
+  convite?: boolean
 }
 
+// Espelha a política de senha configurada no Supabase Auth; se divergir, o updateUser recusa.
 const REQUISITOS = [
-  { label: "Mínimo de 8 caracteres", test: (s: string) => s.length >= 8 },
-  { label: "Pelo menos 1 número",    test: (s: string) => /\d/.test(s) },
-  { label: "1 letra maiúscula",      test: (s: string) => /[A-Z]/.test(s) },
+  { label: "Mínimo de 12 caracteres", test: (s: string) => s.length >= 12 },
+  { label: "1 letra maiúscula",       test: (s: string) => /[A-Z]/.test(s) },
+  { label: "1 letra minúscula",       test: (s: string) => /[a-z]/.test(s) },
+  { label: "Pelo menos 1 número",     test: (s: string) => /\d/.test(s) },
+  { label: "1 símbolo (!@#$...)",     test: (s: string) => /[^A-Za-z0-9]/.test(s) },
 ]
 
-export function RedefinirSenhaForm({ supabaseUrl, supabaseAnonKey }: Props) {
+export function RedefinirSenhaForm({ supabaseUrl, supabaseAnonKey, convite = false }: Props) {
   const router = useRouter()
   const [senha, setSenha]             = useState("")
   const [confirmar, setConfirmar]     = useState("")
@@ -47,12 +51,17 @@ export function RedefinirSenhaForm({ supabaseUrl, supabaseAnonKey }: Props) {
     setLoading(false)
 
     if (updateError) {
-      setError("Não foi possível redefinir a senha. O link pode ter expirado — solicite um novo.")
+      setError(
+        updateError.message.toLowerCase().includes("session")
+          ? "O link expirou. Peça um novo pelo \"Esqueci minha senha\" ou peça ao administrador para reenviar o convite."
+          : "Não foi possível salvar a senha. Confira os requisitos e tente de novo."
+      )
       return
     }
 
-    router.push("/admin")
-    router.refresh()
+    // A sessão do link é só de 1 fator: o login pede a senha nova e o 2FA (ou o cadastro dele, no convite).
+    await supabase.auth.signOut()
+    router.push(convite ? "/admin/login?ok=conta-criada" : "/admin/login?ok=senha-alterada")
   }
 
   return (
@@ -74,7 +83,7 @@ export function RedefinirSenhaForm({ supabaseUrl, supabaseAnonKey }: Props) {
           <div className="px-8 pt-7 pb-6">
             <div className="flex items-center gap-2 mb-5">
               <IconLock size={18} className="text-primary" />
-              <h2 className="font-serif text-[20px] font-bold">Definir nova senha</h2>
+              <h2 className="font-serif text-[20px] font-bold">{convite ? "Criar sua senha" : "Definir nova senha"}</h2>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -116,7 +125,7 @@ export function RedefinirSenhaForm({ supabaseUrl, supabaseAnonKey }: Props) {
               <button type="submit" disabled={loading}
                 className="w-full h-10 bg-primary text-white text-[14px] font-semibold rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
                 {loading ? <IconLoader2 size={16} className="animate-spin" /> : <IconLock size={14} />}
-                {loading ? "Salvando…" : "Salvar nova senha e entrar"}
+                {loading ? "Salvando…" : convite ? "Criar senha" : "Salvar nova senha"}
               </button>
             </form>
           </div>

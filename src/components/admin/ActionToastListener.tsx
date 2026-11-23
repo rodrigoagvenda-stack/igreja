@@ -8,6 +8,8 @@ const MENSAGENS: Record<string, string> = {
   criado: "Criado com sucesso",
   atualizado: "Salvo com sucesso",
   excluido: "Excluído com sucesso",
+  convidado: "Convite enviado por e-mail",
+  reenviado: "Convite reenviado",
 }
 
 export function ActionToastListener() {

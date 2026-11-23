@@ -8,7 +8,7 @@ import { NextResponse, type NextRequest } from "next/server"
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const rotasPublicas = ["/admin/login", "/admin/esqueci-senha", "/admin/redefinir-senha"]
+  const rotasPublicas = ["/admin/login", "/admin/esqueci-senha", "/admin/redefinir-senha", "/admin/auth/confirm"]
   if (rotasPublicas.includes(pathname) || !pathname.startsWith("/admin")) {
     return NextResponse.next()
   }
