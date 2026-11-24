@@ -8,7 +8,12 @@ import { createClient } from "@/lib/supabase/server"
 const TIPOS_ACEITOS: EmailOtpType[] = ["invite", "recovery"]
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = request.nextUrl
+  const { searchParams } = request.nextUrl
+  // No container (standalone, HOSTNAME=0.0.0.0) o nextUrl.origin vira http://0.0.0.0:3000.
+  // O endereço público vem do proxy do Easypanel nos cabeçalhos.
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? request.nextUrl.host
+  const proto = request.headers.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https")
+  const origin = `${proto.split(",")[0].trim()}://${host.split(",")[0].trim()}`
   const tokenHash = searchParams.get("token_hash")
   const type = searchParams.get("type") as EmailOtpType | null
 
