@@ -26,11 +26,13 @@ export async function requireAdminUser(): Promise<AdminUser> {
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
   if (aal?.currentLevel !== "aal2") redirect("/admin/login")
 
-  const { data: perfil } = await supabase
+  // Lido com a chave de serviço: o id vem do getUser() acima (validado no Auth), e assim o
+  // papel não depende da policy de arq_usuarios_admin (que referencia a própria tabela).
+  const { data: perfil } = await adminClient()
     .from("arq_usuarios_admin")
     .select("papel, email")
     .eq("user_id", user.id)
-    .single()
+    .maybeSingle()
 
   if (!perfil) redirect("/admin/login")
 

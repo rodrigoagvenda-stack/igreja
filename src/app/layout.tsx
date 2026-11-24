@@ -46,10 +46,7 @@ export const metadata: Metadata = {
     title: "Arquidiocese de Botucatu",
     description: "Portal Oficial da Arquidiocese de Botucatu",
   },
-  icons: {
-    icon: { url: "/Arqu de botucatu.svg", type: "image/svg+xml" },
-    apple: "/Arqu de botucatu.svg",
-  },
+  // Favicon vem de src/app/icon.svg + apple-icon.png (só o brasão, fundo azul).
 };
 
 export default function RootLayout({
