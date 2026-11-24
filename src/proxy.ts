@@ -17,10 +17,14 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Login sempre acessível
-  if (pathname === "/admin/login") {
+  // Telas do fluxo de acesso: abertas sem sessão (login, pedir recuperação, validar link do e-mail).
+  if (["/admin/login", "/admin/esqueci-senha", "/admin/auth/confirm"].includes(pathname)) {
     return NextResponse.next()
   }
+
+  // Criar/redefinir senha: a sessão do link do e-mail é só de 1 fator (o 2FA é configurado
+  // depois, no login). Exige estar logado, mas não AAL2.
+  const soPrecisaSessao = pathname === "/admin/redefinir-senha"
 
   // Se as env vars do Supabase não estiverem configuradas, redireciona para login
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -66,8 +70,10 @@ export async function proxy(request: NextRequest) {
 
     if (!user) {
       if (isServerAction) return response
-      return NextResponse.redirect(new URL("/admin/login", request.url))
+      return NextResponse.redirect(new URL(soPrecisaSessao ? "/admin/login?erro=link-expirado" : "/admin/login", request.url))
     }
+
+    if (soPrecisaSessao) return response
 
     // Verifica AAL2 (MFA obrigatório)
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
