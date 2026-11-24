@@ -23,6 +23,14 @@ const PERMISSAO: Record<Papel, { permissao: string; permissao_detalhe: string }>
   leitura: { permissao: 'Somente leitura', permissao_detalhe: 'visualiza tudo, sem editar' },
 }
 
+// Marca a conta como "ainda não criou a senha". Só a chave de serviço escreve em app_metadata,
+// então o usuário não consegue se marcar sozinho. A tela de criar senha usa essa marca para
+// gravar a primeira senha pelo servidor, sem o e-mail "Sua senha foi alterada".
+async function marcarSenhaPendente(userId: string) {
+  const { error } = await adminClient().auth.admin.updateUserById(userId, { app_metadata: { senha_pendente: true } })
+  if (error) console.error('[convite] falha ao marcar senha pendente:', error.message)
+}
+
 async function dadosConvite(adminId: string, nome: string, papel: Papel) {
   const { data } = await adminClient().from('arq_usuarios_admin').select('nome').eq('user_id', adminId).maybeSingle()
   return { nome, convidado_por: data?.nome ?? 'O administrador', ...PERMISSAO[papel] }
@@ -66,6 +74,8 @@ export async function convidarUsuario(formData: FormData) {
     erro('Não foi possível concluir o convite. Tente de novo.')
   }
 
+  await marcarSenhaPendente(convite.user.id)
+
   await logAudit({ user: admin, acao: 'create', entidade: 'usuario_admin', entidadeId: convite.user.id, detalhes: { email, papel } })
   revalidatePath(BASE)
   redirect(`${BASE}?ok=convidado`)
@@ -85,6 +95,7 @@ export async function reenviarConvite(userId: string) {
     data: await dadosConvite(admin.id, perfil.nome, perfil.papel),
   })
   if (error) erro('Não foi possível reenviar o convite. Tente de novo em instantes.')
+  await marcarSenhaPendente(userId)
 
   await logAudit({ user: admin, acao: 'update', entidade: 'usuario_admin', entidadeId: userId, detalhes: { reenvio_convite: true } })
   redirect(`${BASE}?ok=reenviado`)

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { IconLock, IconLoader2, IconCheck, IconX } from "@tabler/icons-react"
 import { CampoSenha } from "@/components/auth/CampoSenha"
+import { criarSenhaConvite } from "./actions"
 import { createBrowserClient } from "@supabase/ssr"
 import type { Database } from "@/types/database"
 
@@ -53,6 +54,21 @@ export function RedefinirSenhaForm({ supabaseUrl, supabaseAnonKey, convite = fal
 
     setLoading(true)
     const supabase = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
+
+    // Primeira senha do convite vai pelo servidor (sem o e-mail "senha alterada").
+    // Qualquer outro caso (esqueci a senha) o servidor devolve fluxoNormal e segue aqui.
+    const convidado = await criarSenhaConvite(senha).catch(() => null)
+    if (convidado?.ok) {
+      await supabase.auth.signOut()
+      router.push("/admin/login?ok=conta-criada")
+      return
+    }
+    if (convidado && !convidado.fluxoNormal) {
+      setLoading(false)
+      setError(convidado.erro)
+      return
+    }
+
     const { error: updateError } = await supabase.auth.updateUser({ password: senha })
     setLoading(false)
 
