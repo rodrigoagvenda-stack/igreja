@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { IconLock, IconLoader2, IconCheck } from "@tabler/icons-react"
+import { IconLock, IconLoader2, IconCheck, IconX } from "@tabler/icons-react"
+import { CampoSenha } from "@/components/auth/CampoSenha"
 import { createBrowserClient } from "@supabase/ssr"
 import type { Database } from "@/types/database"
 
@@ -28,16 +29,21 @@ export function RedefinirSenhaForm({ supabaseUrl, supabaseAnonKey, convite = fal
   const [confirmar, setConfirmar]     = useState("")
   const [loading, setLoading]         = useState(false)
   const [error, setError]             = useState("")
+  const [tentou, setTentou]           = useState(false)
 
-  const requisitosOk = REQUISITOS.every(r => r.test(senha))
+  const faltando     = REQUISITOS.filter(r => !r.test(senha))
+  const requisitosOk = faltando.length === 0
   const senhasIguais = senha.length > 0 && senha === confirmar
+  // Confirmação fica vermelha quando já dá pra saber que não bate (ou depois de tentar salvar).
+  const confirmaErrada = confirmar.length > 0 && (tentou || confirmar.length >= senha.length) && !senhasIguais
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
+    setTentou(true)
 
     if (!requisitosOk) {
-      setError("A senha não atende aos requisitos mínimos.")
+      setError(`Falta na senha: ${faltando.map(r => r.label.toLowerCase()).join(", ")}.`)
       return
     }
     if (!senhasIguais) {
@@ -51,9 +57,14 @@ export function RedefinirSenhaForm({ supabaseUrl, supabaseAnonKey, convite = fal
     setLoading(false)
 
     if (updateError) {
+      const msg = updateError.message.toLowerCase()
       setError(
-        updateError.message.toLowerCase().includes("session")
+        msg.includes("session") || msg.includes("jwt")
           ? "O link expirou. Peça um novo pelo \"Esqueci minha senha\" ou peça ao administrador para reenviar o convite."
+          : msg.includes("different from the old")
+          ? "A nova senha precisa ser diferente da senha atual."
+          : msg.includes("weak") || msg.includes("pwned") || msg.includes("leaked") || msg.includes("easy to guess")
+          ? "Essa senha é fraca ou já apareceu em vazamentos de dados. Escolha outra."
           : "Não foi possível salvar a senha. Confira os requisitos e tente de novo."
       )
       return
@@ -91,30 +102,34 @@ export function RedefinirSenhaForm({ supabaseUrl, supabaseAnonKey, convite = fal
                 <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
                   Nova senha
                 </label>
-                <input
-                  type="password" required autoFocus value={senha}
-                  onChange={e => setSenha(e.target.value)}
-                  className="w-full h-10 px-3 rounded-md border border-border text-[14px] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                <CampoSenha
+                  required autoFocus autoComplete="new-password" value={senha}
+                  invalido={tentou && !requisitosOk}
+                  onChange={e => { setSenha(e.target.value); setError("") }}
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
                   Confirmar nova senha
                 </label>
-                <input
-                  type="password" required value={confirmar}
-                  onChange={e => setConfirmar(e.target.value)}
-                  className="w-full h-10 px-3 rounded-md border border-border text-[14px] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                <CampoSenha
+                  required autoComplete="new-password" value={confirmar}
+                  invalido={confirmaErrada}
+                  onChange={e => { setConfirmar(e.target.value); setError("") }}
                 />
+                {confirmaErrada && <p className="text-[12px] text-destructive">As senhas não coincidem.</p>}
               </div>
 
               <div className="bg-muted/40 rounded-md px-3 py-2.5 space-y-1.5">
                 {REQUISITOS.map(({ label, test }) => {
                   const ok = test(senha)
+                  // Antes de tentar salvar: cinza neutro. Depois: o que falta fica vermelho com X.
+                  const falhou = !ok && tentou
+                  const Icone = falhou ? IconX : IconCheck
                   return (
                     <div key={label} className="flex items-center gap-2 text-[11.5px]">
-                      <IconCheck size={13} className={ok ? "text-success" : "text-muted-foreground/40"} />
-                      <span className={ok ? "text-foreground" : "text-muted-foreground"}>{label}</span>
+                      <Icone size={13} className={ok ? "text-success" : falhou ? "text-destructive" : "text-muted-foreground/40"} />
+                      <span className={ok ? "text-foreground" : falhou ? "text-destructive font-medium" : "text-muted-foreground"}>{label}</span>
                     </div>
                   )
                 })}

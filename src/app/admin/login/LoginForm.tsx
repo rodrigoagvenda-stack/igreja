@@ -11,6 +11,7 @@ import {
 import { createBrowserClient } from "@supabase/ssr"
 import type { Database } from "@/types/database"
 import { loginComSenha } from "./actions"
+import { CampoSenha } from "@/components/auth/CampoSenha"
 
 type Step = "credentials" | "mfa-enroll" | "mfa-verify"
 
@@ -168,11 +169,10 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey, aviso = null }: Props)
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[.06em]">
                       Senha
                     </label>
-                    <input
-                      type="password" required autoComplete="current-password"
+                    <CampoSenha
+                      required autoComplete="current-password"
                       value={password} onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full h-10 px-3 rounded-md border border-border text-[14px] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                     />
                   </div>
                   {error && <p className="text-[13px] text-destructive">{error}</p>}
