@@ -134,6 +134,12 @@ export function RedefinirSenhaForm({ supabaseUrl, supabaseAnonKey, convite = fal
         <p className="text-center text-white/20 text-[11px] mt-6">
           Acesso exclusivo para equipe autorizada · Arquidiocese de Botucatu
         </p>
+        <p className="text-center text-white/40 text-[11px] mt-2">
+          Desenvolvido por ❤️{" "}
+          <a href="https://agenciavenda.com.br/" target="_blank" rel="noopener noreferrer" className="text-[#C9A84C] font-semibold hover:underline">
+            Grupo Venda
+          </a>
+        </p>
       </div>
     </div>
   )
