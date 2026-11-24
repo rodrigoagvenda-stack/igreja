@@ -6,6 +6,7 @@ import {
   IconPhotoOff, IconMapPinOff,
 } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
+import { requireAdminUser } from "@/lib/supabase/admin-guard"
 
 export const metadata = { title: "Dashboard" }
 
@@ -33,6 +34,7 @@ const statusConfig = {
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
+  const eu = await requireAdminUser()
 
   const [
     { count: totalNoticias },
@@ -115,7 +117,9 @@ export default async function AdminDashboardPage() {
     { label: "Horários cadastrados",  value: totalHorarios ?? 0,    sub: "por local",            icon: IconClock,          variant: "primary" },
   ]
 
-  const hora = new Date().getHours()
+  // O servidor roda em UTC; a saudação segue o horário de Botucatu.
+  const hora = Number(new Intl.DateTimeFormat("pt-BR", { hour: "numeric", hourCycle: "h23", timeZone: "America/Sao_Paulo" }).format(new Date()))
+  const primeiroNome = eu.nome.trim().split(/\s+/)[0]
   const saudacao = hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite"
 
   return (
@@ -125,7 +129,7 @@ export default async function AdminDashboardPage() {
       <div className="mb-8 pb-6 border-b border-border">
         <SectionLabel>Painel administrativo</SectionLabel>
         <h1 className="font-serif text-[30px] font-bold text-foreground leading-tight">
-          {saudacao}, Administrador
+          {saudacao}, {primeiroNome}
         </h1>
       </div>
 

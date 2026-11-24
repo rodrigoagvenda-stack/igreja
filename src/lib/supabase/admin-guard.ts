@@ -1,4 +1,5 @@
 import "server-only"
+import { cache } from "react"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { createClient as createServerClient } from "@/lib/supabase/server"
@@ -10,6 +11,7 @@ type Papel = Database["public"]["Tables"]["arq_usuarios_admin"]["Row"]["papel"]
 export interface AdminUser {
   id: string
   email: string
+  nome: string
   papel: Papel
 }
 
@@ -17,7 +19,8 @@ export interface AdminUser {
  * Garante sessão autenticada com MFA (AAL2) completo.
  * Usar no início de toda Server Action que lê/grava dados do admin.
  */
-export async function requireAdminUser(): Promise<AdminUser> {
+// cache(): layout e página chamam no mesmo request; assim só consulta uma vez.
+export const requireAdminUser = cache(async function requireAdminUser(): Promise<AdminUser> {
   const supabase = await createServerClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -30,14 +33,14 @@ export async function requireAdminUser(): Promise<AdminUser> {
   // papel não depende da policy de arq_usuarios_admin (que referencia a própria tabela).
   const { data: perfil } = await adminClient()
     .from("arq_usuarios_admin")
-    .select("papel, email")
+    .select("papel, email, nome")
     .eq("user_id", user.id)
     .maybeSingle()
 
   if (!perfil) redirect("/admin/login")
 
-  return { id: user.id, email: perfil.email, papel: perfil.papel }
-}
+  return { id: user.id, email: perfil.email, nome: perfil.nome, papel: perfil.papel }
+})
 
 /** Garante que o usuário tem um dos papéis permitidos; senão lança erro (mostrado como toast de erro na action). */
 export async function requireRole(allowed: Papel[]): Promise<AdminUser> {

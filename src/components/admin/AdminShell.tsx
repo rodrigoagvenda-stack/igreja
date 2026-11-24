@@ -12,7 +12,7 @@ function MenuIcon() {
   )
 }
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({ children, usuario }: { children: React.ReactNode; usuario: { nome: string; email: string } }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -34,7 +34,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      <AdminSidebar open={open} onNavigate={() => setOpen(false)} />
+      <AdminSidebar open={open} onNavigate={() => setOpen(false)} usuario={usuario} />
 
       <div className="flex-1 min-w-0 overflow-y-auto pt-14 lg:pt-0">
         {children}

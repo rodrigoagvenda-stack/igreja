@@ -145,7 +145,7 @@ const nav: NavItem[] = [
   { label: "Configurações", href: "/admin/configuracoes", Icon: ConfiguracoesIcon },
 ]
 
-export function AdminSidebar({ open = true, onNavigate }: { open?: boolean; onNavigate?: () => void }) {
+export function AdminSidebar({ open = true, onNavigate, usuario }: { open?: boolean; onNavigate?: () => void; usuario: { nome: string; email: string } }) {
   const pathname = usePathname()
   const [cleroOpen, setCleroOpen] = useState(pathname.startsWith("/admin/clero"))
 
@@ -233,11 +233,11 @@ export function AdminSidebar({ open = true, onNavigate }: { open?: boolean; onNa
       <div>
         <div className="flex items-center gap-2.5 border-t border-white/[0.08] py-3.5 px-5">
           <div className="flex items-center justify-center flex-shrink-0 w-[30px] h-[30px] rounded-full bg-[#C9A84C]">
-            <span className="text-white text-xs font-bold">A</span>
+            <span className="text-white text-xs font-bold">{usuario.nome.trim().charAt(0).toUpperCase()}</span>
           </div>
           <div className="min-w-0">
-            <p className="text-[12.5px] font-semibold text-white truncate">Administrador</p>
-            <p className="text-[10px] text-white/50 truncate">admin@arquidiocesebotucatu.org.br</p>
+            <p className="text-[12.5px] font-semibold text-white truncate">{usuario.nome}</p>
+            <p className="text-[10px] text-white/50 truncate">{usuario.email}</p>
           </div>
         </div>
         <form action={signOut} className="pt-3 pb-[18px] px-5">
