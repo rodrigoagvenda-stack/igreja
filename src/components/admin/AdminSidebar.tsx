@@ -5,7 +5,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
-import { signOut } from "@/app/admin/actions"
+import { createClient } from "@/lib/supabase/client"
 
 type IconProps = { active?: boolean }
 
@@ -146,6 +146,19 @@ const nav: NavItem[] = [
 ]
 
 export function AdminSidebar({ open = true, onNavigate, usuario }: { open?: boolean; onNavigate?: () => void; usuario: { nome: string; email: string } }) {
+  const [saindo, setSaindo] = useState(false)
+
+  // Encerra a sessão no Supabase (revoga o token e apaga os cookies) e recarrega a página
+  // inteira no login: assim nenhuma tela do painel fica em cache no navegador depois de sair.
+  async function sair() {
+    setSaindo(true)
+    try {
+      await createClient().auth.signOut()
+    } finally {
+      window.location.replace("/admin/login")
+    }
+  }
+
   const pathname = usePathname()
   const [cleroOpen, setCleroOpen] = useState(pathname.startsWith("/admin/clero"))
 
@@ -240,12 +253,13 @@ export function AdminSidebar({ open = true, onNavigate, usuario }: { open?: bool
             <p className="text-[10px] text-white/50 truncate">{usuario.email}</p>
           </div>
         </div>
-        <form action={signOut} className="pt-3 pb-[18px] px-5">
-          <button type="submit" className="w-full flex items-center gap-2 text-[12.5px] font-semibold text-white/60">
+        <div className="pt-3 pb-[18px] px-5">
+          <button type="button" onClick={sair} disabled={saindo}
+            className="w-full flex items-center gap-2 text-[12.5px] font-semibold text-white/60 disabled:opacity-60">
             <LogoutIcon />
-            Sair
+            {saindo ? "Saindo…" : "Sair"}
           </button>
-        </form>
+        </div>
       </div>
     </aside>
   )
