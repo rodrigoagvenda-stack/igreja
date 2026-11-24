@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { CapturaLinkEmail } from "@/components/auth/CapturaLinkEmail";
 import "./globals.css";
 
 // Fontes hospedadas localmente (não buscadas do Google a cada build) — next/font/google
@@ -60,6 +61,7 @@ export default function RootLayout({
       className={`${playfairDisplay.variable} ${sourceSans3.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+          <CapturaLinkEmail />
           <TooltipProvider>{children}</TooltipProvider>
         </body>
     </html>
