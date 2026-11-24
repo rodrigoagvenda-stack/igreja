@@ -20,14 +20,13 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
+# O server.js do modo standalone escuta em $HOSTNAME. No Docker/Swarm do Easypanel essa
+# variável vem com o id do container, que resolve para UMA das redes dele; quando não é a
+# rede do proxy, o site dá 502 depois do deploy. 0.0.0.0 escuta em todas.
+ENV HOSTNAME=0.0.0.0
 
-# Vars de runtime — necessárias para server components e server actions
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG SUPABASE_SERVICE_ROLE_KEY
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
-ENV SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
+# As variáveis de runtime (Supabase URL/chaves) chegam pelo ambiente do Easypanel quando o
+# container sobe; não ficam gravadas na imagem (a service role key não pode ir numa camada).
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
