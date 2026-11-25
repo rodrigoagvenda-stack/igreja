@@ -1,5 +1,7 @@
 import Link from "next/link"
-import { IconPlus, IconPencil, IconTrash } from "@tabler/icons-react"
+import { ExcluirComConfirmacao } from "@/components/admin/Confirmacao"
+import { BuscaLista, limparBusca } from "@/components/admin/BuscaLista"
+import { IconPlus, IconPencil } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
 import { requireAdminUser } from "@/lib/supabase/admin-guard"
 import { deleteDiacono } from "./actions"
@@ -12,9 +14,10 @@ const PAGE_SIZE = 20
 export default async function AdminDiaconosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string; q?: string }>
 }) {
-  const { page: pageParam } = await searchParams
+  const { page: pageParam, q } = await searchParams
+  const busca = limparBusca(q)
   const page = Math.max(1, parseInt(pageParam ?? "1", 10))
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
@@ -26,6 +29,7 @@ export default async function AdminDiaconosPage({
   const { data: diaconos, count } = await supabase
     .from("arq_diaconos")
     .select("id, nome, nascimento, ordenacao, ativo, arq_paroquias(nome, cidade)", { count: "exact" })
+    .ilike("nome", busca ? `%${busca}%` : "%")
     .order("nome")
     .range(from, to)
 
@@ -54,6 +58,8 @@ export default async function AdminDiaconosPage({
         )}
       </div>
 
+
+      <BuscaLista valor={busca} placeholder="Buscar diácono pelo nome…" />
       {diaconos && diaconos.length > 0 ? (
         <>
           <div className="bg-card ring-1 ring-foreground/10 rounded-xl overflow-hidden">
@@ -80,17 +86,13 @@ export default async function AdminDiaconosPage({
                     {podeEditar ? (<Link href={`/admin/clero/diaconos/${dc.id}/editar`} className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
                       <IconPencil size={14} />
                     </Link>) : <span className="w-8 h-8" aria-hidden />}
-                    {podeExcluir ? (<form action={deleteDiacono.bind(null, dc.id)}>
-                      <button type="submit" className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Excluir">
-                        <IconTrash size={14} />
-                      </button>
-                    </form>) : <span className="w-8 h-8" aria-hidden />}
+                    {podeExcluir ? (<ExcluirComConfirmacao action={deleteDiacono.bind(null, dc.id)} item={dc.nome} tipo="diácono" />) : <span className="w-8 h-8" aria-hidden />}
                   </div>
                 )
               })}
             </div>
           </div>
-          <Pagination page={page} total={total} pageSize={PAGE_SIZE} basePath="/admin/clero/diaconos" />
+          <Pagination page={page} total={total} pageSize={PAGE_SIZE} basePath="/admin/clero/diaconos" query={{ q: busca }} />
         </>
       ) : (
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-12 text-center">

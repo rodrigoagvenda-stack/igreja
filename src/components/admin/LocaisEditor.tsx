@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { SalvarComConfirmacao } from "@/components/admin/Confirmacao"
 import Image from "next/image"
 import { IconTrash, IconPlus } from "@tabler/icons-react"
 import { PhotoUploadSlot } from "@/components/admin/PhotoUploadSlot"
@@ -82,9 +83,7 @@ export function LocaisEditor({ paroquiaId, locaisIniciais, action }: Props) {
       </button>
 
       <div className="flex items-center gap-3 pt-2">
-        <button type="submit" className="bg-primary text-white text-[13px] font-semibold px-5 py-2.5 rounded-md hover:bg-primary/90 transition-colors">
-          Salvar todos os locais
-        </button>
+        <SalvarComConfirmacao rotulo="Salvar todos os locais" item="os locais e horários desta paróquia" />
       </div>
     </form>
   )

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { SalvarComConfirmacao } from "@/components/admin/Confirmacao"
 import { requirePodeEditar } from "@/lib/supabase/admin-guard"
 import Image from "next/image"
 import { notFound } from "next/navigation"
@@ -115,9 +116,7 @@ export default async function EditarSeminaryPage({ params }: { params: Promise<{
         </div>
 
         <div className="flex items-center gap-3">
-          <button type="submit" className="bg-primary text-white text-[13px] font-semibold px-5 py-2.5 rounded-md hover:bg-primary/90 transition-colors">
-            Salvar alterações
-          </button>
+          <SalvarComConfirmacao item={sem.nome} />
           <Link href="/admin/clero/seminaristas" className="text-[13px] text-muted-foreground hover:text-foreground transition-colors">
             Cancelar
           </Link>

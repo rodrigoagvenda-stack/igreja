@@ -1,5 +1,7 @@
 import Link from "next/link"
-import { IconPlus, IconPencil, IconTrash, IconMapPin, IconClock, IconSearch } from "@tabler/icons-react"
+import { ExcluirComConfirmacao } from "@/components/admin/Confirmacao"
+import { limparBusca } from "@/components/admin/BuscaLista"
+import { IconPlus, IconPencil, IconMapPin, IconClock, IconSearch } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
 import { requireAdminUser } from "@/lib/supabase/admin-guard"
 import { deleteParoquia } from "./actions"
@@ -22,7 +24,7 @@ export default async function AdminParoquiasPage({
   searchParams: Promise<{ page?: string; q?: string }>
 }) {
   const { page: pageParam, q } = await searchParams
-  const busca = (q ?? "").trim()
+  const busca = limparBusca(q)
   const page = Math.max(1, parseInt(pageParam ?? "1", 10))
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
@@ -117,11 +119,7 @@ export default async function AdminParoquiasPage({
                   >
                     <IconPencil size={14} />
                   </Link>) : <span className="w-8 h-8" aria-hidden />}
-                  {podeExcluir ? (<form action={deleteParoquia.bind(null, id)}>
-                    <button type="submit" className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Excluir">
-                      <IconTrash size={14} />
-                    </button>
-                  </form>) : <span className="w-8 h-8" aria-hidden />}
+                  {podeExcluir ? (<ExcluirComConfirmacao action={deleteParoquia.bind(null, id)} item={nome} tipo="paróquia" />) : <span className="w-8 h-8" aria-hidden />}
                 </div>
               ))}
             </div>

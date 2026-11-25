@@ -1,5 +1,7 @@
 import Link from "next/link"
-import { IconPlus, IconPencil, IconTrash, IconCircleCheck, IconAlertCircle, IconPencil as IconDraft } from "@tabler/icons-react"
+import { ExcluirComConfirmacao } from "@/components/admin/Confirmacao"
+import { BuscaLista, limparBusca } from "@/components/admin/BuscaLista"
+import { IconPlus, IconPencil, IconCircleCheck, IconAlertCircle, IconPencil as IconDraft } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
 import { requireAdminUser } from "@/lib/supabase/admin-guard"
 import { deleteNoticia } from "./actions"
@@ -18,9 +20,10 @@ const statusConfig = {
 export default async function AdminNoticiasPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string; q?: string }>
 }) {
-  const { page: pageParam } = await searchParams
+  const { page: pageParam, q } = await searchParams
+  const busca = limparBusca(q)
   const page = Math.max(1, parseInt(pageParam ?? "1", 10))
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
@@ -32,6 +35,7 @@ export default async function AdminNoticiasPage({
   const { data: noticias, count } = await supabase
     .from("arq_noticias")
     .select("id, titulo, categoria, status, created_at", { count: "exact" })
+    .ilike("titulo", busca ? `%${busca}%` : "%")
     .order("created_at", { ascending: false })
     .range(from, to)
 
@@ -60,6 +64,8 @@ export default async function AdminNoticiasPage({
         )}
       </div>
 
+
+      <BuscaLista valor={busca} placeholder="Buscar notícia pelo título…" />
       {noticias && noticias.length > 0 ? (
         <>
           <div className="bg-card ring-1 ring-foreground/10 rounded-xl overflow-hidden">
@@ -84,18 +90,14 @@ export default async function AdminNoticiasPage({
                       {podeEditar ? (<Link href={`/admin/noticias/${id}/editar`} className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
                         <IconPencil size={14} />
                       </Link>) : <span className="w-8 h-8" aria-hidden />}
-                      {podeExcluir ? (<form action={deleteNoticia.bind(null, id)}>
-                        <button type="submit" className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Excluir">
-                          <IconTrash size={14} />
-                        </button>
-                      </form>) : <span className="w-8 h-8" aria-hidden />}
+                      {podeExcluir ? (<ExcluirComConfirmacao action={deleteNoticia.bind(null, id)} item={titulo} tipo="notícia" />) : <span className="w-8 h-8" aria-hidden />}
                     </div>
                   </div>
                 )
               })}
             </div>
           </div>
-          <Pagination page={page} total={total} pageSize={PAGE_SIZE} basePath="/admin/noticias" />
+          <Pagination page={page} total={total} pageSize={PAGE_SIZE} basePath="/admin/noticias" query={{ q: busca }} />
         </>
       ) : (
         <div className="bg-card ring-1 ring-foreground/10 rounded-xl p-12 text-center">
