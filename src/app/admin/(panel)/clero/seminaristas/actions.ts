@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function createSeminarista(formData: FormData) {
-  const admin = await requireRole(['admin'])
+  const admin = await requireRole(['admin', 'editor'])
   const supabase = await createClient()
 
   const foto_url = await resolveUpload(supabase, formData, 'foto_file', 'foto_url_atual', 'arq-fotos')
@@ -30,7 +30,7 @@ export async function createSeminarista(formData: FormData) {
 }
 
 export async function updateSeminarista(id: string, formData: FormData) {
-  const admin = await requireRole(['admin'])
+  const admin = await requireRole(['admin', 'editor'])
   const supabase = await createClient()
 
   const foto_url = await resolveUpload(supabase, formData, 'foto_file', 'foto_url_atual', 'arq-fotos')
@@ -55,11 +55,13 @@ export async function updateSeminarista(id: string, formData: FormData) {
 export async function deleteSeminarista(id: string) {
   const admin = await requireRole(['admin'])
   const supabase = await createClient()
+  // Guarda o nome antes de apagar, para o histórico dizer o que foi excluído.
+  const { data: antes } = await supabase.from('arq_seminaristas').select('nome').eq('id', id).maybeSingle()
   const { error } = await supabase.from('arq_seminaristas').delete().eq('id', id)
 
   if (error) redirect(`/admin/clero/seminaristas?erro=${encodeURIComponent(error.message)}`)
 
-  await logAudit({ user: admin, acao: 'delete', entidade: 'seminarista', entidadeId: id })
+  await logAudit({ user: admin, acao: 'delete', entidade: 'seminarista', entidadeId: id, detalhes: { nome: antes?.nome ?? null } })
   revalidatePath('/admin/clero/seminaristas')
   redirect('/admin/clero/seminaristas?ok=excluido')
 }

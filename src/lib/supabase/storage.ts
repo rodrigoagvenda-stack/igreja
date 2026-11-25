@@ -1,6 +1,7 @@
 'use server'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { validarArquivo } from "@/lib/upload-validacao"
 import type { Database, FotoParoquia, FotoTag } from '@/types/database'
 
 type Supabase = SupabaseClient<Database>
@@ -17,9 +18,10 @@ export async function uploadToStorage(supabase: Supabase, file: File, bucket: st
   console.log(`[upload] iniciando bucket=${bucket} nome=${file.name} tamanho=${(file.size / 1024).toFixed(0)}KB tipo=${file.type}`)
 
   try {
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin'
-    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const bytes = await file.arrayBuffer()
+    const v = validarArquivo(bucket, file.type, file.size, new Uint8Array(bytes.slice(0, 16)))
+    if (!v.ok) throw new Error(v.erro)
+    const path = `${Date.now()}-${crypto.randomUUID()}.${v.ext}`
     const { error } = await supabase.storage.from(bucket).upload(path, bytes, {
       contentType: file.type,
       upsert: false,

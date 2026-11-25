@@ -67,11 +67,13 @@ export async function updateNoticia(id: string, formData: FormData) {
 export async function deleteNoticia(id: string) {
   const admin = await requireRole(['admin'])
   const supabase = await createClient()
+  // Guarda o nome antes de apagar, para o histórico dizer o que foi excluído.
+  const { data: antes } = await supabase.from('arq_noticias').select('titulo').eq('id', id).maybeSingle()
   const { error } = await supabase.from('arq_noticias').delete().eq('id', id)
 
   if (error) redirect(`/admin/noticias?erro=${encodeURIComponent(error.message)}`)
 
-  await logAudit({ user: admin, acao: 'delete', entidade: 'noticia', entidadeId: id })
+  await logAudit({ user: admin, acao: 'delete', entidade: 'noticia', entidadeId: id, detalhes: { titulo: antes?.titulo ?? null } })
   revalidatePath('/admin/noticias')
   redirect('/admin/noticias?ok=excluido')
 }

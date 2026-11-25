@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { requirePodeEditar } from "@/lib/supabase/admin-guard"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { saveLocaisDaParoquia } from "../../../horarios/actions"
@@ -17,6 +18,7 @@ type LocalRaw = {
 }
 
 export default async function ParoquiaHorariosPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePodeEditar()
   const { id } = await params
   const supabase = await createClient()
 

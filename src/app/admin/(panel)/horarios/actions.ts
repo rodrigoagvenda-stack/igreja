@@ -12,7 +12,7 @@ import { redirect } from 'next/navigation'
 // é assim que o botão "Remover este local" do editor funciona, sem precisar de um campo
 // hidden de "removido" separado.
 export async function saveLocaisDaParoquia(paroquiaId: string, formData: FormData) {
-  const admin = await requireRole(['admin'])
+  const admin = await requireRole(['admin', 'editor'])
   const supabase = await createClient()
   const keys = formData.getAll('local_key') as string[]
   const idsAtuais = new Set<string>()

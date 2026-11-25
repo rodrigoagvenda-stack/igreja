@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { IconPlus, IconPencil, IconTrash, IconCircleCheck, IconAlertCircle, IconPencil as IconDraft } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
+import { requireAdminUser } from "@/lib/supabase/admin-guard"
 import { deleteNoticia } from "./actions"
 import { Pagination } from "@/components/admin/Pagination"
 
@@ -24,6 +25,9 @@ export default async function AdminNoticiasPage({
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
 
+  const { papel } = await requireAdminUser()
+  const podeEditar = papel !== "leitura"
+  const podeExcluir = papel === "admin"
   const supabase = await createClient()
   const { data: noticias, count } = await supabase
     .from("arq_noticias")
@@ -45,6 +49,7 @@ export default async function AdminNoticiasPage({
             Notícias {total > 0 && <span className="text-muted-foreground text-[18px] font-normal">({total})</span>}
           </h1>
         </div>
+        {podeEditar && (
         <Link
           href="/admin/noticias/novo"
           className="flex items-center gap-2 bg-primary text-white text-[13px] font-semibold px-4 py-2.5 rounded-md hover:bg-primary/90 transition-colors"
@@ -52,6 +57,7 @@ export default async function AdminNoticiasPage({
           <IconPlus size={14} />
           Nova notícia
         </Link>
+        )}
       </div>
 
       {noticias && noticias.length > 0 ? (
@@ -75,14 +81,14 @@ export default async function AdminNoticiasPage({
                       {cfg.label}
                     </span>
                     <div className="flex items-center gap-1 shrink-0">
-                      <Link href={`/admin/noticias/${id}/editar`} className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                      {podeEditar ? (<Link href={`/admin/noticias/${id}/editar`} className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
                         <IconPencil size={14} />
-                      </Link>
-                      <form action={deleteNoticia.bind(null, id)}>
+                      </Link>) : <span className="w-8 h-8" aria-hidden />}
+                      {podeExcluir ? (<form action={deleteNoticia.bind(null, id)}>
                         <button type="submit" className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Excluir">
                           <IconTrash size={14} />
                         </button>
-                      </form>
+                      </form>) : <span className="w-8 h-8" aria-hidden />}
                     </div>
                   </div>
                 )

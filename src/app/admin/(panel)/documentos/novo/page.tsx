@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { requirePodeEditar } from "@/lib/supabase/admin-guard"
 import { createDocumento } from "../actions"
 
 export const metadata = { title: "Novo Documento" }
@@ -6,7 +7,8 @@ export const metadata = { title: "Novo Documento" }
 const inputCls = "w-full bg-background border border-border rounded-md px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
 const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
 
-export default function NovoDocumentoPage() {
+export default async function NovoDocumentoPage() {
+  await requirePodeEditar()
   const hoje = new Date().toISOString().split('T')[0]
 
   return (

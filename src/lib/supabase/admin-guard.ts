@@ -42,6 +42,15 @@ export const requireAdminUser = cache(async function requireAdminUser(): Promise
   return { id: user.id, email: perfil.email, nome: perfil.nome, papel: perfil.papel }
 })
 
+/** Telas de criar/editar: "Somente leitura" volta para o painel com aviso (a gravação já é barrada no servidor e no banco). */
+export async function requirePodeEditar(): Promise<AdminUser> {
+  const eu = await requireAdminUser()
+  if (eu.papel === "leitura") {
+    redirect(`/admin?erro=${encodeURIComponent("Seu acesso é somente leitura: você pode ver, mas não editar.")}`)
+  }
+  return eu
+}
+
 /** Garante que o usuário tem um dos papéis permitidos; senão lança erro (mostrado como toast de erro na action). */
 export async function requireRole(allowed: Papel[]): Promise<AdminUser> {
   const admin = await requireAdminUser()

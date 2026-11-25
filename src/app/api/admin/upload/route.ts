@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { adminClient } from '@/lib/supabase/admin-guard'
+import { validarArquivo } from '@/lib/upload-validacao'
 
 const ALLOWED_BUCKETS = new Set(['arq-fotos', 'arq-documentos'])
 
@@ -24,13 +26,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Requisição inválida.' }, { status: 400 })
   }
 
+  // Papel: fotos e documentos só admin/editor (o Storage também barra pelo banco).
+  const { data: perfil } = await adminClient().from('arq_usuarios_admin').select('papel').eq('user_id', user.id).maybeSingle()
+  if (!perfil || (perfil.papel !== 'admin' && perfil.papel !== 'editor')) {
+    return NextResponse.json({ error: 'Você não tem permissão para enviar arquivos.' }, { status: 403 })
+  }
+
   const t0 = Date.now()
   console.log(`[api/upload] iniciando bucket=${bucket} nome=${file.name} tamanho=${(file.size / 1024).toFixed(0)}KB`)
 
   try {
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin'
-    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const bytes = await file.arrayBuffer()
+    const v = validarArquivo(bucket, file.type, file.size, new Uint8Array(bytes.slice(0, 16)))
+    if (!v.ok) return NextResponse.json({ error: v.erro }, { status: 400 })
+    const ext = v.ext
+    const path = `${Date.now()}-${crypto.randomUUID()}.${ext}`
 
     const { error } = await supabase.storage.from(bucket).upload(path, bytes, {
       contentType: file.type,

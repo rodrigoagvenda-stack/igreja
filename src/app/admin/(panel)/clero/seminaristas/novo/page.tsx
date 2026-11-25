@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { requirePodeEditar } from "@/lib/supabase/admin-guard"
 import { createClient } from "@/lib/supabase/server"
 import { createSeminarista } from "../actions"
 
@@ -19,6 +20,7 @@ const anosFormacao = [
 ]
 
 export default async function NovoSeminaryPage() {
+  await requirePodeEditar()
   const supabase = await createClient()
   const { data: paroquias } = await supabase
     .from('arq_paroquias')

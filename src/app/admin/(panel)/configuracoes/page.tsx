@@ -13,6 +13,8 @@ const labelCls = "text-[11px] font-semibold uppercase tracking-[0.06em] leading-
 const inputCls =
   "h-10 w-full px-3 rounded-lg border border-[#DDD9D1] text-[13px] leading-4 text-[#1A1A1A] focus:outline-none focus:border-[#274FA0] focus:ring-2 focus:ring-[#274FA0]/20 transition-colors"
 const cardCls = "bg-white border border-[#ECEAE5] rounded-xl overflow-clip"
+// Card de usuários sem corte: o menu ⋮ abre por cima da borda (na última linha ficava invisível).
+const cardUsuariosCls = "bg-white border border-[#ECEAE5] rounded-xl"
 const cardHeadCls = "flex items-center gap-2.5 py-4 px-5 border-b border-[#ECEAE5]"
 const cardTitleCls = "text-[15px] font-bold leading-[18px] text-[#1A1A1A]"
 
@@ -130,7 +132,7 @@ export default async function AdminConfiguracoesPage() {
         </section>
 
         {/* Usuários do painel */}
-        <section className={cardCls}>
+        <section className={cardUsuariosCls}>
           <div className="flex items-center justify-between gap-3 py-4 px-5 border-b border-[#ECEAE5]">
             <div className="flex items-center gap-2.5">
               <svg width="16" height="16" viewBox="0 0 24 24" className="shrink-0">

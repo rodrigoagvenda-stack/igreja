@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function createDiacono(formData: FormData) {
-  const admin = await requireRole(['admin'])
+  const admin = await requireRole(['admin', 'editor'])
   const supabase = await createClient()
   const nome = formData.get('nome') as string
 
@@ -27,7 +27,7 @@ export async function createDiacono(formData: FormData) {
 }
 
 export async function updateDiacono(id: string, formData: FormData) {
-  const admin = await requireRole(['admin'])
+  const admin = await requireRole(['admin', 'editor'])
   const supabase = await createClient()
   const nome = formData.get('nome') as string
 
@@ -50,11 +50,13 @@ export async function updateDiacono(id: string, formData: FormData) {
 export async function deleteDiacono(id: string) {
   const admin = await requireRole(['admin'])
   const supabase = await createClient()
+  // Guarda o nome antes de apagar, para o histórico dizer o que foi excluído.
+  const { data: antes } = await supabase.from('arq_diaconos').select('nome').eq('id', id).maybeSingle()
   const { error } = await supabase.from('arq_diaconos').delete().eq('id', id)
 
   if (error) redirect(`/admin/clero/diaconos?erro=${encodeURIComponent(error.message)}`)
 
-  await logAudit({ user: admin, acao: 'delete', entidade: 'diacono', entidadeId: id })
+  await logAudit({ user: admin, acao: 'delete', entidade: 'diacono', entidadeId: id, detalhes: { nome: antes?.nome ?? null } })
   revalidatePath('/admin/clero/diaconos')
   redirect('/admin/clero/diaconos?ok=excluido')
 }

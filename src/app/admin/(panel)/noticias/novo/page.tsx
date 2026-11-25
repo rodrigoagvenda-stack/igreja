@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { requirePodeEditar } from "@/lib/supabase/admin-guard"
 import { createNoticia } from "../actions"
 
 export const metadata = { title: "Nova Notícia" }
@@ -6,7 +7,8 @@ export const metadata = { title: "Nova Notícia" }
 const inputCls = "w-full bg-background border border-border rounded-md px-3 py-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
 const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
 
-export default function NovaNoticiaPage() {
+export default async function NovaNoticiaPage() {
+  await requirePodeEditar()
   return (
     <div className="p-8 max-w-[700px] w-full mx-auto">
       <div className="flex items-end justify-between mb-8 pb-6 border-b border-border">

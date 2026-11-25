@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function createPadre(formData: FormData) {
-  const admin = await requireRole(['admin'])
+  const admin = await requireRole(['admin', 'editor'])
   const supabase = await createClient()
 
   const foto_url = await resolveUpload(supabase, formData, 'foto_file', 'foto_url_atual', 'arq-fotos')
@@ -30,7 +30,7 @@ export async function createPadre(formData: FormData) {
 }
 
 export async function updatePadre(id: string, formData: FormData) {
-  const admin = await requireRole(['admin'])
+  const admin = await requireRole(['admin', 'editor'])
   const supabase = await createClient()
 
   const foto_url = await resolveUpload(supabase, formData, 'foto_file', 'foto_url_atual', 'arq-fotos')
@@ -55,11 +55,13 @@ export async function updatePadre(id: string, formData: FormData) {
 export async function deletePadre(id: string) {
   const admin = await requireRole(['admin'])
   const supabase = await createClient()
+  // Guarda o nome antes de apagar, para o histórico dizer o que foi excluído.
+  const { data: antes } = await supabase.from('arq_padres').select('nome').eq('id', id).maybeSingle()
   const { error } = await supabase.from('arq_padres').delete().eq('id', id)
 
   if (error) redirect(`/admin/clero/padres?erro=${encodeURIComponent(error.message)}`)
 
-  await logAudit({ user: admin, acao: 'delete', entidade: 'padre', entidadeId: id })
+  await logAudit({ user: admin, acao: 'delete', entidade: 'padre', entidadeId: id, detalhes: { nome: antes?.nome ?? null } })
   revalidatePath('/admin/clero/padres')
   redirect('/admin/clero/padres?ok=excluido')
 }

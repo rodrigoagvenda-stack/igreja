@@ -52,11 +52,13 @@ export async function updateEvento(id: string, formData: FormData) {
 export async function deleteEvento(id: string) {
   const admin = await requireRole(['admin'])
   const supabase = await createClient()
+  // Guarda o nome antes de apagar, para o histórico dizer o que foi excluído.
+  const { data: antes } = await supabase.from('arq_eventos').select('titulo').eq('id', id).maybeSingle()
   const { error } = await supabase.from('arq_eventos').delete().eq('id', id)
 
   if (error) redirect(`/admin/agenda?erro=${encodeURIComponent(error.message)}`)
 
-  await logAudit({ user: admin, acao: 'delete', entidade: 'evento', entidadeId: id })
+  await logAudit({ user: admin, acao: 'delete', entidade: 'evento', entidadeId: id, detalhes: { titulo: antes?.titulo ?? null } })
   revalidatePath('/admin/agenda')
   redirect('/admin/agenda?ok=excluido')
 }

@@ -153,7 +153,8 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Quick actions */}
+      {/* Quick actions (somente leitura não cria nada) */}
+      {eu.papel !== "leitura" && (
       <div className="mb-10">
         <div className="flex items-end justify-between pb-4 border-b border-border mb-5">
           <div>
@@ -179,6 +180,7 @@ export default async function AdminDashboardPage() {
           ))}
         </div>
       </div>
+      )}
 
       {/* Pendências */}
       {pendencias.length > 0 && (

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { requirePodeEditar } from "@/lib/supabase/admin-guard"
 import { createClient } from "@/lib/supabase/server"
 import { createDiacono } from "../actions"
 
@@ -8,6 +9,7 @@ const inputCls = "w-full bg-background border border-border rounded-md px-3 py-2
 const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
 
 export default async function NovoDiaconoPage() {
+  await requirePodeEditar()
   const supabase = await createClient()
   const { data: paroquias } = await supabase
     .from('arq_paroquias')

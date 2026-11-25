@@ -16,7 +16,7 @@ function slugify(text: string) {
 }
 
 export async function createParoquia(formData: FormData) {
-  const admin = await requireRole(['admin'])
+  const admin = await requireRole(['admin', 'editor'])
   const nome = formData.get('nome') as string
   const cidade = formData.get('cidade') as string
 
@@ -50,7 +50,7 @@ export async function createParoquia(formData: FormData) {
 }
 
 export async function updateParoquia(id: string, formData: FormData) {
-  const admin = await requireRole(['admin'])
+  const admin = await requireRole(['admin', 'editor'])
 
   const supabase = await createClient()
   const fotos = await resolvePhotos(formData, 'foto', 10)
@@ -83,11 +83,13 @@ export async function updateParoquia(id: string, formData: FormData) {
 export async function deleteParoquia(id: string) {
   const admin = await requireRole(['admin'])
   const supabase = await createClient()
+  // Guarda o nome antes de apagar, para o histórico dizer o que foi excluído.
+  const { data: antes } = await supabase.from('arq_paroquias').select('nome').eq('id', id).maybeSingle()
   const { error } = await supabase.from('arq_paroquias').delete().eq('id', id)
 
   if (error) redirect(`/admin/paroquias?erro=${encodeURIComponent(error.message)}`)
 
-  await logAudit({ user: admin, acao: 'delete', entidade: 'paroquia', entidadeId: id })
+  await logAudit({ user: admin, acao: 'delete', entidade: 'paroquia', entidadeId: id, detalhes: { nome: antes?.nome ?? null } })
   revalidatePath('/admin/paroquias')
   redirect('/admin/paroquias?ok=excluido')
 }

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { requirePodeEditar } from "@/lib/supabase/admin-guard"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
@@ -24,6 +25,7 @@ const anosFormacao = [
 ]
 
 export default async function EditarSeminaryPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePodeEditar()
   const { id } = await params
   const supabase = await createClient()
 

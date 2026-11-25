@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { requirePodeEditar } from "@/lib/supabase/admin-guard"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateDiacono } from "../../actions"
@@ -12,6 +13,7 @@ const labelCls = "block text-[12px] font-semibold text-foreground mb-1.5"
 type ParoquiaOption = { id: string; nome: string; cidade: string }
 
 export default async function EditarDiaconoPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePodeEditar()
   const { id } = await params
   const supabase = await createClient()
 

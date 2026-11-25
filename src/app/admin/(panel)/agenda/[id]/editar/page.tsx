@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { requirePodeEditar } from "@/lib/supabase/admin-guard"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { updateEvento } from "../../actions"
@@ -14,6 +15,7 @@ function toDatetimeLocal(iso: string) {
 }
 
 export default async function EditarEventoPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePodeEditar()
   const { id } = await params
   const supabase = await createClient()
 

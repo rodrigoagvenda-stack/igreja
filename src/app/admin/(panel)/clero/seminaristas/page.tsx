@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { IconPlus, IconPencil, IconTrash } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/server"
+import { requireAdminUser } from "@/lib/supabase/admin-guard"
 import { deleteSeminarista } from "./actions"
 import { Pagination } from "@/components/admin/Pagination"
 
@@ -29,6 +30,9 @@ export default async function AdminSeminaristasPage({
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
 
+  const { papel } = await requireAdminUser()
+  const podeEditar = papel !== "leitura"
+  const podeExcluir = papel === "admin"
   const supabase = await createClient()
   const { data: seminaristas, count } = await supabase
     .from("arq_seminaristas")
@@ -50,6 +54,7 @@ export default async function AdminSeminaristasPage({
             Seminaristas {total > 0 && <span className="text-muted-foreground text-[18px] font-normal">({total})</span>}
           </h1>
         </div>
+        {podeEditar && (
         <Link
           href="/admin/clero/seminaristas/novo"
           className="flex items-center gap-2 bg-primary text-white text-[13px] font-semibold px-4 py-2.5 rounded-md hover:bg-primary/90 transition-colors"
@@ -57,6 +62,7 @@ export default async function AdminSeminaristasPage({
           <IconPlus size={14} />
           Cadastrar seminarista
         </Link>
+        )}
       </div>
 
       {seminaristas && seminaristas.length > 0 ? (
@@ -83,14 +89,14 @@ export default async function AdminSeminaristasPage({
                     <span className={`text-[10px] font-semibold uppercase tracking-[.04em] px-2 py-0.5 rounded-full mx-4 text-center whitespace-nowrap ${anoColor[sem.ano_formacao] ?? "bg-muted text-muted-foreground"}`}>
                       {sem.ano_formacao}
                     </span>
-                    <Link href={`/admin/clero/seminaristas/${sem.id}/editar`} className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                    {podeEditar ? (<Link href={`/admin/clero/seminaristas/${sem.id}/editar`} className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
                       <IconPencil size={14} />
-                    </Link>
-                    <form action={deleteSeminarista.bind(null, sem.id)}>
+                    </Link>) : <span className="w-8 h-8" aria-hidden />}
+                    {podeExcluir ? (<form action={deleteSeminarista.bind(null, sem.id)}>
                       <button type="submit" className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Excluir">
                         <IconTrash size={14} />
                       </button>
-                    </form>
+                    </form>) : <span className="w-8 h-8" aria-hidden />}
                   </div>
                 )
               })}
